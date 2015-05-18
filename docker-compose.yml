@@ -1,0 +1,9 @@
+gdbserver:
+  build: .
+  volumes:
+    - /dev/stlinkv2_*:/dev/stlinkv2_5:rw
+    - .:/home/cubicle/firmware
+    - /etc/passwd:/etc/passwd:ro
+  working_dir: /home/cubicle/firmware/cubicle
+  privileged: true
+  command: /home/cubicle/stlink/st-util

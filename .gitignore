@@ -1,0 +1,4 @@
+.mxproject
+*.bin
+*.hex
+*.elf

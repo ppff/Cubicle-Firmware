@@ -1,0 +1,93 @@
+# Binaries will be generated with this name (.elf, .bin, .hex, etc)
+PROJ_NAME=cubicle-stm32
+
+SRCS=Src/main.c
+
+# Normally you shouldn't need to change anything below this line!
+#######################################################################################
+
+##########
+# STLINK
+##########
+STLINK=/home/decro/stlink
+
+#############
+#cross tools
+#############
+CC=arm-none-eabi-gcc
+LD=arm-none-eabi-ld
+OBJCOPY=arm-none-eabi-objcopy
+
+#########
+# CFLAGS
+#########
+#CFLAGS  = -g -O2 -Wall
+CFLAGS  = -g -Wall
+CFLAGS += -T$(LDSCRIPT)
+CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
+CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+CFLAGS += -I.
+CFLAGS += -I/usr/arm-none-eabi/lib
+
+
+#########
+# ARM DEF
+#########
+CFLAGS += -IDrivers/CMSIS/Include/
+
+##################
+# STM32F4xx Drivers
+##################
+
+CFLAGS += -IDrivers/CMSIS/Device/ST/STM32F4xx/Include
+SRCS += Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
+
+CFLAGS += -IDrivers/STM32F4xx_HAL_Driver/Inc
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+
+
+########################
+# specific to STM32F429
+########################
+
+DEFS = -DSTM32F429xx
+
+SRCS += Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f429xx.s
+
+LDSCRIPT = SW4STM32/cubicle\ Configuration/STM32F429ZITx_FLASH.ld
+
+#########
+# BSP
+#########
+
+CFLAGS += -IInc
+SRCS += Src/main.c
+SRCS += Src/stm32f4xx_hal_msp.c
+SRCS += Src/stm32f4xx_it.c
+SRCS += Src/gpio.c
+
+##########
+# Rules
+##########
+OBJS = $(SRCS:.c=.o)
+
+.PHONY: proj
+
+all: proj
+
+proj: $(PROJ_NAME).elf
+
+$(PROJ_NAME).elf: $(SRCS)
+	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) $^ -o $@
+	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
+	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
+
+clean:
+	rm -f *.o $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin
+
+# Flash the STM32F4
+burn: proj
+	$(STLINK)/st-flash write $(PROJ_NAME).bin 0x8000000
