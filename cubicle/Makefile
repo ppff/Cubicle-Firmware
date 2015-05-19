@@ -9,7 +9,7 @@ SRCS=Src/main.c
 ##########
 # STLINK
 ##########
-STLINK=/home/decro/stlink
+STLINK=/home/cubicle/stlink
 
 #############
 #cross tools

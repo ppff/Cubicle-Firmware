@@ -5,7 +5,7 @@ clean:
 	docker-compose run -u `id -u` gdbserver make $@
 
 burn:
-	docker-compose run -u `id -u` gdbserver make $@
+	docker-compose run gdbserver make $@
 
 tools:
 	docker-compose build
