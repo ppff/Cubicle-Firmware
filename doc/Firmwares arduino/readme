@@ -1,0 +1,5 @@
+Il y a deux arduino : 
+ - le micro qui affiche en permanence
+ - le mega qui gère toutes les entrées/sorties et qui envoie la matrice à afficher à l'arduino micro
+
+NB : il n'y a pas d'accès SD ni de fonctions pour parser les motifs
