@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : 18/05/2015 20:01:35
+  * Date               : 19/05/2015 17:00:28
   * Description        : Main program body
   ******************************************************************************
   *
@@ -37,31 +37,31 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "stm32f4xx_hal_conf.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+    
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
-
+    
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-
+    
 /* USER CODE END 0 */
 
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+	    
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -76,18 +76,21 @@ int main(void)
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
-
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	    while (1)
+		
+ {
+		
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
-  }
+		
+}
+	
   /* USER CODE END 3 */
 
 }
@@ -125,7 +128,9 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+}    
 /* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT
@@ -140,8 +145,8 @@ void SystemClock_Config(void)
 void assert_failed(uint8_t* file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	    /* User can add his own implementation to report the file name and line number,
+	       ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */ 
   /* USER CODE END 6 */
 
 }
@@ -150,10 +155,10 @@ void assert_failed(uint8_t* file, uint32_t line)
 
 /**
   * @}
-  */
+  */ 
 
 /**
   * @}
-*/
+*/ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

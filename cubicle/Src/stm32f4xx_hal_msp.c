@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * File Name          : stm32f4xx_hal_msp.c
-  * Date               : 18/05/2015 20:01:35
-  * Description        : This file provides code for the MSP Initialization
+  * Date               : 19/05/2015 17:00:27
+  * Description        : This file provides code for the MSP Initialization 
   *                      and de-Initialization codes.
   ******************************************************************************
   *
