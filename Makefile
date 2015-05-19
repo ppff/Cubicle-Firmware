@@ -14,3 +14,6 @@ gdb:
 	docker-compose up -d
 	docker-compose run gdbserver arm-none-eabi-gdb --eval-command="target extended-remote gdbserver:4242" cubicle-stm32.elf
 	docker-compose stop
+
+gdb2:
+	arm-none-eabi-gdb --eval-command="target extended-remote localhost:4242" cubicle/cubicle-stm32.elf
