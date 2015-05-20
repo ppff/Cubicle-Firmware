@@ -1,23 +1,7 @@
-#include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 
 #include "led.h"
-#include "constant.h"
-
-/**
- * 0000000111111111 0000000110100101 ... <= plane 0
- * %%%%%%% line 0   %%%%%%% line 1
- * 0000000100000001 0000000110101101 ... <= plane 1
- *                ^
- *    LED 0 of line 0 of plane 1
- * ...
- *
- * %: unused bits.
- */
-struct led {
-	uint16_t data[HEIGHT][WIDTH];
-};
 
 bool in_range(int x, int y, int z)
 {
@@ -39,7 +23,7 @@ bool in_range(int x, int y, int z)
 void led_switch_on(struct led *l, int x, int y, int z)
 {
 	if (in_range(x,y,z))
-		l->data[z][x] |= 1 << y;
+		l->data[z][y] |= 1 << x;
 }
 
 /**
@@ -49,8 +33,14 @@ void led_switch_on(struct led *l, int x, int y, int z)
  */
 void led_switch_off(struct led *l, int x, int y, int z)
 {
-	if (in_range(x,y,z))
-		l->data[z][x] ^= 1 << y;
+	if (in_range(x, y, z))
+		if (l->data[z][y] & (1 << x))
+			l->data[z][y] ^= 1 << x;
+}
+
+int led_get(struct led *l, int x, int y, int z)
+{
+	return ((l->data[z][y] >> x) & 1);
 }
 
 void led_reset(struct led *l)
