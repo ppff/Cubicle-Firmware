@@ -1,3 +1,6 @@
+#ifndef LED_H
+#define LED_H
+
 /**
  * Structure representing the LEDs of the cube.
  */
@@ -23,3 +26,4 @@ void led_reset(struct led *l);
  */
 void led_display(struct led *l);
 
+#endif
