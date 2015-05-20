@@ -10,7 +10,7 @@ SRCS+=Src/led.c
 ##########
 # STLINK
 ##########
-STLINK=/home/decro/stlink
+STLINK=/home/cubicle/stlink
 
 #############
 #cross tools
