@@ -45,7 +45,7 @@ int led_get(struct led *l, int x, int y, int z)
 
 void led_reset(struct led *l)
 {
-	memset(l, 0, WIDTH*HEIGHT*sizeof(uint16_t));
+	memset(l, 0, WIDTH*HEIGHT*sizeof(line_t));
 }
 
 /*
@@ -65,7 +65,7 @@ void led_display(struct led *l)
 		for (int l=0; k<HEIGHT; l++)
 			push_if(l == k);
 		for (int j=0; j<WIDTH; j++) {
-			uint16_t tmp = l->data[k][j];
+			line_t tmp = l->data[k][j];
 			for (int l=0; l<LENGTH; l++) {
 				push_if(tmp && 0b1);
 				tmp <<= 1;

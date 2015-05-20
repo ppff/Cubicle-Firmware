@@ -5,6 +5,12 @@
 #include "constant.h"
 
 /**
+ * Type used to store the content of a line. It must verify:
+ * sizeof(line_t) >= LENGTH
+ */
+typedef uint16_t line_t;
+
+/**
  * Structure representing the LEDs of the cube.
  *
  * 0000000111111111 0000000110100101 ... <= plane 0
@@ -17,7 +23,7 @@
  * %: unused bits.
  */
 struct led {
-	uint16_t data[HEIGHT][WIDTH];
+	line_t data[HEIGHT][WIDTH];
 };
 
 /**
