@@ -3,6 +3,14 @@ PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
 SRCS+=Src/led.c
+SRCS+=Src/os/croutine.c
+SRCS+=Src/os/event_groups.c
+SRCS+=Src/os/list.c
+SRCS+=Src/os/queue.c
+SRCS+=Src/os/tasks.c
+SRCS+=Src/os/timers.c
+
+INCDIRS=Inc/os/
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -29,7 +37,7 @@ CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -I.
 CFLAGS += -I/usr/arm-none-eabi/lib
-
+CFLAGS += -I$(INCDIRS)
 
 #########
 # ARM DEF
