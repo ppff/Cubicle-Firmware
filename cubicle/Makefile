@@ -2,6 +2,7 @@
 PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
+SRCS+=Src/led.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -22,7 +23,7 @@ OBJCOPY=arm-none-eabi-objcopy
 # CFLAGS
 #########
 #CFLAGS  = -g -O2 -Wall
-CFLAGS  = -g -Wall
+CFLAGS  = -g -Wall -std=gnu99
 CFLAGS += -T$(LDSCRIPT)
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
