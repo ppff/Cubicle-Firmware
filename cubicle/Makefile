@@ -3,14 +3,6 @@ PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
 SRCS+=Src/led.c
-SRCS+=Src/os/croutine.c
-SRCS+=Src/os/event_groups.c
-SRCS+=Src/os/list.c
-SRCS+=Src/os/queue.c
-SRCS+=Src/os/tasks.c
-SRCS+=Src/os/timers.c
-
-INCDIRS=Inc/os/
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -37,7 +29,6 @@ CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -I.
 CFLAGS += -I/usr/arm-none-eabi/lib
-CFLAGS += -I$(INCDIRS)
 
 #########
 # ARM DEF
@@ -77,6 +68,20 @@ SRCS += Src/main.c
 SRCS += Src/stm32f4xx_hal_msp.c
 SRCS += Src/stm32f4xx_it.c
 SRCS += Src/gpio.c
+SRCS += Src/freertos.c
+
+##########
+# FreeRTOS
+##########
+
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/include
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/*.c)
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/*.c)
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c)
+SRCS += Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
 
 ##########
 # Rules
