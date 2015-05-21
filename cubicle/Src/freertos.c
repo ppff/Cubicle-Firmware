@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : 21/05/2015 14:36:34
+  * Date               : 21/05/2015 22:07:43
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -39,10 +39,13 @@
 
 /* USER CODE BEGIN Includes */     
 #include "stm32f4xx_hal_conf.h"
+#include "spi.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
+osThreadId myTask02Handle;
 
 /* USER CODE BEGIN Variables */
 
@@ -50,6 +53,7 @@ osThreadId defaultTaskHandle;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
+void StartTask02(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -82,6 +86,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of myTask02 */
+  osThreadDef(myTask02, StartTask02, osPriorityIdle, 0, 128);
+  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -100,9 +108,25 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-    osDelay(1000);
+    osDelay(3000);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* StartTask02 function */
+void StartTask02(void const * argument)
+{
+  /* USER CODE BEGIN StartTask02 */
+    HAL_SPI_Init(&hspi4);
+    uint8_t pData[] = {255, 0, 0, 0};
+  /* Infinite loop */
+  for(;;)
+  {
+    HAL_SPI_Transmit(&hspi4, pData, 4, 0);
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+    osDelay(1);
+  }
+  /* USER CODE END StartTask02 */
 }
 
 /* USER CODE BEGIN Application */
