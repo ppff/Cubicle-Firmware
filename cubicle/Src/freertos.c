@@ -1,9 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : stm32f4xx_hal_msp.c
+  * File Name          : freertos.c
   * Date               : 21/05/2015 14:36:34
-  * Description        : This file provides code for the MSP Initialization 
-  *                      and de-Initialization codes.
+  * Description        : Code for freertos applications
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -32,43 +31,82 @@
   *
   ******************************************************************************
   */
+
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
 
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN Includes */     
+#include "stm32f4xx_hal_conf.h"
+/* USER CODE END Includes */
 
-/* USER CODE END 0 */
+/* Variables -----------------------------------------------------------------*/
+osThreadId defaultTaskHandle;
 
-/**
-  * Initializes the Global MSP.
-  */
-void HAL_MspInit(void)
-{
-  /* USER CODE BEGIN MspInit 0 */
+/* USER CODE BEGIN Variables */
 
-  /* USER CODE END MspInit 0 */
+/* USER CODE END Variables */
 
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+/* Function prototypes -------------------------------------------------------*/
+void StartDefaultTask(void const * argument);
 
-  /* System interrupt init*/
-/* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
-  /* USER CODE BEGIN MspInit 1 */
+/* USER CODE BEGIN FunctionPrototypes */
 
-  /* USER CODE END MspInit 1 */
+/* USER CODE END FunctionPrototypes */
+/* Hook prototypes */
+
+/* Init FreeRTOS */
+
+void MX_FREERTOS_Init(void) {
+  /* USER CODE BEGIN Init */
+       
+  /* USER CODE END Init */
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the thread(s) */
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
 }
 
-/* USER CODE BEGIN 1 */
+/* StartDefaultTask function */
+void StartDefaultTask(void const * argument)
+{
 
-/* USER CODE END 1 */
+  /* USER CODE BEGIN StartDefaultTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    osDelay(1000);
+  }
+  /* USER CODE END StartDefaultTask */
+}
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+/* USER CODE BEGIN Application */
+     
+/* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

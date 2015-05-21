@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
   * File Name          : gpio.h
-  * Date               : 18/05/2015 20:01:34
-  * Description        : This file contains all the functions prototypes for
-  *                      the gpio
+  * Date               : 21/05/2015 14:36:32
+  * Description        : This file contains all the functions prototypes for 
+  *                      the gpio  
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics

@@ -2,6 +2,7 @@
 PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
+SRCS+=Src/led.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -22,13 +23,12 @@ OBJCOPY=arm-none-eabi-objcopy
 # CFLAGS
 #########
 #CFLAGS  = -g -O2 -Wall
-CFLAGS  = -g -Wall
+CFLAGS  = -g -Wall -std=gnu99
 CFLAGS += -T$(LDSCRIPT)
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -I.
 CFLAGS += -I/usr/arm-none-eabi/lib
-
 
 #########
 # ARM DEF
@@ -47,6 +47,8 @@ SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
 
 
 ########################
@@ -68,6 +70,21 @@ SRCS += Src/main.c
 SRCS += Src/stm32f4xx_hal_msp.c
 SRCS += Src/stm32f4xx_it.c
 SRCS += Src/gpio.c
+SRCS += Src/spi.c
+SRCS += Src/freertos.c
+
+##########
+# FreeRTOS
+##########
+
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/include
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/*.c)
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/*.c)
+SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c)
+SRCS += Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
 
 ##########
 # Rules
