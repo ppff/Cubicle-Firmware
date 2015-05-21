@@ -39,6 +39,7 @@
 
 /* USER CODE BEGIN Includes */     
 #include "stm32f4xx_hal_conf.h"
+#include "CUB_event.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -95,11 +96,14 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
 
+    CUB_Event event;
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
   {
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    if (CUB_PollEvent(&event)) {
+        HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    }
     osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
