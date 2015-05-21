@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : 19/05/2015 17:00:28
+  * Date               : 21/05/2015 09:32:23
   * Description        : Main program body
   ******************************************************************************
   *
@@ -34,6 +34,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "FreeRTOSConfig.h"
+#include "spi.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
@@ -48,6 +50,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_FREERTOS_Init(void);
 
 /* USER CODE BEGIN PFP */
     
@@ -74,10 +77,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_SPI4_Init();
 
   /* USER CODE BEGIN 2 */
 	
   /* USER CODE END 2 */
+
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+  osKernelStart();
+  
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
