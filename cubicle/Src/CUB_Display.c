@@ -48,8 +48,6 @@ void clear(struct led *l)
 	memset(l, 0, WIDTH*HEIGHT*sizeof(line_t));
 }
 
-/*
-
 void push_if(int condition)
 {
 	if (condition) {
@@ -61,17 +59,21 @@ void push_if(int condition)
 
 void update_display(struct led *l)
 {
+	for (int k=0; k<HEIGHT; k++)
+		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*WIDTH);
+
+	// while...
 	for (int k=0; k<HEIGHT; k++) {
 		for (int l=0; k<HEIGHT; l++)
 			push_if(l == k);
 		for (int j=0; j<WIDTH; j++) {
-			line_t tmp = l->data[k][j];
+			line_t tmp = l->buffer[k][j];
 			for (int l=0; l<LENGTH; l++) {
 				push_if(tmp && 0b1);
 				tmp <<= 1;
 			}
 		}
+		// latch enable
 	}
 }
 
-*/
