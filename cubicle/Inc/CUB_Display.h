@@ -54,6 +54,9 @@ void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z);
  */
 void led_switch_off(struct led *l, uint32_t x, uint32_t y, uint32_t z);
 
+/**
+ * Translate display (fill with 0).
+ */
 void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z);
 
 /**

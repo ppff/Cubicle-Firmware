@@ -69,6 +69,60 @@ int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 	}
 }
 
+void CUB_translate_x(struct led *l, int32_t x)
+{
+	if (x > 0) {
+		for (uint32_t k=0; k<l->height; ++k)
+			for (uint32_t j=0; j<l->width; ++j)
+				l->data[k][j] <<= x;
+	} else if (x < 0) {
+		for (uint32_t k=0; k<l->height; ++k)
+			for (uint32_t j=0; j<l->width; ++j)
+				l->data[k][j] >>= -x;
+	}
+}
+
+void CUB_translate_y(struct led *l, int32_t y)
+{
+	if (y > 0) {
+		for (uint32_t j=l->width-1; j>=(uint32_t)y; --j)
+			for (uint32_t k=0; k<l->height; ++k)
+				l->data[k][j] = l->data[k][j-y];
+		for (int32_t j=y-1; j>=0; --j)
+			for (uint32_t k=0; k<l->height; ++k)
+				l->data[k][j] = 0;
+	} else if (y < 0) {
+		for (uint32_t j=0; j<l->width-y; ++j)
+			for (uint32_t k=0; k<l->height; ++k)
+				l->data[k][j] = l->data[k][j-y];
+		for (uint32_t j=l->width-y; j<l->width; ++j)
+			for (uint32_t k=0; k<l->height; ++k)
+				l->data[k][j] = 0;
+	}
+}
+
+void CUB_translate_z(struct led *l, int32_t z)
+{
+	if (z > 0) {
+		for (uint32_t k=l->height-1; k>=(uint32_t)z; --k)
+			l->data[k] = l->data[k-z];
+		for (int32_t k=z-1; k>=0; --k)
+			memset(l->data[k], 0, sizeof(line_t)*l->width);
+	} else if (z < 0) {
+		for (uint32_t k=0; k<l->height-z; ++k)
+			l->data[k] = l->data[k-z];
+		for (uint32_t k=l->height-z; k<l->length; ++k)
+			memset(l->data[k], 0, sizeof(line_t)*l->width);
+	}
+}
+
+void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z)
+{
+	CUB_translate_x(l, x);
+	CUB_translate_y(l, y);
+	CUB_translate_z(l, z);
+}
+
 void clear(struct led *l)
 {
 	for (uint32_t k=0; k<l->height; ++k)
