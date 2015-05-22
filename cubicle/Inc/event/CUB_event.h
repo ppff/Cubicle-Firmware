@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include "event/CUB_button.h"
 
 /**
  * All possible event types

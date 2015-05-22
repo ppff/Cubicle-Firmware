@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "CUB_event.h"
+#include "event/CUB_event.h"
 
 #define MAX_EVENTS 1<<16
 
