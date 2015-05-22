@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : 21/05/2015 22:07:43
+  * Date               : 22/05/2015 09:44:32
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -107,7 +107,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    //HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
     osDelay(3000);
   }
   /* USER CODE END StartDefaultTask */
@@ -117,14 +117,31 @@ void StartDefaultTask(void const * argument)
 void StartTask02(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
-    HAL_SPI_Init(&hspi4);
-    uint8_t pData[] = {255, 0, 0, 0};
+    uint8_t pData[] = {
+                       0b10000000, 0b00000000, // Selection plan
+                       0b10010000, 0b00000000, // 1ère rangée de colones
+                       0b10010000, 0b00000000, // 2ème rangée de colones
+                       0b10010000, 0b00000000, // 3ème rangée de colones
+                       0b10010000, 0b00000000, // 4ème rangée de colones
+                       0b10010000, 0b00000000, // 5ème rangée de colones
+                       0b10010000, 0b00000000, // 6ème rangée de colones
+                       0b10010000, 0b00000000, // 7ème rangée de colones
+                       0b10010000, 0b00000000, // 8ème rangée de colones
+                       0b10010000, 0b00000000  // 9ème rangée de colones
+                      };
+    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
+    // TODO: boucle while tant que status == HAL_TIMEOUT
+    // retente la transmission
+
+    // ATTENTION : min(Tsetup) = 15 ns
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+    for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
   /* Infinite loop */
   for(;;)
   {
-    HAL_SPI_Transmit(&hspi4, pData, 4, 0);
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartTask02 */
 }
