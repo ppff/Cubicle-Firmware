@@ -91,6 +91,7 @@ def FlagsForFile( filename, **kwargs ):
     '-Wno-variadic-macros',
     '-fexceptions',
     '-Icubicle/Inc',
+    '-Icubicle/Middlewares/Third_Party/FreeRTOS/Source/include',
     '-DNDEBUG',
     # You 100% do NOT need -DUSE_CLANG_COMPLETER in your flags; only the YCM
     # source code needs it.
