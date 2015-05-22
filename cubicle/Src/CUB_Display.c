@@ -72,7 +72,8 @@ int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 
 void clear(struct led *l)
 {
-	memset(l, 0, l->width*l->height*sizeof(line_t));
+	for (uint32_t k=0; k<l->height; ++k)
+		memset(l->data[k], 0, l->width*sizeof(line_t));
 }
 
 void push_if(int condition)
