@@ -45,4 +45,7 @@ bool CUB_PollEvent(CUB_Event * event);
  */
 bool CUB_PushEvent(CUB_Event * event);
 
+// private
+void _idlePushBtnEvent();
+
 #endif

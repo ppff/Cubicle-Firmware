@@ -5,8 +5,8 @@
 
 #define MAX_EVENTS 1<<16
 
-uint16_t mSize = 0;
-CUB_Event mEvents[MAX_EVENTS];
+static uint16_t mSize = 0;
+static CUB_Event mEvents[MAX_EVENTS];
 
 /**
  * Polls for currently pending events, and returns true if there are any pending
@@ -38,5 +38,65 @@ bool CUB_PushEvent(CUB_Event * event)
     memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
     mSize++;
     return true;
+}
+
+/**
+ * Private
+ */
+
+/**
+ * Flag when button is pressed
+ */
+static bool mButtonDown[CUB_BTN_LAST];
+/**
+ * Flag when button is released
+ */
+static bool mButtonUp[CUB_BTN_LAST];
+
+/**
+ * It handler when button pressed
+ */
+static void _itHdl_btnPressed(CUB_Button id)
+{
+    mButtonDown[id] = true;
+}
+
+/**
+ * It handler when button released
+ */
+static void _itHdl_btnReleased(CUB_Button id)
+{
+	mButtonUp[id] = true;
+}
+
+/**
+ * Examine flags and create
+ * corresponding events
+ */
+/*static*/ void _idlePushBtnEvent()
+{
+	CUB_Event event;
+	for(int i=0; i < CUB_BTN_LAST; i++) {
+        if (mButtonDown[i]) {
+            mButtonDown[i] = 0;
+            event.type = CUB_BUTTON_DOWN;
+            event.button.id = i;
+            CUB_PushEvent(&event);
+        }
+        if (mButtonUp[i]) {
+            mButtonUp[i] = 0;
+            event.type = CUB_BUTTON_UP;
+            event.button.id = i;
+            CUB_PushEvent(&event);
+        }
+    }
+}
+
+#include "stm32f4xx_hal.h"
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	uint8_t val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+		_itHdl_btnPressed(CUB_BTN_UP);
 }
 

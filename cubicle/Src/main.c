@@ -141,13 +141,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-    CUB_Event event;
-    event.type = CUB_BUTTON_DOWN;
-    event.button.id = 0;
-    CUB_PushEvent(&event);
-}    
 /* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT

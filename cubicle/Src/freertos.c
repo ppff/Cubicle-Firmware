@@ -96,15 +96,26 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
 
-    CUB_Event event;
+  CUB_Event event;
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
   {
-    if (CUB_PollEvent(&event)) {
-        HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    while (CUB_PollEvent(&event)) {
+		if (event.type == CUB_BUTTON_DOWN) {
+			switch (event.button.id) {
+				case CUB_BTN_UP:
+					HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+					break;
+				default:
+					;
+			}
+		}
     }
-    osDelay(1000);
+
+	_idlePushBtnEvent();
+	HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+    osDelay(200);
   }
   /* USER CODE END StartDefaultTask */
 }
