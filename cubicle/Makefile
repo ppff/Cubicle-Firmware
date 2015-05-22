@@ -2,7 +2,7 @@
 PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
-SRCS+=Src/led.c
+SRCS+=Src/CUB_Display.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
