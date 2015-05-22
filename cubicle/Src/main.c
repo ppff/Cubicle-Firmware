@@ -40,6 +40,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "stm32f4xx_hal_conf.h"
+#include "event/CUB_event.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -140,9 +141,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-}    
 /* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT
