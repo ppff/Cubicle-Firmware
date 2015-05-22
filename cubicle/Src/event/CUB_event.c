@@ -1,12 +1,26 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "cmsis_os.h"
 #include "event/CUB_event.h"
 
 #define MAX_EVENTS 1<<16
 
 static uint16_t mSize = 0;
 static CUB_Event mEvents[MAX_EVENTS];
+
+static osThreadId idlePushEvtTaskHandle;
+static void _idlePushBtnEvent(void const * arg);
+
+/**
+ * Initialize the event module.
+ */
+void CUB_EventInit()
+{
+	// Create task to create button events.
+	osThreadDef(IDLE_PUSH_EVT_TASK, _idlePushBtnEvent, osPriorityBelowNormal, 0, 128);
+	idlePushEvtTaskHandle = osThreadCreate(osThread(IDLE_PUSH_EVT_TASK), NULL);
+}
 
 /**
  * Polls for currently pending events, and returns true if there are any pending
@@ -73,23 +87,26 @@ static void _itHdl_btnReleased(CUB_Button id)
  * Examine flags and create
  * corresponding events
  */
-/*static*/ void _idlePushBtnEvent()
+static void _idlePushBtnEvent(void const * arg)
 {
 	CUB_Event event;
-	for(int i=0; i < CUB_BTN_LAST; i++) {
-        if (mButtonDown[i]) {
-            mButtonDown[i] = 0;
-            event.type = CUB_BUTTON_DOWN;
-            event.button.id = i;
-            CUB_PushEvent(&event);
-        }
-        if (mButtonUp[i]) {
-            mButtonUp[i] = 0;
-            event.type = CUB_BUTTON_UP;
-            event.button.id = i;
-            CUB_PushEvent(&event);
-        }
-    }
+	for(;;) {
+		for(int i=0; i < CUB_BTN_LAST; i++) {
+			if (mButtonDown[i]) {
+				mButtonDown[i] = 0;
+				event.type = CUB_BUTTON_DOWN;
+				event.button.id = i;
+				CUB_PushEvent(&event);
+			}
+			if (mButtonUp[i]) {
+				mButtonUp[i] = 0;
+				event.type = CUB_BUTTON_UP;
+				event.button.id = i;
+				CUB_PushEvent(&event);
+			}
+		}
+		osDelay(10);
+	}
 }
 
 #include "stm32f4xx_hal.h"

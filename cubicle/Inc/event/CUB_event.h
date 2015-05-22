@@ -32,6 +32,11 @@ typedef union {
 } CUB_Event;
 
 /**
+ * Initialize the event module.
+ */
+void CUB_EventInit();
+
+/**
  * Polls for currently pending events, and returns true if there are any pending
  * events, or false if there are none available.  If 'event' is not NULL, the next
  * event is removed from the queue and stored in that memory area.
@@ -45,7 +50,5 @@ bool CUB_PollEvent(CUB_Event * event);
  */
 bool CUB_PushEvent(CUB_Event * event);
 
-// private
-void _idlePushBtnEvent();
-
 #endif
+
