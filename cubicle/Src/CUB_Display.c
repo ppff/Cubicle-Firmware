@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "led.h"
+#include "CUB_Display.h"
 
 bool in_range(int x, int y, int z)
 {
@@ -43,7 +43,7 @@ int led_get(struct led *l, int x, int y, int z)
 	return ((l->data[z][y] >> x) & 1);
 }
 
-void led_reset(struct led *l)
+void clear(struct led *l)
 {
 	memset(l, 0, WIDTH*HEIGHT*sizeof(line_t));
 }
@@ -59,7 +59,7 @@ void push_if(int condition)
 	}
 }
 
-void led_display(struct led *l)
+void update_display(struct led *l)
 {
 	for (int k=0; k<HEIGHT; k++) {
 		for (int l=0; k<HEIGHT; l++)

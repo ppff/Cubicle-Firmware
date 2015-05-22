@@ -39,12 +39,12 @@ void led_switch_off(struct led *l, int x, int y, int z);
 /**
  * Switch off all LEDs.
  */
-void led_reset(struct led *l);
+void clear(struct led *l);
 
 /**
  * Display the LED structure on the cube.
  */
-void led_display(struct led *l);
+void update_display(struct led *l);
 
 /**
  * Return 1 if LED (x,y,z) is on, else 0.
