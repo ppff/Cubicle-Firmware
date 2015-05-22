@@ -42,7 +42,7 @@ void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height);
 /**
  * Free a LED structure.
  */
-void led_free(struct led **pl);
+void led_free(struct led *l);
 
 /**
  * Switch on the LED (x,y,z).

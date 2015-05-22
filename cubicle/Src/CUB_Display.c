@@ -18,9 +18,8 @@ void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
 	}
 }
 
-void led_free(struct led **pl)
+void led_free(struct led *l)
 {
-	struct led *l = *pl;
 	for (uint32_t k=0; k<l->height; ++k) {
 		free(l->data[k]);
 		free(l->buffer[k]);
