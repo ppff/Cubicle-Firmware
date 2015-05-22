@@ -19,7 +19,7 @@ typedef enum {
  */
 typedef struct {
     uint8_t type;
-    uint8_t id;
+    CUB_Button id;
 } CUB_ButtonEvent;
 
 /**
