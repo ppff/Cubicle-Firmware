@@ -1,6 +1,14 @@
 #ifndef LED_H
 #define LED_H
 
+#ifdef STANDARD_COMPILATION
+#define MALLOC malloc
+#define FREE   free
+#else
+#define MALLOC pvPortMalloc
+#define FREE   vPortFree
+#endif
+
 #include <stdint.h>
 
 /**

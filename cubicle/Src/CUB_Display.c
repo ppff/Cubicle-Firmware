@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "FreeRTOS.h"
 
 #include "CUB_Display.h"
 
@@ -10,22 +11,22 @@ void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
 	l->width  = width;
 	l->height = height;
 
-	l->data   = malloc(sizeof(line_t *) * height);
-	l->buffer = malloc(sizeof(line_t *) * height);
+	l->data   = MALLOC(sizeof(line_t *) * height);
+	l->buffer = MALLOC(sizeof(line_t *) * height);
 	for (uint32_t k=0; k<height; ++k) {
-		l->data[k]   = malloc(sizeof(line_t) * width);
-		l->buffer[k] = malloc(sizeof(line_t) * width);
+		l->data[k]   = MALLOC(sizeof(line_t) * width);
+		l->buffer[k] = MALLOC(sizeof(line_t) * width);
 	}
 }
 
 void led_free(struct led *l)
 {
 	for (uint32_t k=0; k<l->height; ++k) {
-		free(l->data[k]);
-		free(l->buffer[k]);
+		FREE(l->data[k]);
+		FREE(l->buffer[k]);
 	}
-	free(l->data);
-	free(l->buffer);
+	FREE(l->data);
+	FREE(l->buffer);
 }
 
 bool in_range(struct led *l, uint32_t x, uint32_t y, uint32_t z)
