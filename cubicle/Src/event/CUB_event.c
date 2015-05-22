@@ -115,5 +115,33 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	uint8_t val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
 	if (val)
 		_itHdl_btnPressed(CUB_BTN_UP);
+	/*val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_DOWN);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_LEFT);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_RIGHT);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_TOP);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_BOTTOM);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_M_LEFT);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_M_RIGHT);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_SM_LEFT);
+	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
+	if (val)
+	    _itHdl_btnPressed(CUB_BTN_SM_RIGHT);
+	*/
 }
 
