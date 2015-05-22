@@ -1,9 +1,14 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "FreeRTOS.h"
 
 #include "CUB_Display.h"
+
+#ifdef STANDARD_COMPILATION
+#include <stdio.h>
+#else
+#include "FreeRTOS.h"
+#endif
 
 void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
 {
@@ -159,3 +164,30 @@ void update_display(struct led *l)
 	}
 }
 
+#ifdef STANDARD_COMPILATION
+void led_project(struct led *l, uint8_t dir, uint32_t n)
+{
+	if (dir == 0) {
+		for (uint32_t k=0; k<l->height; ++k) {
+			for (uint32_t j=0; j<l->width; ++j)
+				printf("%u ", l->data[k][j] >> n & 1);
+			printf("\n");
+		}
+	} else if (dir == 1) {
+		for (uint32_t k=0; k<l->height; ++k) {
+			line_t tmp = l->data[k][n];
+			for (uint32_t i=0; i<l->length; ++i)
+				printf("%u ", tmp >> i & 1);
+			printf("\n");
+		}
+	} else if (dir == 2) {
+		for (uint32_t j=0; j<l->width; ++j) {
+			line_t tmp = l->data[n][j];
+			for (uint32_t i=0; i<l->length; ++i)
+				printf("%u ", tmp >> i & 1);
+			printf("\n");
+		}
+	}
+	printf("\n");
+}
+#endif
