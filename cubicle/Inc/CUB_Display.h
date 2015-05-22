@@ -37,6 +37,7 @@ typedef uint16_t line_t;
 struct led {
 	line_t **data;
 	line_t **buffer;
+	line_t **tmp;
 	uint32_t length;
 	uint32_t width;
 	uint32_t height;
@@ -82,11 +83,8 @@ void update_display(struct led *l);
  */
 int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z);
 
-/**
- * Print a projection of the cube.
- * dir: direction (0: x, 1: y, 2: z)
- * n: number of the plane.
- */
-void led_project(struct led *l, uint8_t dir, uint32_t n);
+#ifdef STANDARD_COMPILATION
+void led_print(struct led *l);
+#endif
 
 #endif

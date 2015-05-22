@@ -18,6 +18,7 @@ void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
 
 	l->data   = MALLOC(sizeof(line_t *) * height);
 	l->buffer = MALLOC(sizeof(line_t *) * height);
+	l->tmp    = MALLOC(sizeof(line_t *) * height);
 	for (uint32_t k=0; k<height; ++k) {
 		l->data[k]   = MALLOC(sizeof(line_t) * width);
 		l->buffer[k] = MALLOC(sizeof(line_t) * width);
@@ -109,14 +110,20 @@ void CUB_translate_y(struct led *l, int32_t y)
 
 void CUB_translate_z(struct led *l, int32_t z)
 {
+	for (uint32_t k=0; k<l->height; ++k)
+		l->tmp[k] = l->data[k];
+	for (uint32_t k=0; k<l->height; ++k) {
+		int32_t ind = k-z;
+		if (ind >= (int32_t)l->height)
+			ind -= l->height;
+		if (ind < 0)
+			ind += l->height;
+		l->data[k] = l->tmp[ind];
+	}
 	if (z > 0) {
-		for (uint32_t k=l->height-1; k>=(uint32_t)z; --k)
-			l->data[k] = l->data[k-z];
-		for (int32_t k=z-1; k>=0; --k)
+		for (uint32_t k=0; k<(uint32_t)z; ++k)
 			memset(l->data[k], 0, sizeof(line_t)*l->width);
 	} else if (z < 0) {
-		for (uint32_t k=0; k<l->height-z; ++k)
-			l->data[k] = l->data[k-z];
 		for (uint32_t k=l->height-z; k<l->length; ++k)
 			memset(l->data[k], 0, sizeof(line_t)*l->width);
 	}
@@ -124,9 +131,12 @@ void CUB_translate_z(struct led *l, int32_t z)
 
 void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z)
 {
-	CUB_translate_x(l, x);
-	CUB_translate_y(l, y);
-	CUB_translate_z(l, z);
+	if (x != 0)
+		CUB_translate_x(l, x);
+	if (y != 0)
+		CUB_translate_y(l, y);
+	if (z != 0)
+		CUB_translate_z(l, z);
 }
 
 void clear(struct led *l)
@@ -165,29 +175,16 @@ void update_display(struct led *l)
 }
 
 #ifdef STANDARD_COMPILATION
-void led_project(struct led *l, uint8_t dir, uint32_t n)
+void led_print(struct led *l)
 {
-	if (dir == 0) {
-		for (uint32_t k=0; k<l->height; ++k) {
-			for (uint32_t j=0; j<l->width; ++j)
-				printf("%u ", l->data[k][j] >> n & 1);
-			printf("\n");
-		}
-	} else if (dir == 1) {
-		for (uint32_t k=0; k<l->height; ++k) {
-			line_t tmp = l->data[k][n];
-			for (uint32_t i=0; i<l->length; ++i)
-				printf("%u ", tmp >> i & 1);
-			printf("\n");
-		}
-	} else if (dir == 2) {
+	for (uint32_t k=0; k<l->height; ++k) {
 		for (uint32_t j=0; j<l->width; ++j) {
-			line_t tmp = l->data[n][j];
-			for (uint32_t i=0; i<l->length; ++i)
-				printf("%u ", tmp >> i & 1);
-			printf("\n");
+			line_t tmp = l->data[k][j];
+			for (uint32_t i=0; i<l->length; ++i) {
+				if (tmp >> i & 1)
+					printf("(%u, %u, %u)\n", i, j, k);
+			}
 		}
 	}
-	printf("\n");
 }
 #endif
