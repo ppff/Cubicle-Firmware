@@ -47,7 +47,7 @@ osThreadId defaultTaskHandle;
 osThreadId myTask02Handle;
 
 /* USER CODE BEGIN Variables */
-
+#define SPI_TIMEOUT 15
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -128,9 +128,9 @@ void StartTask02(void const * argument)
                        0b10010000, 0b00000000, // 8ème rangée de colones
                        0b10010000, 0b00000000  // 9ème rangée de colones
                       };
-    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
-    // TODO: boucle while tant que status == HAL_TIMEOUT
-    // retente la transmission
+    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, pData, 2, SPI_TIMEOUT);
+    while (status != HAL_OK)
+        status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
 
     // ATTENTION : min(Tsetup) = 15 ns
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
