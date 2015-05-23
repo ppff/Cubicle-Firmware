@@ -96,8 +96,8 @@ void MX_FREERTOS_Init(void) {
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
-  CUB_Event event;
   /* USER CODE BEGIN StartDefaultTask */
+  CUB_Event event;
   /* Infinite loop */
   for(;;)
   {
