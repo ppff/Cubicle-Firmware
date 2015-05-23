@@ -1,9 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.h
+  * File Name          : fatfs.h
   * Date               : 22/05/2015 16:33:35
-  * Description        : This file contains all the functions prototypes for 
-  *                      the gpio  
+  * Description        : Header for fatfs applications
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -34,26 +33,31 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __gpio_H
-#define __gpio_H
+#ifndef __fatfs_H
+#define __fatfs_H
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-void MX_GPIO_Init(void);
+#include "ff.h"
+#include "ff_gen_drv.h"
+#include "sd_diskio.h" /* defines SD_Driver as external */
+
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+extern uint8_t retSD; /* Return value for SD */
+extern char SD_Path[4]; /* SD logical drive path */
+
+void MX_FATFS_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+/* USER CODE END Prototypes */
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ pinoutConfig_H */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /*__fatfs_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

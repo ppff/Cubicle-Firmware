@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.h
-  * Date               : 22/05/2015 16:33:35
-  * Description        : This file contains all the functions prototypes for 
-  *                      the gpio  
+  * File Name          : SDIO.h
+  * Date               : 22/05/2015 16:33:36
+  * Description        : This file provides code for the configuration
+  *                      of the SDIO instances.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -32,21 +32,25 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __gpio_H
-#define __gpio_H
+#ifndef __sdio_H
+#define __sdio_H
 #ifdef __cplusplus
  extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-void MX_GPIO_Init(void);
+
+extern SD_HandleTypeDef hsd;
+extern HAL_SD_CardInfoTypedef SDCardInfo;
+
+void MX_SDIO_SD_Init(void);
+
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ pinoutConfig_H */
+#endif /*__ sdio_H */
 
 /**
   * @}

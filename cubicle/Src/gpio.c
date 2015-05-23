@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : gpio.c
-  * Date               : 23/05/2015 17:52:08
+  * Date               : 22/05/2015 16:33:35
   * Description        : This file provides code for the configuration
   *                      of all used GPIO pins.
   ******************************************************************************
@@ -97,13 +97,9 @@
      PG6   ------> LTDC_R7
      PG7   ------> LTDC_CLK
      PG8   ------> FMC_SDCLK
-     PC6   ------> LTDC_HSYNC
-     PC7   ------> LTDC_G6
-     PC9   ------> I2C3_SDA
      PA8   ------> I2C3_SCL
      PA11   ------> LTDC_R4
      PA12   ------> LTDC_R5
-     PC10   ------> LTDC_R2
      PD0   ------> FMC_D2_DA2
      PD1   ------> FMC_D3_DA3
      PD3   ------> LTDC_G7
@@ -114,8 +110,6 @@
      PG15   ------> FMC_SDNCAS
      PB5   ------> FMC_SDCKE1
      PB6   ------> FMC_SDNE1
-     PB8   ------> LTDC_B6
-     PB9   ------> LTDC_B7
      PE0   ------> FMC_NBL0
      PE1   ------> FMC_NBL1
 */
@@ -255,8 +249,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF12_FMC;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB10 PB11 PB8 PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_8|GPIO_PIN_9;
+  /*Configure GPIO pins : PB10 PB11 */
+  GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
@@ -295,22 +289,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PC6 PC7 PC10 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_10;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PC9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF4_I2C3;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PA8 */
   GPIO_InitStruct.Pin = GPIO_PIN_8;

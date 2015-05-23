@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : 22/05/2015 09:44:33
+  * Date               : 22/05/2015 16:33:36
   * Description        : Main program body
   ******************************************************************************
   *
@@ -35,6 +35,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
+#include "fatfs.h"
+#include "sdio.h"
 #include "spi.h"
 #include "gpio.h"
 
@@ -78,6 +80,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_SDIO_SD_Init();
   MX_SPI4_Init();
 
   /* USER CODE BEGIN 2 */

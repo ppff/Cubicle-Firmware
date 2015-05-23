@@ -1,4 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
+#Sat May 23 12:48:02 CEST 2015
 FATFS.IPParameters=_CODE_PAGE
 FATFS._CODE_PAGE=1252
 FREERTOS.IPParameters=Tasks01
