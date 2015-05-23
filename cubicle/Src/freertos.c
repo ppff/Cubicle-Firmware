@@ -38,7 +38,6 @@
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */     
-#include "stm32f4xx_hal_conf.h"
 #include "spi.h"
 #include <stdint.h>
 /* USER CODE END Includes */

@@ -39,7 +39,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include "stm32f4xx_hal_conf.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
