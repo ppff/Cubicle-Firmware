@@ -40,6 +40,8 @@
 /* USER CODE BEGIN Includes */     
 #include "spi.h"
 #include <stdint.h>
+#include "stm32f4xx_hal_conf.h"
+#include "CUB.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -57,7 +59,6 @@ void StartTask02(void const * argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* USER CODE BEGIN FunctionPrototypes */
-
 /* USER CODE END FunctionPrototypes */
 /* Hook prototypes */
 
@@ -98,18 +99,23 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
+
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+// begin test
   for(;;)
   {
     //HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
     osDelay(3000);
   }
-  /* USER CODE END StartDefaultTask */
+// end test
+
+	CUB_ApplicationRun();
+	/* USER CODE END StartDefaultTask */
 }
 
 /* StartTask02 function */
