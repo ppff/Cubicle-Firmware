@@ -40,6 +40,7 @@
 /* USER CODE BEGIN Includes */     
 #include "stm32f4xx_hal_conf.h"
 #include "event/CUB_event.h"
+#include "text/CUB_text.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -93,10 +94,13 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
+
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+	CUB_TextInit(2,20);
+
   CUB_Event event;
   /* Infinite loop */
   for(;;)
@@ -112,6 +116,9 @@ void StartDefaultTask(void const * argument)
 			}
 		}
     }
+
+	CUB_TextHome();
+	CUB_TextPrint("Hello World :)");
 
 	HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
     osDelay(200);
