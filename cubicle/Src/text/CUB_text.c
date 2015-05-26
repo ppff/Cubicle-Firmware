@@ -4,13 +4,11 @@
  * Supports only 4 bits mode.
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
 #include "stm32f4xx_hal_conf.h"
 #include "text/CUB_text.h"
-
 
 // When the display powers up, it is configured as follows:
 //
@@ -27,7 +25,6 @@
 //    I/D = 1; Increment by 1
 //    S = 0; No shift
 //
-
 
 // commands
 #define LCD_CLEARDISPLAY 0x01
@@ -65,7 +62,8 @@
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-
+#define LOW GPIO_PIN_RESET
+#define HIGH GPIO_PIN_SET
 
 void CUB_TextInit(uint8_t nbRows, uint8_t nbColumns);
 void CUB_TextClear();
@@ -103,7 +101,6 @@ static uint8_t _initialized;
 static uint8_t _numlines;
 static uint8_t _currline;
 
-
 //#include <stdarg.h>
 //#define PRINTF_BUF 80 // define the tmp buffer size (change if desired)
 
@@ -121,7 +118,7 @@ static uint8_t _currline;
 
 static void delayMicroseconds(uint32_t i)
 {
-	i <<= 8;
+	i <<= 4;
 	while(i--);
 }
 
@@ -135,10 +132,6 @@ void CUB_TextPrint(const char *str)
 	while (*str)
 		write(*str++);
 }
-
-
-#define LOW GPIO_PIN_RESET
-#define HIGH GPIO_PIN_SET
 
 void CUB_TextInit(uint8_t nbRows, uint8_t nbColumns)
 {
