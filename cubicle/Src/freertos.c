@@ -39,8 +39,7 @@
 
 /* USER CODE BEGIN Includes */     
 #include "stm32f4xx_hal_conf.h"
-#include "event/CUB_event.h"
-#include "text/CUB_text.h"
+#include "CUB.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -97,6 +96,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
 	/* USER CODE BEGIN StartDefaultTask */
+	CUB_ApplicationRun();
 	/* USER CODE END StartDefaultTask */
 }
 
