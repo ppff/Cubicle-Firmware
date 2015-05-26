@@ -15,27 +15,27 @@
 #define FREE   vPortFree
 #endif
 
-void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
+void led_init(struct led *l, uint32_t size_x, uint32_t size_y, uint32_t size_z)
 {
-	l->length = length;
-	l->width  = width;
-	l->height = height;
-	l->buffer_size = width + 1;
+	l->size_x = size_x;
+	l->size_y = size_y;
+	l->size_z = size_z;
+	l->buffer_size = size_y + 1;
 
-	l->data   = MALLOC(sizeof(line_t *) * height);
-	l->buffer = MALLOC(sizeof(line_t *) * height);
-	l->tmp    = MALLOC(sizeof(line_t *) * height);
-	for (uint32_t k=0; k<height; ++k) {
-		l->data[k]   = MALLOC(sizeof(line_t) * width);
-		l->buffer[k] = MALLOC(sizeof(line_t) * width + 1);
-		l->buffer[k][0] = 1 << k;
+	l->data   = MALLOC(sizeof(line_t *) * size_z);
+	l->buffer = MALLOC(sizeof(line_t *) * size_z);
+	l->tmp    = MALLOC(sizeof(line_t *) * size_z);
+	for (uint32_t k=0; k<size_z; ++k) {
+		l->data[k]   = MALLOC(sizeof(line_t) * size_y);
+		l->buffer[k] = MALLOC(sizeof(line_t) * size_y + 1);
+		l->buffer[k][l->buffer_size-1] = 1 << k;
 	}
 
 }
 
 void led_free(struct led *l)
 {
-	for (uint32_t k=0; k<l->height; ++k) {
+	for (uint32_t k=0; k<l->size_z; ++k) {
 		FREE(l->data[k]);
 		FREE(l->buffer[k]);
 	}
@@ -45,7 +45,7 @@ void led_free(struct led *l)
 
 bool in_range(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 {
-	if (x < l->length && y < l->width && z < l->height) {
+	if (x < l->size_x && y < l->size_y && z < l->size_z) {
 		return true;
 	} else {
 		return false;
@@ -60,7 +60,7 @@ bool in_range(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (in_range(l, x, y, z))
-		l->data[z][y] |= 1 << x;
+		l->data[z][l->size_y-y] |= 1 << x;
 }
 
 /**
@@ -71,14 +71,14 @@ void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 void led_switch_off(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (in_range(l, x, y, z))
-		if (l->data[z][y] & (1 << x))
-			l->data[z][y] ^= 1 << x;
+		if (l->data[z][l->size_y-y] & (1 << x))
+			l->data[z][l->size_y-y] ^= 1 << x;
 }
 
 int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (in_range(l, x, y, z)) {
-		return ((l->data[z][y] >> x) & 1);
+		return ((l->data[z][l->size_y-y] >> x) & 1);
 	} else {
 		return 0;
 	}
@@ -87,53 +87,53 @@ int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z)
 void CUB_translate_x(struct led *l, int32_t x)
 {
 	if (x > 0) {
-		for (uint32_t k=0; k<l->height; ++k)
-			for (uint32_t j=0; j<l->width; ++j)
-				l->data[k][j] <<= x;
+		for (uint32_t k=0; k<l->size_z; ++k)
+			for (uint32_t j=0; j<l->size_y; ++j)
+				l->data[k][l->size_y-j] <<= x;
 	} else if (x < 0) {
-		for (uint32_t k=0; k<l->height; ++k)
-			for (uint32_t j=0; j<l->width; ++j)
-				l->data[k][j] >>= -x;
+		for (uint32_t k=0; k<l->size_z; ++k)
+			for (uint32_t j=0; j<l->size_y; ++j)
+				l->data[k][l->size_y-j] >>= -x;
 	}
 }
 
 void CUB_translate_y(struct led *l, int32_t y)
 {
 	if (y > 0) {
-		for (uint32_t j=l->width-1; j>=(uint32_t)y; --j)
-			for (uint32_t k=0; k<l->height; ++k)
-				l->data[k][j] = l->data[k][j-y];
+		for (uint32_t j=l->size_y-1; j>=(uint32_t)y; --j)
+			for (uint32_t k=0; k<l->size_z; ++k)
+				l->data[k][l->size_y-j] = l->data[k][l->size_y-(j-y)];
 		for (int32_t j=y-1; j>=0; --j)
-			for (uint32_t k=0; k<l->height; ++k)
-				l->data[k][j] = 0;
+			for (uint32_t k=0; k<l->size_z; ++k)
+				l->data[k][l->size_y-j] = 0;
 	} else if (y < 0) {
-		for (uint32_t j=0; j<l->width-y; ++j)
-			for (uint32_t k=0; k<l->height; ++k)
-				l->data[k][j] = l->data[k][j-y];
-		for (uint32_t j=l->width-y; j<l->width; ++j)
-			for (uint32_t k=0; k<l->height; ++k)
-				l->data[k][j] = 0;
+		for (uint32_t j=0; j<l->size_y-y; ++j)
+			for (uint32_t k=0; k<l->size_z; ++k)
+				l->data[k][l->size_y-j] = l->data[k][l->size_y-(j-y)];
+		for (uint32_t j=l->size_y-y; j<l->size_y; ++j)
+			for (uint32_t k=0; k<l->size_z; ++k)
+				l->data[k][l->size_y-j] = 0;
 	}
 }
 
 void CUB_translate_z(struct led *l, int32_t z)
 {
-	for (uint32_t k=0; k<l->height; ++k)
+	for (uint32_t k=0; k<l->size_z; ++k)
 		l->tmp[k] = l->data[k];
-	for (uint32_t k=0; k<l->height; ++k) {
+	for (uint32_t k=0; k<l->size_z; ++k) {
 		int32_t ind = k-z;
-		if (ind >= (int32_t)l->height)
-			ind -= l->height;
+		if (ind >= (int32_t)l->size_z)
+			ind -= l->size_z;
 		if (ind < 0)
-			ind += l->height;
+			ind += l->size_z;
 		l->data[k] = l->tmp[ind];
 	}
 	if (z > 0) {
 		for (uint32_t k=0; k<(uint32_t)z; ++k)
-			memset(l->data[k], 0, sizeof(line_t)*l->width);
+			memset(l->data[k], 0, sizeof(line_t)*l->size_y);
 	} else if (z < 0) {
-		for (uint32_t k=l->height-z; k<l->length; ++k)
-			memset(l->data[k], 0, sizeof(line_t)*l->width);
+		for (uint32_t k=l->size_z-z; k<l->size_z; ++k)
+			memset(l->data[k], 0, sizeof(line_t)*l->size_y);
 	}
 }
 
@@ -149,20 +149,20 @@ void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z)
 
 void CUB_clear(struct led *l)
 {
-	for (uint32_t k=0; k<l->height; ++k)
-		memset(l->data[k], 0, l->width*sizeof(line_t));
+	for (uint32_t k=0; k<l->size_z; ++k)
+		memset(l->data[k], 0, l->size_y*sizeof(line_t));
 }
 
 void led_update_display(struct led *l)
 {
-	for (uint32_t k=0; k<l->height; k++)
-		memcpy(l->buffer[k]+1, l->data[k], sizeof(line_t)*l->width);
+	for (uint32_t k=0; k<l->size_z; k++)
+		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*l->size_y);
 }
 
 void led_display(struct led *l)
 {
 	for (;;) {
-		for (uint32_t k=0; k<l->height; k++) {
+		for (uint32_t k=0; k<l->size_z; k++) {
 			HAL_SPI_Transmit(&hspi4, l->buffer[k], l->buffer_size, 15);
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 			for (int i=0; i<40; ++i) {}

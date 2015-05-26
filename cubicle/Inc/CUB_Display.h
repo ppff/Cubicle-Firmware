@@ -15,11 +15,14 @@ typedef uint16_t line_t;
  * The structure must be initialized and freed.
  *
  * LED description:
- * %%%%%%% line 0   %%%%%%% line 1
- * 0000000111111111 0000000110100101 ... <= plane 0
- * 0000000100000001 0000000110101101 ... <= plane 1
+ * %%%%%%% line     %%%%%%% line         %%%%%%% line 0   not in data,
+ *         size_y-1         size_y-2                      only in buffer
+ * 0000000111111111 0000000110100101 ... 0000000101010101 0000000000000001 <= plane 0
+ * 0000000100000001 0000000110101101 ... 0000000111011010 0000000000000010 <= plane 1
  *                ^
- *    LED 0 of line 0 of plane 1
+ *              x = 0
+ *              y = size_y-1
+ *              z = 1
  * ...
  * %: unused bits.
  *
@@ -30,9 +33,9 @@ struct led {
 	line_t **data;
 	line_t **buffer;
 	line_t **tmp;
-	uint32_t length;
-	uint32_t width;
-	uint32_t height;
+	uint32_t size_x;
+	uint32_t size_y;
+	uint32_t size_z;
 	uint32_t buffer_size;
 };
 
