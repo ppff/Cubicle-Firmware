@@ -6,6 +6,8 @@
 void CUB_ApplicationRun()
 {
 	CUB_Init();
+	CUB_TextHome();
+	CUB_TextPrint("Hello World :)");
 
 	CUB_Event event;
 	/* Infinite loop */
@@ -23,8 +25,6 @@ void CUB_ApplicationRun()
 			}
 		}
 
-		CUB_TextHome();
-		CUB_TextPrint("Hello World :)");
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
 		CUB_Sleep(200);
