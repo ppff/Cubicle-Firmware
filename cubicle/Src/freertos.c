@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : 22/05/2015 16:33:36
+  * Date               : 26/05/2015 17:32:30
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -89,7 +89,7 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask02 */
-  osThreadDef(myTask02, StartTask02, osPriorityIdle, 0, 128);
+  osThreadDef(myTask02, StartTask02, osPriorityHigh, 0, 128);
   myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -123,37 +123,135 @@ void StartDefaultTask(void const * argument)
 void StartTask02(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
-    uint8_t pData[] = {
-                       0b10000000, 0b00000000, // Selection plan
-                       0b10010000, 0b00000000, // 1ère rangée de colones
-                       0b10010000, 0b00000000, // 2ème rangée de colones
-                       0b10010000, 0b00000000, // 3ème rangée de colones
-                       0b10010000, 0b00000000, // 4ème rangée de colones
-                       0b10010000, 0b00000000, // 5ème rangée de colones
-                       0b10010000, 0b00000000, // 6ème rangée de colones
-                       0b10010000, 0b00000000, // 7ème rangée de colones
-                       0b10010000, 0b00000000, // 8ème rangée de colones
-                       0b10010000, 0b00000000  // 9ème rangée de colones
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+    uint8_t pData0[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000000, 0b00000000, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000000, 0b00000000, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00000001  // Selection plan
                       };
-    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, pData, 2, SPI_TIMEOUT);
-    while (status != HAL_OK)
-        status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
-
-    // ATTENTION : min(Tsetup) = 15 ns
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
-    for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+    uint8_t pData1[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000000, 0b00000000, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000001, 0b11111111, // 4ème rangée de colones
+                       0b00000001, 0b11111111, // 5ème rangée de colones
+                       0b00000001, 0b11111111, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000000, 0b00000000, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00000010  // Selection plan
+                      };
+    uint8_t pData2[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000000, 0b00000000, // 2ème rangée de colones
+                       0b00000001, 0b11111111, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000001, 0b11111111, // 7ème rangée de colones
+                       0b00000000, 0b00000000, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00000100  // Selection plan
+                      };
+    uint8_t pData3[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000001, 0b11111111, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000001, 0b11111111, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00001000  // Selection plan
+                      };
+    uint8_t pData4[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000001, 0b11111111, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000001, 0b11111111, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00010000  // Selection plan
+                      };
+    uint8_t pData5[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000001, 0b11111111, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000001, 0b11111111, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b00100000  // Selection plan
+                      };
+    uint8_t pData6[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000000, 0b00000000, // 2ème rangée de colones
+                       0b00000001, 0b11111111, // 3ème rangée de colones
+                       0b00000000, 0b00000000, // 4ème rangée de colones
+                       0b00000000, 0b00000000, // 5ème rangée de colones
+                       0b00000000, 0b00000000, // 6ème rangée de colones
+                       0b00000001, 0b11111111, // 7ème rangée de colones
+                       0b00000000, 0b00000000, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000000, 0b01000000  // Selection plan
+                      };
+    uint8_t pData7[] = {
+                       0b00000000, 0b00000001, // 1ère rangée de colones
+                       0b00000000, 0b00000001, // 2ème rangée de colones
+                       0b00000000, 0b00000001, // 3ème rangée de colones
+                       0b00000001, 0b11111111, // 4ème rangée de colones
+                       0b00000001, 0b11111111, // 5ème rangée de colones
+                       0b00000001, 0b11111111, // 6ème rangée de colones
+                       0b00000000, 0b00000001, // 7ème rangée de colones
+                       0b00000000, 0b00000001, // 8ème rangée de colones
+                       0b00000000, 0b00000001, // 9ème rangée de colones
+                       0b00000000, 0b10000000  // Selection plan
+                      };
+    uint8_t pData8[] = {
+                       0b00000000, 0b00000000, // 1ère rangée de colones
+                       0b00000000, 0b00000000, // 2ème rangée de colones
+                       0b00000000, 0b00000000, // 3ème rangée de colones
+                       0b00000001, 0b11111111, // 4ème rangée de colones
+                       0b00000001, 0b11111111, // 5ème rangée de colones
+                       0b00000001, 0b11111111, // 6ème rangée de colones
+                       0b00000000, 0b00000000, // 7ème rangée de colones
+                       0b00000000, 0b00000000, // 8ème rangée de colones
+                       0b00000000, 0b00000000, // 9ème rangée de colones
+                       0b00000001, 0b00000000  // Selection plan
+                      };
   /* Infinite loop */
+    uint8_t plan = 0;
+    uint8_t* cercle[] = {pData0, pData1, pData2, pData3, pData4, pData5, pData6, pData7, pData8};
   for(;;)
   {
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-    osDelay(1000);
+    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, *(cercle+plan), 20, 15);
+    while (status != HAL_OK)
+        status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
+    for (int i=0; i < 8000; i++) ; 
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+    for (int i=0; i < 8000; i++) ; // 40 tours de boucles == 3 µs
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+    plan = (plan + 1)%9;
+    osDelay(1);
   }
   /* USER CODE END StartTask02 */
 }
 
 /* USER CODE BEGIN Application */
-     
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

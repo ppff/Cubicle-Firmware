@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : 22/05/2015 16:33:36
+  * Date               : 26/05/2015 17:32:30
   * Description        : Main program body
   ******************************************************************************
   *
@@ -84,7 +84,7 @@ int main(void)
   MX_SPI4_Init();
 
   /* USER CODE BEGIN 2 */
-	
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
