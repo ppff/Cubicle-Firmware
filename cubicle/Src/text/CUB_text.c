@@ -86,6 +86,7 @@ void CUB_TextAutoscroll();
 void CUB_TextNoAutoscroll();
 void CUB_TextCreateChar(uint8_t location, uint8_t charmap[]);
 void CUB_TextSetCursor(uint8_t col, uint8_t row);
+void CUB_TextQuit();
 
 // Private
 static void command(uint8_t);
@@ -310,6 +311,10 @@ void CUB_TextCreateChar(uint8_t location, uint8_t charmap[])
   	for (int i=0; i<8; i++) {
     	write(charmap[i]);
   	}
+}
+
+void CUB_TextQuit()
+{
 }
 
 /*********** mid level commands, for sending data/cmds */
