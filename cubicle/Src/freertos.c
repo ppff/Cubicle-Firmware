@@ -56,7 +56,6 @@ void StartDefaultTask(void const * argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* USER CODE BEGIN FunctionPrototypes */
-void TestCUBText();
 /* USER CODE END FunctionPrototypes */
 /* Hook prototypes */
 
@@ -86,7 +85,6 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	CUB_EventInit();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -99,45 +97,10 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
 	/* USER CODE BEGIN StartDefaultTask */
-	CUB_TextInit(2,20);
-
-	CUB_Event event;
-	/* Infinite loop */
-	for(;;) {
-
-		while (CUB_PollEvent(&event)) {
-			if (event.type == CUB_BUTTON_DOWN) {
-				switch (event.button.id) {
-					case CUB_BTN_UP:
-						HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-						TestCUBText();
-						break;
-					default:
-						;
-				}
-			}
-		}
-
-		CUB_TextHome();
-		CUB_TextPrint("Hello World :)");
-
-		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		osDelay(200);
-	}
 	/* USER CODE END StartDefaultTask */
 }
 
 /* USER CODE BEGIN Application */
-void TestCUBText()
-{
-	CUB_TextClear();
-	CUB_TextHome();
-	CUB_TextPrint("abcdefghijklmnopqrstuvwxyz123456789");
-	osDelay(2000);
-	CUB_TextNoAutoscroll();
-	CUB_TextHome();
-	CUB_TextPrint("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-}
      
 /* USER CODE END Application */
 
