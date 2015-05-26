@@ -2,12 +2,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "spi.h"
 #include "CUB_Display.h"
 
 #ifdef STANDARD_COMPILATION
 #include <stdio.h>
+#define MALLOC malloc
+#define FREE   free
 #else
 #include "FreeRTOS.h"
+#define MALLOC pvPortMalloc
+#define FREE   vPortFree
 #endif
 
 void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
@@ -15,14 +20,17 @@ void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height)
 	l->length = length;
 	l->width  = width;
 	l->height = height;
+	l->buffer_size = width + 1;
 
 	l->data   = MALLOC(sizeof(line_t *) * height);
 	l->buffer = MALLOC(sizeof(line_t *) * height);
 	l->tmp    = MALLOC(sizeof(line_t *) * height);
 	for (uint32_t k=0; k<height; ++k) {
 		l->data[k]   = MALLOC(sizeof(line_t) * width);
-		l->buffer[k] = MALLOC(sizeof(line_t) * width);
+		l->buffer[k] = MALLOC(sizeof(line_t) * width + 1);
+		l->buffer[k][0] = 1 << k;
 	}
+
 }
 
 void led_free(struct led *l)
@@ -139,38 +147,27 @@ void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z)
 		CUB_translate_z(l, z);
 }
 
-void clear(struct led *l)
+void CUB_clear(struct led *l)
 {
 	for (uint32_t k=0; k<l->height; ++k)
 		memset(l->data[k], 0, l->width*sizeof(line_t));
 }
 
-void push_if(int condition)
-{
-	if (condition) {
-		// push 1
-	} else {
-		// push 0
-	}
-}
-
-void update_display(struct led *l)
+void led_update_display(struct led *l)
 {
 	for (uint32_t k=0; k<l->height; k++)
-		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*l->width);
+		memcpy(l->buffer[k]+1, l->data[k], sizeof(line_t)*l->width);
+}
 
-	// while...
-	for (uint32_t k=0; k<l->height; k++) {
-		for (uint32_t n=0; n<l->height; n++)
-			push_if(n == k);
-		for (uint32_t j=0; j<l->width; j++) {
-			line_t tmp = l->buffer[k][j];
-			for (uint32_t n=0; n<l->length; n++) {
-				push_if(tmp && 0b1);
-				tmp <<= 1;
-			}
+void led_display(struct led *l)
+{
+	for (;;) {
+		for (uint32_t k=0; k<l->height; k++) {
+			HAL_SPI_Transmit(&hspi4, l->buffer[k], l->buffer_size, 15);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+			for (int i=0; i<40; ++i) {}
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
 		}
-		// latch enable
 	}
 }
 

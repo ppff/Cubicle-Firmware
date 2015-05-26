@@ -1,14 +1,6 @@
 #ifndef LED_H
 #define LED_H
 
-#ifdef STANDARD_COMPILATION
-#define MALLOC malloc
-#define FREE   free
-#else
-#define MALLOC pvPortMalloc
-#define FREE   vPortFree
-#endif
-
 #include <stdint.h>
 
 /**
@@ -41,6 +33,7 @@ struct led {
 	uint32_t length;
 	uint32_t width;
 	uint32_t height;
+	uint32_t buffer_size;
 };
 
 /**
