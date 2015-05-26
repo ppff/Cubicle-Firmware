@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "spi.h"
-#include "CUB_Display.h"
+#include "display/CUB_display.h"
 
 #ifdef STANDARD_COMPILATION
 #include <stdio.h>
