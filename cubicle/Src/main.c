@@ -40,7 +40,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "stm32f4xx_hal_conf.h"
-#include "event/CUB_event.h"
+#include "CUB.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/

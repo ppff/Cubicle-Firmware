@@ -36,6 +36,8 @@ typedef union {
  */
 void CUB_EventInit();
 
+void CUB_EventQuit();
+
 /**
  * Polls for currently pending events, and returns true if there are any pending
  * events, or false if there are none available.  If 'event' is not NULL, the next

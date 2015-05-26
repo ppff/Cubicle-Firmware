@@ -5,6 +5,8 @@ SRCS=Src/main.c
 SRCS+=Src/led.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
+SRCS+=Src/CUB.c
+SRCS+=Src/application.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
