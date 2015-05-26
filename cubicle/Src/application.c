@@ -5,7 +5,6 @@
 
 void CUB_ApplicationRun()
 {
-	CUB_Init();
 	CUB_TextHome();
 	CUB_TextPrint("Hello World :)");
 
