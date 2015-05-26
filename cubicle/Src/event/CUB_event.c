@@ -131,7 +131,7 @@ static void _idlePushBtnEvent(void const * arg)
 				CUB_PushEvent(&event);
 			}
 		}
-		osDelay(10);
+		osDelay(50);
 	}
 }
 
