@@ -28,6 +28,11 @@ void CUB_EventInit()
 	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
 }
 
+void CUB_EventQuit()
+{
+	osMutexDelete(_mutex_events);
+}
+
 static inline void takeMutex()
 {
 	while (osMutexWait(_mutex_events, 0) != osOK);
