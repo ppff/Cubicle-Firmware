@@ -103,17 +103,7 @@ void MX_FREERTOS_Init(void) {
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
-
-  /* USER CODE BEGIN StartDefaultTask */
-  /* Infinite loop */
-// begin test
-  for(;;)
-  {
-    //HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-    osDelay(3000);
-  }
-// end test
-
+	/* USER CODE BEGIN StartDefaultTask */
 	CUB_ApplicationRun();
 	/* USER CODE END StartDefaultTask */
 }
