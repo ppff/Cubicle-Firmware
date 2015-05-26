@@ -119,13 +119,13 @@ static void _idlePushBtnEvent(void const * arg)
 	for(;;) {
 		for(int i=0; i < CUB_BTN_LAST; i++) {
 			if (mButtonDown[i]) {
-				mButtonDown[i] = 0;
+				mButtonDown[i] = false;
 				event.type = CUB_BUTTON_DOWN;
 				event.button.id = i;
 				CUB_PushEvent(&event);
 			}
 			if (mButtonUp[i]) {
-				mButtonUp[i] = 0;
+				mButtonUp[i] = false;
 				event.type = CUB_BUTTON_UP;
 				event.button.id = i;
 				CUB_PushEvent(&event);
