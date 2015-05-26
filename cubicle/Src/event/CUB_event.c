@@ -12,29 +12,53 @@ static CUB_Event mEvents[MAX_EVENTS];
 static osThreadId idlePushEvtTaskHandle;
 static void _idlePushBtnEvent(void const * arg);
 
+static osMutexId _mutex_events;
+
 /**
  * Initialize the event module.
  */
 void CUB_EventInit()
 {
 	// Create task to create button events.
-	osThreadDef(IDLE_PUSH_EVT_TASK, _idlePushBtnEvent, osPriorityBelowNormal, 0, 128);
+	osThreadDef(IDLE_PUSH_EVT_TASK, _idlePushBtnEvent, osPriorityAboveNormal, 0, 128);
 	idlePushEvtTaskHandle = osThreadCreate(osThread(IDLE_PUSH_EVT_TASK), NULL);
+
+	// Create mutex to share event structure.
+	osMutexDef(MUTEX_EVENTS);
+	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
+}
+
+void CUB_EventQuit()
+{
+	osMutexDelete(_mutex_events);
+}
+
+static inline void takeMutex()
+{
+	while (osMutexWait(_mutex_events, 0) != osOK);
+}
+
+static inline void releaseMutex()
+{
+	osMutexRelease(_mutex_events);
 }
 
 /**
  * Polls for currently pending events, and returns true if there are any pending
  * events, or false if there are none available.  If 'event' is not NULL, the next
  * event is removed from the queue and stored in that memory area.
+ * This function can be blocked.
  */
 bool CUB_PollEvent(CUB_Event * event)
 {
     if (mSize == 0)
         return false;
+	takeMutex();
     if (event != NULL) {
         memcpy(event, &mEvents[mSize-1], sizeof(CUB_Event));
     }
     mSize--;
+	releaseMutex();
     return true;
 }
 
@@ -42,15 +66,22 @@ bool CUB_PollEvent(CUB_Event * event)
  * Add an event to the event queue.
  * This function returns true on success, or false if the event queue was full
  * or there was some other error.
+ * This function can be blocked.
  */
 bool CUB_PushEvent(CUB_Event * event)
 {
-    if (event == NULL)
+	takeMutex();
+    if (event == NULL) {
+		releaseMutex();
         return true;
-    if (mSize == MAX_EVENTS)
+	}
+    if (mSize == MAX_EVENTS) {
+		releaseMutex();
         return false;
+	}
     memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
     mSize++;
+	releaseMutex();
     return true;
 }
 
@@ -93,19 +124,19 @@ static void _idlePushBtnEvent(void const * arg)
 	for(;;) {
 		for(int i=0; i < CUB_BTN_LAST; i++) {
 			if (mButtonDown[i]) {
-				mButtonDown[i] = 0;
+				mButtonDown[i] = false;
 				event.type = CUB_BUTTON_DOWN;
 				event.button.id = i;
 				CUB_PushEvent(&event);
 			}
 			if (mButtonUp[i]) {
-				mButtonUp[i] = 0;
+				mButtonUp[i] = false;
 				event.type = CUB_BUTTON_UP;
 				event.button.id = i;
 				CUB_PushEvent(&event);
 			}
 		}
-		osDelay(10);
+		osDelay(50);
 	}
 }
 
