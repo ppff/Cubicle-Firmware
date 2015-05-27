@@ -4,15 +4,40 @@
 #include "cmsis_os.h"
 #include "event/CUB_event.h"
 
-#define MAX_EVENTS 1<<16
+#define MAX_EVENTS (1<<8)
 
-static uint16_t mSize = 0;
+/**
+ * Circular buffer
+ */
 static CUB_Event mEvents[MAX_EVENTS];
+static uint16_t mWriter;
+static uint16_t mReader;
+static uint16_t mSize;
 
 static osThreadId idlePushEvtTaskHandle;
 static void _idlePushBtnEvent(void const * arg);
 
 static osMutexId _mutex_events;
+
+
+/**
+ * Button current states
+ */
+enum {RELEASED=0, PRESSED};
+static uint8_t mButtonState[CUB_BTN_LAST];
+/**
+ * Flag when button is pressed
+ */
+static bool mButtonWasPressed[CUB_BTN_LAST];
+/**
+ * Flag when button is released
+ */
+static bool mButtonWasReleased[CUB_BTN_LAST];
+/**
+ * Old button values
+ */
+static uint8_t mButtonOldValue[CUB_BTN_LAST];
+
 
 /**
  * Initialize the event module.
@@ -26,6 +51,17 @@ void CUB_EventInit()
 	// Create mutex to share event structure.
 	osMutexDef(MUTEX_EVENTS);
 	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
+
+	// Init circular buffer
+	mWriter = mReader = mSize = 0;
+
+	// Init flags
+	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
+		mButtonWasPressed[i] = false;
+		mButtonWasReleased[i] = false;
+		mButtonState[i] = false;
+		mButtonOldValue[i] = 0;
+	}
 }
 
 void CUB_EventQuit()
@@ -51,13 +87,16 @@ static inline void releaseMutex()
  */
 bool CUB_PollEvent(CUB_Event * event)
 {
-    if (mSize == 0)
+    if (mSize == 0) {
         return false;
+	}
+
 	takeMutex();
-    if (event != NULL) {
-        memcpy(event, &mEvents[mSize-1], sizeof(CUB_Event));
+	if (event != NULL) {
+		memcpy(event, &mEvents[mReader], sizeof(CUB_Event));
     }
-    mSize--;
+	mReader = (mReader+1) % MAX_EVENTS;
+	mSize--;
 	releaseMutex();
     return true;
 }
@@ -70,49 +109,27 @@ bool CUB_PollEvent(CUB_Event * event)
  */
 bool CUB_PushEvent(CUB_Event * event)
 {
-	takeMutex();
     if (event == NULL) {
-		releaseMutex();
         return true;
 	}
+
+	bool ret = false;
+	takeMutex();
     if (mSize == MAX_EVENTS) {
-		releaseMutex();
-        return false;
+        ret = false;
+	} else {
+    	memcpy(&mEvents[mWriter], event, sizeof(CUB_Event));
+		mWriter = (mWriter+1) % MAX_EVENTS;
+    	mSize++;
+		ret = true;
 	}
-    memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
-    mSize++;
 	releaseMutex();
-    return true;
+    return ret;
 }
 
 /**
  * Private
  */
-
-/**
- * Flag when button is pressed
- */
-static bool mButtonDown[CUB_BTN_LAST];
-/**
- * Flag when button is released
- */
-static bool mButtonUp[CUB_BTN_LAST];
-
-/**
- * It handler when button pressed
- */
-static void _itHdl_btnPressed(CUB_Button id)
-{
-    mButtonDown[id] = true;
-}
-
-/**
- * It handler when button released
- */
-/*static*/ void _itHdl_btnReleased(CUB_Button id)
-{
-	mButtonUp[id] = true;
-}
 
 /**
  * Examine flags and create
@@ -122,18 +139,28 @@ static void _idlePushBtnEvent(void const * arg)
 {
 	CUB_Event event;
 	for(;;) {
-		for(int i=0; i < CUB_BTN_LAST; i++) {
-			if (mButtonDown[i]) {
-				mButtonDown[i] = false;
-				event.type = CUB_BUTTON_DOWN;
-				event.button.id = i;
-				CUB_PushEvent(&event);
-			}
-			if (mButtonUp[i]) {
-				mButtonUp[i] = false;
-				event.type = CUB_BUTTON_UP;
-				event.button.id = i;
-				CUB_PushEvent(&event);
+		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
+			switch (mButtonState[i]) {
+			case RELEASED:
+				if (mButtonWasPressed[i]) {
+					mButtonWasPressed[i] = false;
+					mButtonState[i] = PRESSED;
+
+					event.type = CUB_BUTTON_DOWN;
+					event.button.id = i;
+					CUB_PushEvent(&event);
+				}
+				break;
+			case PRESSED: 
+				if (mButtonWasReleased[i]) {
+					mButtonWasReleased[i] = false;
+					mButtonState[i] = RELEASED;
+
+					event.type = CUB_BUTTON_UP;
+					event.button.id = i;
+					CUB_PushEvent(&event);
+				}
+				break;
 			}
 		}
 		osDelay(50);
@@ -142,37 +169,22 @@ static void _idlePushBtnEvent(void const * arg)
 
 #include "stm32f4xx_hal.h"
 
+/**
+ * 
+ */
+static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btnId)
+{
+	uint8_t val = HAL_GPIO_ReadPin(port, pin);
+	if (!mButtonOldValue[btnId] && val) { // rising edge
+		mButtonWasPressed[btnId] = true;
+	} else if (mButtonOldValue[btnId] && !val) { // falling edge
+		mButtonWasReleased[btnId] = true;
+	}
+	mButtonOldValue[btnId] = val;
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	uint8_t val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-		_itHdl_btnPressed(CUB_BTN_UP);
-	/*val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_DOWN);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_RIGHT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_TOP);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_BOTTOM);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_M_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_M_RIGHT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_SM_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_SM_RIGHT);
-	*/
+	treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
+	//treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
 }
 
