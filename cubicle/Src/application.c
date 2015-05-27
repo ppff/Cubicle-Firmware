@@ -16,7 +16,15 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_DOWN) {
 				switch (event.button.id) {
 					case CUB_BTN_UP:
-						HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 1);
+						break;
+					default:
+						;
+				}
+			} else if (event.type == CUB_BUTTON_UP) {
+				switch (event.button.id) {
+					case CUB_BTN_UP:
+						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 0);
 						break;
 					default:
 						;
@@ -24,9 +32,8 @@ void CUB_ApplicationRun()
 			}
 		}
 
-
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		CUB_Sleep(200);
+		CUB_Sleep(1000);
 	}
 }
 
