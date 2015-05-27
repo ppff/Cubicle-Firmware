@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "spi.h"
 #include "LEDs/CUB_LEDs.h"
 
 #ifdef STANDARD_COMPILATION
@@ -11,6 +10,7 @@
 #define FREE   free
 #else
 #include "FreeRTOS.h"
+#include "spi.h"
 #define MALLOC pvPortMalloc
 #define FREE   vPortFree
 #endif
@@ -25,22 +25,19 @@ void CUB_LEDs_init(CUB_LEDs *l, uint32_t size_x, uint32_t size_y, uint32_t size_
 	l->data   = MALLOC(sizeof(line_t *) * size_z);
 	l->buffer = MALLOC(sizeof(line_t *) * size_z);
 	l->tmp    = MALLOC(sizeof(line_t *) * size_z);
+	l->pointer_to_data   = MALLOC(sizeof(line_t) * size_y     * size_z);
+	l->pointer_to_buffer = MALLOC(sizeof(line_t) * (size_y+1) * size_z);
 	for (uint32_t k=0; k<size_z; ++k) {
-		l->data[k]   = MALLOC(sizeof(line_t) * size_y);
-		l->buffer[k] = MALLOC(sizeof(line_t) * size_y + 1);
+		l->data[k]   = l->pointer_to_data   + size_y     * k;
+		l->buffer[k] = l->pointer_to_buffer + (size_y+1) * k;
 		l->buffer[k][l->buffer_size-1] = 1 << k;
 	}
-
 }
 
 void CUB_LEDs_free(CUB_LEDs *l)
 {
-	for (uint32_t k=0; k<l->size_z; ++k) {
-		FREE(l->data[k]);
-		FREE(l->buffer[k]);
-	}
-	FREE(l->data);
-	FREE(l->buffer);
+	FREE(l->pointer_to_data);
+	FREE(l->pointer_to_buffer);
 }
 
 bool CUB_LEDs_in_range(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
@@ -60,7 +57,7 @@ bool CUB_LEDs_in_range(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_on(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (CUB_LEDs_in_range(l, x, y, z))
-		l->data[z][l->size_y-y] |= 1 << x;
+		l->data[z][l->size_y-1-y] |= 1 << x;
 }
 
 /**
@@ -71,14 +68,14 @@ void CUB_LEDs_switch_on(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_off(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (CUB_LEDs_in_range(l, x, y, z))
-		if (l->data[z][l->size_y-y] & (1 << x))
-			l->data[z][l->size_y-y] ^= 1 << x;
+		if (l->data[z][l->size_y-1-y] & (1 << x))
+			l->data[z][l->size_y-1-y] ^= 1 << x;
 }
 
 int CUB_LEDs_get(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (CUB_LEDs_in_range(l, x, y, z)) {
-		return ((l->data[z][l->size_y-y] >> x) & 1);
+		return ((l->data[z][l->size_y-1-y] >> x) & 1);
 	} else {
 		return 0;
 	}
@@ -89,30 +86,30 @@ void CUB_LEDs_translate_x(CUB_LEDs *l, int32_t x)
 	if (x > 0) {
 		for (uint32_t k=0; k<l->size_z; ++k)
 			for (uint32_t j=0; j<l->size_y; ++j)
-				l->data[k][l->size_y-j] <<= x;
+				l->data[k][l->size_y-1-j] <<= x;
 	} else if (x < 0) {
 		for (uint32_t k=0; k<l->size_z; ++k)
 			for (uint32_t j=0; j<l->size_y; ++j)
-				l->data[k][l->size_y-j] >>= -x;
+				l->data[k][l->size_y-1-j] >>= -x;
 	}
 }
 
 void CUB_LEDs_translate_y(CUB_LEDs *l, int32_t y)
 {
 	if (y > 0) {
-		for (uint32_t j=l->size_y-1; j>=(uint32_t)y; --j)
-			for (uint32_t k=0; k<l->size_z; ++k)
-				l->data[k][l->size_y-j] = l->data[k][l->size_y-(j-y)];
-		for (int32_t j=y-1; j>=0; --j)
-			for (uint32_t k=0; k<l->size_z; ++k)
-				l->data[k][l->size_y-j] = 0;
+		for (uint32_t k=0; k<l->size_z; ++k) {
+			for (uint32_t j=0; j<l->size_y-y; ++j)
+				l->data[k][j] = l->data[k][j+y];
+			for (uint32_t j=l->size_y-y; j<l->size_y; ++j)
+				l->data[k][j] = 0;
+		}
 	} else if (y < 0) {
-		for (uint32_t j=0; j<l->size_y-y; ++j)
-			for (uint32_t k=0; k<l->size_z; ++k)
-				l->data[k][l->size_y-j] = l->data[k][l->size_y-(j-y)];
-		for (uint32_t j=l->size_y-y; j<l->size_y; ++j)
-			for (uint32_t k=0; k<l->size_z; ++k)
-				l->data[k][l->size_y-j] = 0;
+		for (uint32_t k=0; k<l->size_z; ++k) {
+			for (uint32_t j=0; j<l->size_y+y; ++j)
+				l->data[k][l->size_y-1-j] = l->data[k][l->size_y-1-j+y];
+			for (uint32_t j=l->size_y+y; j<l->size_y; ++j)
+				l->data[k][l->size_y-1-j] = 0;
+		}
 	}
 }
 
@@ -153,6 +150,7 @@ void CUB_LEDs_clear(CUB_LEDs *l)
 		memset(l->data[k], 0, l->size_y*sizeof(line_t));
 }
 
+#ifndef STANDARD_COMPILATION
 void CUB_LEDs_update_display(CUB_LEDs *l)
 {
 	for (uint32_t k=0; k<l->size_z; k++)
@@ -170,14 +168,15 @@ void CUB_LEDs_display(CUB_LEDs *l)
 		}
 	}
 }
+#endif
 
 #ifdef STANDARD_COMPILATION
 void CUB_LEDs_print(CUB_LEDs *l)
 {
-	for (uint32_t k=0; k<l->height; ++k) {
-		for (uint32_t j=0; j<l->width; ++j) {
-			line_t tmp = l->data[k][j];
-			for (uint32_t i=0; i<l->length; ++i) {
+	for (uint32_t k=0; k<l->size_z; ++k) {
+		for (uint32_t j=0; j<l->size_y; ++j) {
+			line_t tmp = l->data[k][l->size_y-1-j];
+			for (uint32_t i=0; i<l->size_x; ++i) {
 				if (tmp >> i & 1)
 					printf("(%u, %u, %u)\n", i, j, k);
 			}

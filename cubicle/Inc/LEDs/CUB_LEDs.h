@@ -33,6 +33,8 @@ typedef struct CUB_LEDs {
 	line_t **data;
 	line_t **buffer;
 	line_t **tmp;
+	line_t *pointer_to_data;
+	line_t *pointer_to_buffer;
 	uint32_t size_x;
 	uint32_t size_y;
 	uint32_t size_z;
