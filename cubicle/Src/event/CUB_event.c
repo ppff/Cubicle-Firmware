@@ -4,10 +4,15 @@
 #include "cmsis_os.h"
 #include "event/CUB_event.h"
 
-#define MAX_EVENTS 1<<16
+#define MAX_EVENTS 1<<8
 
-static uint16_t mSize = 0;
+/**
+ * Circular buffer
+ */
 static CUB_Event mEvents[MAX_EVENTS];
+static uint16_t mWriter;
+static uint16_t mReader;
+static uint16_t mSize;
 
 static osThreadId idlePushEvtTaskHandle;
 static void _idlePushBtnEvent(void const * arg);
@@ -40,6 +45,10 @@ void CUB_EventInit()
 	osMutexDef(MUTEX_EVENTS);
 	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
 
+	// Init circular buffer
+	mWriter = mReader = mSize = 0;
+
+	// Init flags
 	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
 		mButtonDown[i] = false;
 		mButtonUp[i] = false;
@@ -76,8 +85,9 @@ bool CUB_PollEvent(CUB_Event * event)
 
 	takeMutex();
 	if (event != NULL) {
-		memcpy(event, &mEvents[mSize-1], sizeof(CUB_Event));
+		memcpy(event, &mEvents[mReader], sizeof(CUB_Event));
     }
+	mReader = (mReader+1) % MAX_EVENTS;
 	mSize--;
 	releaseMutex();
     return true;
@@ -100,12 +110,13 @@ bool CUB_PushEvent(CUB_Event * event)
     if (mSize == MAX_EVENTS) {
         ret = false;
 	} else {
-    	memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
+    	memcpy(&mEvents[mWriter], event, sizeof(CUB_Event));
+		mWriter = (mWriter+1) % MAX_EVENTS;
     	mSize++;
 		ret = true;
 	}
 	releaseMutex();
-    return true;
+    return ret;
 }
 
 /**
