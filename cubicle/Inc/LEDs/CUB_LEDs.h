@@ -2,6 +2,7 @@
 #define LED_H
 
 #include <stdint.h>
+#include <constant.h>
 
 /**
  * Type used to store the content of a line. It must verify:
@@ -35,16 +36,12 @@ typedef struct CUB_LEDs {
 	line_t **tmp;
 	line_t *pointer_to_data;
 	line_t *pointer_to_buffer;
-	uint32_t size_x;
-	uint32_t size_y;
-	uint32_t size_z;
-	uint32_t buffer_size;
 } CUB_LEDs;
 
 /**
  * Initialize a LED structure.
  */
-void CUB_LEDs_init(CUB_LEDs *l, uint32_t length, uint32_t width, uint32_t height);
+void CUB_LEDs_init(CUB_LEDs *l);
 
 /**
  * Free a LED structure.

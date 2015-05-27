@@ -8,7 +8,7 @@
 int main(void)
 {
 	CUB_LEDs l;
-	CUB_LEDs_init(&l, 9, 8, 10);
+	CUB_LEDs_init(&l);
 	CUB_LEDs_switch_on(&l, 0, 0, 0);
 	CUB_LEDs_switch_on(&l, 1, 0, 0);
 	CUB_LEDs_switch_on(&l, 2, 1, 0);
