@@ -15,6 +15,19 @@ static void _idlePushBtnEvent(void const * arg);
 static osMutexId _mutex_events;
 
 /**
+ * Flag when button is pressed
+ */
+static bool mButtonDown[CUB_BTN_LAST];
+/**
+ * Flag when button is released
+ */
+static bool mButtonUp[CUB_BTN_LAST];
+/**
+ * Button current states
+ */
+static bool mButtonState[CUB_BTN_LAST];
+
+/**
  * Initialize the event module.
  */
 void CUB_EventInit()
@@ -26,6 +39,12 @@ void CUB_EventInit()
 	// Create mutex to share event structure.
 	osMutexDef(MUTEX_EVENTS);
 	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
+
+	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
+		mButtonDown[i] = false;
+		mButtonUp[i] = false;
+		mButtonState[i] = false;
+	}
 }
 
 void CUB_EventQuit()
@@ -89,14 +108,6 @@ bool CUB_PushEvent(CUB_Event * event)
  * Private
  */
 
-/**
- * Flag when button is pressed
- */
-static bool mButtonDown[CUB_BTN_LAST];
-/**
- * Flag when button is released
- */
-static bool mButtonUp[CUB_BTN_LAST];
 
 /**
  * It handler when button pressed
@@ -122,7 +133,7 @@ static void _idlePushBtnEvent(void const * arg)
 {
 	CUB_Event event;
 	for(;;) {
-		for(int i=0; i < CUB_BTN_LAST; i++) {
+		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
 			if (mButtonDown[i]) {
 				mButtonDown[i] = false;
 				event.type = CUB_BUTTON_DOWN;
