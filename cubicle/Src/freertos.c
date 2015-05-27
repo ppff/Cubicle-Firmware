@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : 26/05/2015 17:32:30
+  * Date               : 27/05/2015 10:40:54
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -66,10 +66,10 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 /* Init FreeRTOS */
 
 void MX_FREERTOS_Init(void) {
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 	CUB_Init();
        
-	/* USER CODE END Init */
+  /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -101,14 +101,13 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
-
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
-    /* init code for FATFS */
-    MX_FATFS_Init();
+  /* init code for FATFS */
+  MX_FATFS_Init();
 
-    /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN StartDefaultTask */
     CUB_ApplicationRun();
     /* Infinite loop */
     for(;;)
@@ -116,7 +115,7 @@ void StartDefaultTask(void const * argument)
         HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
         osDelay(3000);
     }
-    /* USER CODE END StartDefaultTask */
+  /* USER CODE END StartDefaultTask */
 }
 
 /* StartTask02 function */
