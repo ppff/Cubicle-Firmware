@@ -8,6 +8,8 @@ void CUB_ApplicationRun()
 	CUB_TextHome();
 	CUB_TextPrint("Hello World :)");
 
+	CUB_LEDs_init();
+
 	CUB_Event event;
 	int count = 0;
 	/* Infinite loop */
@@ -33,6 +35,9 @@ void CUB_ApplicationRun()
 				}
 			}
 		}
+
+		CUB_LEDs_switch_on(count, count, count);
+		CUB_LEDs_update_display();
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
 		if (count < 4)
