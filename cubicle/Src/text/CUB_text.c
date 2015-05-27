@@ -97,7 +97,6 @@ static uint16_t _data_pins[4];
 static uint8_t _displayfunction;
 static uint8_t _displaycontrol;
 static uint8_t _displaymode;
-static uint8_t _initialized;
 static uint8_t _numlines;
 static uint8_t _currline;
 
