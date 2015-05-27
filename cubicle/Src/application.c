@@ -10,6 +10,7 @@ void CUB_ApplicationRun()
 
 	CUB_Event event;
 	int count = 0;
+	int loop = 0;
 	/* Infinite loop */
 	for(;;) {
 
@@ -34,12 +35,15 @@ void CUB_ApplicationRun()
 			}
 		}
 
-		CUB_LEDs_switch_on(count, count, count);
+		CUB_LEDs_switch_on(loop, 0,    0);
+		CUB_LEDs_switch_on(0,    loop, 0);
+		CUB_LEDs_switch_on(0,    0,    loop);
 		CUB_LEDs_update_display();
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		if (count < 4)
-			CUB_Sleep(1000);
+		CUB_Sleep(200);
+
+		loop++;
 	}
 }
 
