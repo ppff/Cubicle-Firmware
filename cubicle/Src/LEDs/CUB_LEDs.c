@@ -213,21 +213,27 @@ void CUB_LEDs_update_display()
 	for (uint32_t k=0; k<SIZE_Z; k++)
 		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*SIZE_Y);
 }
-
 void CUB_LEDs_display()
 {
 	CUB_LEDs *l = &mMainLEDs;
+	HAL_StatusTypeDef status;
+	uint32_t k=0;
 	for (;;) {
-		for (uint32_t k=0; k<SIZE_Z; k++) {
-			HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], (SIZE_Y+1)*2, 15);
-			for (int i=0; i<80; ++i);
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
-			for (int i=0; i<40; ++i);
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
-		}
+		do {
+			status = HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], 20, 15);
+		} while (status != HAL_OK);
+
+		// latch enable
+		for (int i=0; i < 40; i++) ; 
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+		for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
+		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+
+		k = (k+1) % (SIZE_Z);
 		osDelay(10);
 	}
 }
+
 
 static void _refresh(void const * arg)
 {
