@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "spi.h"
-#include "display/CUB_display.h"
+#include "LEDs/CUB_LEDs.h"
 
 #ifdef STANDARD_COMPILATION
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #define FREE   vPortFree
 #endif
 
-void led_init(struct led *l, uint32_t size_x, uint32_t size_y, uint32_t size_z)
+void CUB_LEDs_init(CUB_LEDs *l, uint32_t size_x, uint32_t size_y, uint32_t size_z)
 {
 	l->size_x = size_x;
 	l->size_y = size_y;
@@ -33,7 +33,7 @@ void led_init(struct led *l, uint32_t size_x, uint32_t size_y, uint32_t size_z)
 
 }
 
-void led_free(struct led *l)
+void CUB_LEDs_free(CUB_LEDs *l)
 {
 	for (uint32_t k=0; k<l->size_z; ++k) {
 		FREE(l->data[k]);
@@ -43,7 +43,7 @@ void led_free(struct led *l)
 	FREE(l->buffer);
 }
 
-bool in_range(struct led *l, uint32_t x, uint32_t y, uint32_t z)
+bool CUB_LEDs_in_range(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
 	if (x < l->size_x && y < l->size_y && z < l->size_z) {
 		return true;
@@ -57,9 +57,9 @@ bool in_range(struct led *l, uint32_t x, uint32_t y, uint32_t z)
  * mask: 0000000100
  * or:   0000010101 <= LED on
  */
-void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z)
+void CUB_LEDs_switch_on(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
-	if (in_range(l, x, y, z))
+	if (CUB_LEDs_in_range(l, x, y, z))
 		l->data[z][l->size_y-y] |= 1 << x;
 }
 
@@ -68,23 +68,23 @@ void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z)
  * mask: 0000000100
  * xor:  0000010001 <= LED off
  */
-void led_switch_off(struct led *l, uint32_t x, uint32_t y, uint32_t z)
+void CUB_LEDs_switch_off(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
-	if (in_range(l, x, y, z))
+	if (CUB_LEDs_in_range(l, x, y, z))
 		if (l->data[z][l->size_y-y] & (1 << x))
 			l->data[z][l->size_y-y] ^= 1 << x;
 }
 
-int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z)
+int CUB_LEDs_get(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z)
 {
-	if (in_range(l, x, y, z)) {
+	if (CUB_LEDs_in_range(l, x, y, z)) {
 		return ((l->data[z][l->size_y-y] >> x) & 1);
 	} else {
 		return 0;
 	}
 }
 
-void CUB_translate_x(struct led *l, int32_t x)
+void CUB_LEDs_translate_x(CUB_LEDs *l, int32_t x)
 {
 	if (x > 0) {
 		for (uint32_t k=0; k<l->size_z; ++k)
@@ -97,7 +97,7 @@ void CUB_translate_x(struct led *l, int32_t x)
 	}
 }
 
-void CUB_translate_y(struct led *l, int32_t y)
+void CUB_LEDs_translate_y(CUB_LEDs *l, int32_t y)
 {
 	if (y > 0) {
 		for (uint32_t j=l->size_y-1; j>=(uint32_t)y; --j)
@@ -116,7 +116,7 @@ void CUB_translate_y(struct led *l, int32_t y)
 	}
 }
 
-void CUB_translate_z(struct led *l, int32_t z)
+void CUB_LEDs_translate_z(CUB_LEDs *l, int32_t z)
 {
 	for (uint32_t k=0; k<l->size_z; ++k)
 		l->tmp[k] = l->data[k];
@@ -137,33 +137,33 @@ void CUB_translate_z(struct led *l, int32_t z)
 	}
 }
 
-void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z)
+void CUB_LEDs_translate(CUB_LEDs *l, int32_t x, int32_t y, int32_t z)
 {
 	if (x != 0)
-		CUB_translate_x(l, x);
+		CUB_LEDs_translate_x(l, x);
 	if (y != 0)
-		CUB_translate_y(l, y);
+		CUB_LEDs_translate_y(l, y);
 	if (z != 0)
-		CUB_translate_z(l, z);
+		CUB_LEDs_translate_z(l, z);
 }
 
-void CUB_clear(struct led *l)
+void CUB_LEDs_clear(CUB_LEDs *l)
 {
 	for (uint32_t k=0; k<l->size_z; ++k)
 		memset(l->data[k], 0, l->size_y*sizeof(line_t));
 }
 
-void led_update_display(struct led *l)
+void CUB_LEDs_update_display(CUB_LEDs *l)
 {
 	for (uint32_t k=0; k<l->size_z; k++)
 		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*l->size_y);
 }
 
-void led_display(struct led *l)
+void CUB_LEDs_display(CUB_LEDs *l)
 {
 	for (;;) {
 		for (uint32_t k=0; k<l->size_z; k++) {
-			HAL_SPI_Transmit(&hspi4, l->buffer[k], l->buffer_size, 15);
+			HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], l->buffer_size*2, 15);
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 			for (int i=0; i<40; ++i) {}
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
@@ -172,7 +172,7 @@ void led_display(struct led *l)
 }
 
 #ifdef STANDARD_COMPILATION
-void led_print(struct led *l)
+void CUB_LEDs_print(CUB_LEDs *l)
 {
 	for (uint32_t k=0; k<l->height; ++k) {
 		for (uint32_t j=0; j<l->width; ++j) {

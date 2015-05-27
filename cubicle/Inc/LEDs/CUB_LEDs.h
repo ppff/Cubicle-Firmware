@@ -14,7 +14,7 @@ typedef uint16_t line_t;
  *
  * The structure must be initialized and freed.
  *
- * LED description:
+ * LEDs description:
  * %%%%%%% line     %%%%%%% line         %%%%%%% line 0   not in data,
  *         size_y-1         size_y-2                      only in buffer
  * 0000000111111111 0000000110100101 ... 0000000101010101 0000000000000001 <= plane 0
@@ -29,7 +29,7 @@ typedef uint16_t line_t;
  * The content of the "data" field will be copied in "buffer" when updating
  * display,
  */
-struct led {
+typedef struct CUB_LEDs {
 	line_t **data;
 	line_t **buffer;
 	line_t **tmp;
@@ -37,50 +37,50 @@ struct led {
 	uint32_t size_y;
 	uint32_t size_z;
 	uint32_t buffer_size;
-};
+} CUB_LEDs;
 
 /**
  * Initialize a LED structure.
  */
-void led_init(struct led *l, uint32_t length, uint32_t width, uint32_t height);
+void CUB_LEDs_init(CUB_LEDs *l, uint32_t length, uint32_t width, uint32_t height);
 
 /**
  * Free a LED structure.
  */
-void led_free(struct led *l);
+void CUB_LEDs_free(CUB_LEDs *l);
 
 /**
  * Switch on the LED (x,y,z).
  */
-void led_switch_on(struct led *l, uint32_t x, uint32_t y, uint32_t z);
+void CUB_LEDs_switch_on(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z);
 
 /**
  * Switch off the LED (x,y,z).
  */
-void led_switch_off(struct led *l, uint32_t x, uint32_t y, uint32_t z);
+void CUB_LEDs_switch_off(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z);
 
 /**
  * Translate display (fill with 0).
  */
-void CUB_translate(struct led *l, int32_t x, int32_t y, int32_t z);
+void CUB_LEDs_translate(CUB_LEDs *l, int32_t x, int32_t y, int32_t z);
 
 /**
  * Switch off all LEDs.
  */
-void clear(struct led *l);
+void CUB_LEDs_clear(CUB_LEDs *l);
 
 /**
  * Display the LED structure on the cube.
  */
-void update_display(struct led *l);
+void CUB_LEDs_update_display(CUB_LEDs *l);
 
 /**
  * Return 1 if LED (x,y,z) is on, else 0.
  */
-int led_get(struct led *l, uint32_t x, uint32_t y, uint32_t z);
+int CUB_LEDs_get(CUB_LEDs *l, uint32_t x, uint32_t y, uint32_t z);
 
 #ifdef STANDARD_COMPILATION
-void led_print(struct led *l);
+void CUB_LEDs_print(CUB_LEDs *l);
 #endif
 
 #endif

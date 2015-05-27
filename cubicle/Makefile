@@ -2,7 +2,7 @@
 PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
-SRCS+=Src/display/CUB_display.c
+SRCS+=Src/LEDs/CUB_LEDs.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
 SRCS+=Src/CUB.c
