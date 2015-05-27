@@ -9,6 +9,7 @@ void CUB_ApplicationRun()
 	CUB_TextPrint("Hello World :)");
 
 	CUB_Event event;
+	int count = 0;
 	/* Infinite loop */
 	for(;;) {
 
@@ -25,6 +26,7 @@ void CUB_ApplicationRun()
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 0);
+						count++;
 						break;
 					default:
 						;
@@ -33,7 +35,8 @@ void CUB_ApplicationRun()
 		}
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		CUB_Sleep(1000);
+		if (count < 4)
+			CUB_Sleep(1000);
 	}
 }
 

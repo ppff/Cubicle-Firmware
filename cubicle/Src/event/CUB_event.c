@@ -4,7 +4,7 @@
 #include "cmsis_os.h"
 #include "event/CUB_event.h"
 
-#define MAX_EVENTS 1<<8
+#define MAX_EVENTS (1<<8)
 
 /**
  * Circular buffer
@@ -19,18 +19,25 @@ static void _idlePushBtnEvent(void const * arg);
 
 static osMutexId _mutex_events;
 
-/**
- * Flag when button is pressed
- */
-static bool mButtonDown[CUB_BTN_LAST];
-/**
- * Flag when button is released
- */
-static bool mButtonUp[CUB_BTN_LAST];
+
 /**
  * Button current states
  */
-static bool mButtonState[CUB_BTN_LAST];
+enum {RELEASED=0, PRESSED};
+static uint8_t mButtonState[CUB_BTN_LAST];
+/**
+ * Flag when button is pressed
+ */
+static bool mButtonWasPressed[CUB_BTN_LAST];
+/**
+ * Flag when button is released
+ */
+static bool mButtonWasReleased[CUB_BTN_LAST];
+/**
+ * Old button values
+ */
+static uint8_t mButtonOldValue[CUB_BTN_LAST];
+
 
 /**
  * Initialize the event module.
@@ -50,9 +57,10 @@ void CUB_EventInit()
 
 	// Init flags
 	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
-		mButtonDown[i] = false;
-		mButtonUp[i] = false;
+		mButtonWasPressed[i] = false;
+		mButtonWasReleased[i] = false;
 		mButtonState[i] = false;
+		mButtonOldValue[i] = 0;
 	}
 }
 
@@ -123,25 +131,6 @@ bool CUB_PushEvent(CUB_Event * event)
  * Private
  */
 
-
-/**
- * It handler when button pressed
- */
-static void _itHdl_btnPressed(CUB_Button id)
-{
-    mButtonDown[id] = true;
-	mButtonState[id] = true;
-}
-
-/**
- * It handler when button released
- */
-static void _itHdl_btnReleased(CUB_Button id)
-{
-	mButtonUp[id] = true;
-	mButtonState[id] = false;
-}
-
 /**
  * Examine flags and create
  * corresponding events
@@ -151,17 +140,27 @@ static void _idlePushBtnEvent(void const * arg)
 	CUB_Event event;
 	for(;;) {
 		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
-			if (mButtonDown[i]) {
-				mButtonDown[i] = false;
-				event.type = CUB_BUTTON_DOWN;
-				event.button.id = i;
-				CUB_PushEvent(&event);
-			}
-			if (mButtonUp[i]) {
-				mButtonUp[i] = false;
-				event.type = CUB_BUTTON_UP;
-				event.button.id = i;
-				CUB_PushEvent(&event);
+			switch (mButtonState[i]) {
+			case RELEASED:
+				if (mButtonWasPressed[i]) {
+					mButtonWasPressed[i] = false;
+					mButtonState[i] = PRESSED;
+
+					event.type = CUB_BUTTON_DOWN;
+					event.button.id = i;
+					CUB_PushEvent(&event);
+				}
+				break;
+			case PRESSED: 
+				if (mButtonWasReleased[i]) {
+					mButtonWasReleased[i] = false;
+					mButtonState[i] = RELEASED;
+
+					event.type = CUB_BUTTON_UP;
+					event.button.id = i;
+					CUB_PushEvent(&event);
+				}
+				break;
 			}
 		}
 		osDelay(50);
@@ -170,16 +169,18 @@ static void _idlePushBtnEvent(void const * arg)
 
 #include "stm32f4xx_hal.h"
 
-static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t buttonId)
+/**
+ * 
+ */
+static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btnId)
 {
 	uint8_t val = HAL_GPIO_ReadPin(port, pin);
-	if (mButtonState[buttonId] && !val) {
-		// button was pressed and is now released
-		_itHdl_btnReleased(buttonId);
-	} else if (!mButtonState[buttonId] && val) {
-		// button was released and is now pressed
-		_itHdl_btnPressed(buttonId);
+	if (!mButtonOldValue[btnId] && val) { // rising edge
+		mButtonWasPressed[btnId] = true;
+	} else if (mButtonOldValue[btnId] && !val) { // falling edge
+		mButtonWasReleased[btnId] = true;
 	}
+	mButtonOldValue[btnId] = val;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
