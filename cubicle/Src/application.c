@@ -8,8 +8,6 @@ void CUB_ApplicationRun()
 	CUB_TextHome();
 	CUB_TextPrint("Hello World :)");
 
-	CUB_LEDs_init();
-
 	CUB_Event event;
 	int count = 0;
 	/* Infinite loop */
