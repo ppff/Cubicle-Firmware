@@ -70,13 +70,15 @@ static inline void releaseMutex()
  */
 bool CUB_PollEvent(CUB_Event * event)
 {
-    if (mSize == 0)
+    if (mSize == 0) {
         return false;
+	}
+
 	takeMutex();
-    if (event != NULL) {
-        memcpy(event, &mEvents[mSize-1], sizeof(CUB_Event));
+	if (event != NULL) {
+		memcpy(event, &mEvents[mSize-1], sizeof(CUB_Event));
     }
-    mSize--;
+	mSize--;
 	releaseMutex();
     return true;
 }
@@ -89,17 +91,19 @@ bool CUB_PollEvent(CUB_Event * event)
  */
 bool CUB_PushEvent(CUB_Event * event)
 {
-	takeMutex();
     if (event == NULL) {
-		releaseMutex();
         return true;
 	}
+
+	bool ret = false;
+	takeMutex();
     if (mSize == MAX_EVENTS) {
-		releaseMutex();
-        return false;
+        ret = false;
+	} else {
+    	memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
+    	mSize++;
+		ret = true;
 	}
-    memcpy(&mEvents[mSize], event, sizeof(CUB_Event));
-    mSize++;
 	releaseMutex();
     return true;
 }
@@ -115,14 +119,16 @@ bool CUB_PushEvent(CUB_Event * event)
 static void _itHdl_btnPressed(CUB_Button id)
 {
     mButtonDown[id] = true;
+	mButtonState[id] = true;
 }
 
 /**
  * It handler when button released
  */
-/*static*/ void _itHdl_btnReleased(CUB_Button id)
+static void _itHdl_btnReleased(CUB_Button id)
 {
 	mButtonUp[id] = true;
+	mButtonState[id] = false;
 }
 
 /**
@@ -153,37 +159,20 @@ static void _idlePushBtnEvent(void const * arg)
 
 #include "stm32f4xx_hal.h"
 
+static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t buttonId)
+{
+	uint8_t val = HAL_GPIO_ReadPin(port, pin);
+	if (mButtonState[buttonId] && !val) {
+		// button was pressed and is now released
+		_itHdl_btnReleased(buttonId);
+	} else if (!mButtonState[buttonId] && val) {
+		// button was released and is now pressed
+		_itHdl_btnPressed(buttonId);
+	}
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	uint8_t val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-		_itHdl_btnPressed(CUB_BTN_UP);
-	/*val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_DOWN);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_RIGHT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_TOP);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_BOTTOM);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_M_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_M_RIGHT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_SM_LEFT);
-	val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-	if (val)
-	    _itHdl_btnPressed(CUB_BTN_SM_RIGHT);
-	*/
+	treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
+	//treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
 }
 
