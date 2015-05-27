@@ -69,7 +69,12 @@ void CUB_LEDs_translate(CUB_LEDs *l, int32_t x, int32_t y, int32_t z);
 void CUB_LEDs_clear(CUB_LEDs *l);
 
 /**
- * Display the LED structure on the cube.
+ * Display a LED structure on the cube.
+ */
+void CUB_LEDs_display(CUB_LEDs *l);
+
+/**
+ * Update the LED structure on the cube.
  */
 void CUB_LEDs_update_display(CUB_LEDs *l);
 
