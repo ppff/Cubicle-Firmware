@@ -109,7 +109,7 @@ static void _itHdl_btnPressed(CUB_Button id)
 /**
  * It handler when button released
  */
-static void _itHdl_btnReleased(CUB_Button id)
+/*static*/ void _itHdl_btnReleased(CUB_Button id)
 {
 	mButtonUp[id] = true;
 }
