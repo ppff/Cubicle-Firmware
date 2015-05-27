@@ -11,9 +11,17 @@
 #else
 #include "FreeRTOS.h"
 #include "spi.h"
+#include "cmsis_os.h"
 #define MALLOC pvPortMalloc
 #define FREE   vPortFree
+/*
+ * Thread to always refresh real LED matrix
+ */
+static osThreadId refreshTaskHandle;
+static void _refresh(void const * arg);
+CUB_LEDs mMainLEDs; // to use
 #endif
+
 
 void CUB_LEDs_init(CUB_LEDs *l)
 {
@@ -27,6 +35,12 @@ void CUB_LEDs_init(CUB_LEDs *l)
 		l->buffer[k] = l->pointer_to_buffer + (SIZE_Z+1) * k;
 		l->buffer[k][SIZE_Y] = 1 << k;
 	}
+
+#ifndef STANDARD_COMPILATION
+	// launch task to always refresh
+	osThreadDef(REFRESH_TASK, _refresh, osPriorityAboveNormal, 0, 128);
+	refreshTaskHandle = osThreadCreate(osThread(REFRESH_TASK), NULL);
+#endif
 }
 
 void CUB_LEDs_free(CUB_LEDs *l)
@@ -156,12 +170,18 @@ void CUB_LEDs_display(CUB_LEDs *l)
 {
 	for (;;) {
 		for (uint32_t k=0; k<SIZE_Z; k++) {
-			HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], l->buffer_size*2, 15);
+			HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], (SIZE_Y+1)*2, 15);
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 			for (int i=0; i<40; ++i) {}
 			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
 		}
+		osDelay(10);
 	}
+}
+
+static void _refresh(void const * arg)
+{
+	CUB_LEDs_display(&mMainLEDs);
 }
 #endif
 
@@ -179,3 +199,4 @@ void CUB_LEDs_print(CUB_LEDs *l)
 	}
 }
 #endif
+
