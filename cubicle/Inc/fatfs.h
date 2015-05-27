@@ -1,9 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : stm32f4xx_hal_msp.c
-  * Date               : 22/05/2015 09:44:33
-  * Description        : This file provides code for the MSP Initialization 
-  *                      and de-Initialization codes.
+  * File Name          : fatfs.h
+  * Date               : 22/05/2015 16:33:35
+  * Description        : Header for fatfs applications
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -32,43 +31,33 @@
   *
   ******************************************************************************
   */
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
 
-/* USER CODE BEGIN 0 */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __fatfs_H
+#define __fatfs_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
-/* USER CODE END 0 */
+#include "ff.h"
+#include "ff_gen_drv.h"
+#include "sd_diskio.h" /* defines SD_Driver as external */
 
-/**
-  * Initializes the Global MSP.
-  */
-void HAL_MspInit(void)
-{
-  /* USER CODE BEGIN MspInit 0 */
+/* USER CODE BEGIN Includes */
 
-  /* USER CODE END MspInit 0 */
+/* USER CODE END Includes */
 
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+extern uint8_t retSD; /* Return value for SD */
+extern char SD_Path[4]; /* SD logical drive path */
 
-  /* System interrupt init*/
-/* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+void MX_FATFS_Init(void);
 
-  /* USER CODE BEGIN MspInit 1 */
+/* USER CODE BEGIN Prototypes */
 
-  /* USER CODE END MspInit 1 */
+/* USER CODE END Prototypes */
+#ifdef __cplusplus
 }
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif
+#endif /*__fatfs_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

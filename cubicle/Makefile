@@ -2,7 +2,7 @@
 PROJ_NAME=cubicle-stm32
 
 SRCS=Src/main.c
-SRCS+=Src/led.c
+SRCS+=Src/display/CUB_display.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
 SRCS+=Src/CUB.c
@@ -55,6 +55,8 @@ SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
 
 
 ########################
@@ -78,6 +80,9 @@ SRCS += Src/stm32f4xx_it.c
 SRCS += Src/gpio.c
 SRCS += Src/spi.c
 SRCS += Src/freertos.c
+SRCS += Src/bsp_driver_sd.c
+SRCS += Src/fatfs.c
+SRCS += Src/sdio.c
 
 ##########
 # FreeRTOS
@@ -91,6 +96,16 @@ SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/*.c)
 SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/*.c)
 SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c)
 SRCS += Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+
+#########
+# FatFS
+#########
+CFLAGS += -IMiddlewares/Third_Party/FatFs/src
+CFLAGS += -IMiddlewares/Third_Party/FatFs/src/drivers
+SRCS += Middlewares/Third_Party/FatFs/src/drivers/sd_diskio.c
+SRCS += $(wildcard Middlewares/Third_Party/FatFs/src/*.c)
+SRCS += Middlewares/Third_Party/FatFs/src/option/syscall.c
+SRCS += Middlewares/Third_Party/FatFs/src/option/unicode.c
 
 ##########
 # Rules
