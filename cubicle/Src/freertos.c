@@ -239,7 +239,7 @@ void StartTask02(void const * argument)
   {
     HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi4, *(cercle+plan), 20, 15);
     while (status != HAL_OK)
-        status = HAL_SPI_Transmit(&hspi4, pData, 2, 15);
+        status = HAL_SPI_Transmit(&hspi4, *(cercle+plan), 20, 15);
     for (int i=0; i < 8000; i++) ; 
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
     for (int i=0; i < 8000; i++) ; // 40 tours de boucles == 3 µs
