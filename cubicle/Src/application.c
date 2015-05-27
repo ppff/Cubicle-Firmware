@@ -14,7 +14,7 @@ void CUB_ApplicationRun()
 	for(;;) {
 
 		while (CUB_PollEvent(&event)) {
-			if (event.type == CUB_BUTTON_DOWN) {
+			if (event.type == CUB_BUTTON_PRESSED) {
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 1);
@@ -22,7 +22,7 @@ void CUB_ApplicationRun()
 					default:
 						;
 				}
-			} else if (event.type == CUB_BUTTON_UP) {
+			} else if (event.type == CUB_BUTTON_RELEASED) {
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 0);

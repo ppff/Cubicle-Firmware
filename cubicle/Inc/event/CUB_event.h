@@ -10,8 +10,9 @@
  */
 typedef enum {
     CUB_NOEVENT = 0,
-    CUB_BUTTON_DOWN,
-    CUB_BUTTON_UP,
+    CUB_BUTTON_PRESSED,
+    CUB_BUTTON_RELEASED,
+
     CUB_NUM_EVENTS
 } CUB_EventType;
 

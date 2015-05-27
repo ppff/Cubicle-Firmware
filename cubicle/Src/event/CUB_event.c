@@ -146,7 +146,7 @@ static void _idlePushBtnEvent(void const * arg)
 					mButtonWasPressed[i] = false;
 					mButtonState[i] = PRESSED;
 
-					event.type = CUB_BUTTON_DOWN;
+					event.type = CUB_BUTTON_PRESSED;
 					event.button.id = i;
 					CUB_PushEvent(&event);
 				}
@@ -156,7 +156,7 @@ static void _idlePushBtnEvent(void const * arg)
 					mButtonWasReleased[i] = false;
 					mButtonState[i] = RELEASED;
 
-					event.type = CUB_BUTTON_UP;
+					event.type = CUB_BUTTON_RELEASED;
 					event.button.id = i;
 					CUB_PushEvent(&event);
 				}
