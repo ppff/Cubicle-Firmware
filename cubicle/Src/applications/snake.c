@@ -20,69 +20,69 @@ typedef enum direction {
 
 
 typedef struct snake {
-	point_list_t *body;
+	point_list_t body;
 	direction_t direction;
 } snake_t;
 
 void snake_init(snake_t *snake)
 {
-	snake->body = MALLOC(sizeof(point_list_t));
 	for (uint32_t i=0; i<4; ++i) {
 		point_t p = {3-i, 0, 0};
-		point_list_add_element(snake->body, &p);
+		point_list_add_element(&(snake->body), &p);
 	}
+	snake->direction = PLUS_X;
 }
 
 void snake_free(snake_t *snake)
 {
-	point_list_free(snake->body);
+	point_list_free(&(snake->body));
 }
 
 void snake_move_forward(snake_t *snake)
 {
 	switch(snake->direction) {
 	case PLUS_X:
-		snake->body->last->p.x = snake->body->first->p.x + 1;
-		snake->body->last->p.y = snake->body->first->p.y;
-		snake->body->last->p.z = snake->body->first->p.z;
+		snake->body.last->p.x = snake->body.first->p.x + 1;
+		snake->body.last->p.y = snake->body.first->p.y;
+		snake->body.last->p.z = snake->body.first->p.z;
 		break;
 	case MINUS_X:
-		snake->body->last->p.x = snake->body->first->p.x - 1;
-		snake->body->last->p.y = snake->body->first->p.y;
-		snake->body->last->p.z = snake->body->first->p.z;
+		snake->body.last->p.x = snake->body.first->p.x - 1;
+		snake->body.last->p.y = snake->body.first->p.y;
+		snake->body.last->p.z = snake->body.first->p.z;
 		break;
 	case PLUS_Y:
-		snake->body->last->p.x = snake->body->first->p.x;
-		snake->body->last->p.y = snake->body->first->p.y + 1;
-		snake->body->last->p.z = snake->body->first->p.z;
+		snake->body.last->p.x = snake->body.first->p.x;
+		snake->body.last->p.y = snake->body.first->p.y + 1;
+		snake->body.last->p.z = snake->body.first->p.z;
 		break;
 	case MINUS_Y:
-		snake->body->last->p.x = snake->body->first->p.x;
-		snake->body->last->p.y = snake->body->first->p.y - 1;
-		snake->body->last->p.z = snake->body->first->p.z;
+		snake->body.last->p.x = snake->body.first->p.x;
+		snake->body.last->p.y = snake->body.first->p.y - 1;
+		snake->body.last->p.z = snake->body.first->p.z;
 		break;
 	case PLUS_Z:
-		snake->body->last->p.x = snake->body->first->p.x;
-		snake->body->last->p.y = snake->body->first->p.y;
-		snake->body->last->p.z = snake->body->first->p.z + 1;
+		snake->body.last->p.x = snake->body.first->p.x;
+		snake->body.last->p.y = snake->body.first->p.y;
+		snake->body.last->p.z = snake->body.first->p.z + 1;
 		break;
 	case MINUS_Z:
-		snake->body->last->p.x = snake->body->first->p.x;
-		snake->body->last->p.y = snake->body->first->p.y;
-		snake->body->last->p.z = snake->body->first->p.z - 1;
+		snake->body.last->p.x = snake->body.first->p.x;
+		snake->body.last->p.y = snake->body.first->p.y;
+		snake->body.last->p.z = snake->body.first->p.z - 1;
 		break;
 	}
-	point_list_element_t *previous_first = snake->body->first;
-	snake->body->last = snake->body->last->prev;
-	snake->body->last->next = NULL;
-	snake->body->first = snake->body->last;
-	snake->body->first->next = previous_first;
-	snake->body->first->prev = NULL;
+	point_list_element_t *previous_first = snake->body.first;
+	snake->body.last = snake->body.last->prev;
+	snake->body.last->next = NULL;
+	snake->body.first = snake->body.last;
+	snake->body.first->next = previous_first;
+	snake->body.first->prev = NULL;
 }
 
 void snake_display(snake_t *s)
 {
-	point_list_element_t *cur = s->body->first;
+	point_list_element_t *cur = s->body.first;
 	while (cur != NULL) {
 		CUB_LEDs_switch_on(cur->p.x, cur->p.y, cur->p.z);
 		cur = cur->next;
