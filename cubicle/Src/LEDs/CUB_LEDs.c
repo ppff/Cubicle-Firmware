@@ -209,6 +209,7 @@ void CUB_LEDs_update_display()
 	for (uint32_t k=0; k<SIZE_Z; k++)
 		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*SIZE_Y);
 }
+
 void CUB_LEDs_display()
 {
 	CUB_LEDs *l = &mMainLEDs;
@@ -216,7 +217,7 @@ void CUB_LEDs_display()
 	uint32_t k=0;
 	for (;;) {
 		do {
-			status = HAL_SPI_Transmit(&hspi4, (uint8_t *)l->buffer[k], 20, 15);
+			status = HAL_SPI_Transmit(&hspi4, (uint8_t*)l->buffer[k], (SIZE_Y+1), 15);
 		} while (status != HAL_OK);
 
 		// latch enable
