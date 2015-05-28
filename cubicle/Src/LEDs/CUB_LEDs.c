@@ -4,16 +4,10 @@
 
 #include "LEDs/CUB_LEDs.h"
 
-#ifdef STANDARD_COMPILATION
-#include <stdio.h>
-#define MALLOC malloc
-#define FREE   free
-#else
+#ifndef STANDARD_COMPILATION
 #include "FreeRTOS.h"
 #include "spi.h"
 #include "cmsis_os.h"
-#define MALLOC pvPortMalloc
-#define FREE   vPortFree
 #endif
 
 #include "constant.h"

@@ -51,3 +51,12 @@
 
 
 
+#ifdef STANDARD_COMPILATION
+#include <stdlib.h>
+#define MALLOC malloc
+#define FREE   free
+#else
+#include "FreeRTOS.h"
+#define MALLOC pvPortMalloc
+#define FREE   vPortFree
+#endif
