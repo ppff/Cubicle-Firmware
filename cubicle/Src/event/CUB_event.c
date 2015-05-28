@@ -2,10 +2,23 @@
 #include <string.h>
 
 #include "cmsis_os.h"
+#include "stm32f4xx_hal.h"
 #include "event/CUB_event.h"
 #include "constant.h"
 
 #define MAX_EVENTS (1<<8)
+
+/**
+ * Define virtual state in fonction of
+ * electric state.
+ */
+#if BUTTONS_ARE_ACTIVATED_AT_HIGH_LEVEL
+	#define BTN_IS_ACTIVE GPIO_PIN_SET
+	#define BTN_IS_NOT_ACTIVE GPIO_PIN_RESET
+#else
+	#define BTN_IS_ACTIVE GPIO_PIN_RESET
+	#define BTN_IS_NOT_ACTIVE GPIO_PIN_SET
+#endif
 
 /**
  * Circular buffer
@@ -61,7 +74,7 @@ void CUB_EventInit()
 		mButtonWasPressed[i] = false;
 		mButtonWasReleased[i] = false;
 		mButtonState[i] = false;
-		mButtonOldValue[i] = 0;
+		mButtonOldValue[i] = BTN_IS_NOT_ACTIVE;
 	}
 }
 
@@ -168,7 +181,7 @@ static void _idlePushBtnEvent(void const * arg)
 	}
 }
 
-#include "stm32f4xx_hal.h"
+
 
 /**
  * 
@@ -176,13 +189,14 @@ static void _idlePushBtnEvent(void const * arg)
 static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btnId)
 {
 	uint8_t val = HAL_GPIO_ReadPin(port, pin);
-	if (!mButtonOldValue[btnId] && val) { // rising edge
+	if ((mButtonOldValue[btnId]==BTN_IS_NOT_ACTIVE) && (val==BTN_IS_ACTIVE)) { // virtual rising edge
 		mButtonWasPressed[btnId] = true;
-	} else if (mButtonOldValue[btnId] && !val) { // falling edge
+	} else if ((mButtonOldValue[btnId]==BTN_IS_ACTIVE) && (val==BTN_IS_NOT_ACTIVE)) { // virtual falling edge
 		mButtonWasReleased[btnId] = true;
 	}
 	mButtonOldValue[btnId] = val;
 }
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	treatBtnChange(CONFIG_BTN_TOP_PORT,    CONFIG_BTN_TOP_PIN,    CUB_BTN_TOP);

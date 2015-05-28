@@ -8,6 +8,12 @@
 
 #define SIZE_Z 9
 
+/**
+ * Define relation between button state 
+ * and electrical value.
+ * Value can be 0 or 1
+ */
+#define BUTTONS_ARE_ACTIVATED_AT_HIGH_LEVEL 0
 
 /**
  * Button pins configuration
