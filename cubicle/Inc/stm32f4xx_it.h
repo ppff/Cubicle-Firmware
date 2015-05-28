@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    stm32f4xx_it.h
-  * @date    22/05/2015 09:44:33
+  * @date    28/05/2015 14:27:25
   * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   *
@@ -46,8 +46,11 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
+void EXTI1_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
 void EXTI0_IRQHandler(void);
 void SysTick_Handler(void);
+void EXTI9_5_IRQHandler(void);
 
 #ifdef __cplusplus
 }
