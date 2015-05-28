@@ -20,4 +20,6 @@ void point_list_add_element(point_list_t *l, point_t *p);
 
 bool point_list_is_in(point_list_t *l, point_t *p);
 
+void point_list_queue_to_head(point_list_t *l);
+
 #endif

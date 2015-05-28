@@ -34,3 +34,13 @@ bool point_list_is_in(point_list_t *l, point_t *p)
 	return false;
 }
 
+void point_list_queue_to_head(point_list_t *l)
+{
+	point_list_element_t *previous_first = l->first;
+	l->first = l->last;
+	l->last  = l->last->prev;
+	l->last->next = NULL;
+	l->first->next = previous_first;
+	l->first->prev = NULL;
+}
+
