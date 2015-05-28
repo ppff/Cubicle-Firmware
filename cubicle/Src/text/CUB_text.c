@@ -117,7 +117,7 @@ static uint8_t _currline;
 
 static void delayMicroseconds(uint32_t i)
 {
-	i <<= 4;
+	i <<= 5;
 	while(i--);
 }
 
