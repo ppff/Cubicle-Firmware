@@ -58,8 +58,9 @@ typedef struct CUB_LEDs {
  */
 static osThreadId refreshTaskHandle;
 static void _refresh(void const * arg);
-static CUB_LEDs mMainLEDs; // to use
 #endif
+static CUB_LEDs mMainLEDs; // to use
+static line_t translate_plus_x_mask = 0;
 
 void CUB_LEDs_init()
 {
@@ -73,6 +74,10 @@ void CUB_LEDs_init()
 		l->data[k]   = l->pointer_to_data   + SIZE_Y     * k;
 		l->buffer[k] = l->pointer_to_buffer + (SIZE_Z+1) * k;
 		l->buffer[k][SIZE_Y] = 1 << k;
+	}
+	for (uint32_t j=0; j<SIZE_Y; ++j) {
+		translate_plus_x_mask <<= 1;
+		translate_plus_x_mask |= 1;
 	}
 
 #ifndef STANDARD_COMPILATION
@@ -133,9 +138,12 @@ void CUB_LEDs_translate_x(int32_t x)
 {
 	CUB_LEDs *l = &mMainLEDs;
 	if (x > 0) {
-		for (uint32_t k=0; k<SIZE_Z; ++k)
-			for (uint32_t j=0; j<SIZE_Y; ++j)
+		for (uint32_t k=0; k<SIZE_Z; ++k) {
+			for (uint32_t j=0; j<SIZE_Y; ++j) {
 				l->data[k][SIZE_Y-1-j] <<= x;
+				l->data[k][SIZE_Y-1-j] &= translate_plus_x_mask;
+			}
+		}
 	} else if (x < 0) {
 		for (uint32_t k=0; k<SIZE_Z; ++k)
 			for (uint32_t j=0; j<SIZE_Y; ++j)

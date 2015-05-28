@@ -7,31 +7,40 @@
 
 int main(void)
 {
-	CUB_LEDs l;
-	CUB_LEDs_init(&l);
-	CUB_LEDs_switch_on(&l, 0, 0, 0);
-	CUB_LEDs_switch_on(&l, 1, 0, 0);
-	CUB_LEDs_switch_on(&l, 2, 1, 0);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_init();
+	CUB_LEDs_switch_on(0, 0, 0);
+	CUB_LEDs_switch_on(1, 0, 0);
+	CUB_LEDs_switch_on(2, 1, 0);
+	CUB_LEDs_print();
 	printf("Translate x +1:\n");
-	CUB_LEDs_translate(&l, 1, 0, 0);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_translate(1, 0, 0);
+	CUB_LEDs_print();
 	printf("Translate x -1:\n");
-	CUB_LEDs_translate(&l, -1, 0, 0);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_translate(-1, 0, 0);
+	CUB_LEDs_print();
 	printf("Translate y +1:\n");
-	CUB_LEDs_translate(&l, 0, 1, 0);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_translate(0, 1, 0);
+	CUB_LEDs_print();
 	printf("Translate y -1:\n");
-	CUB_LEDs_translate(&l, 0, -1, 0);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_translate(0, -1, 0);
+	CUB_LEDs_print();
 	printf("Translate z +1:\n");
-	CUB_LEDs_translate(&l, 0, 0, 1);
-	CUB_LEDs_print(&l);
+	CUB_LEDs_translate(0, 0, 1);
+	CUB_LEDs_print();
 	printf("Translate z -1:\n");
-	CUB_LEDs_translate(&l, 0, 0, -1);
-	CUB_LEDs_print(&l);
-	CUB_LEDs_free(&l);
+	CUB_LEDs_translate(0, 0, -1);
+	CUB_LEDs_print();
+
+	CUB_LEDs_clear();
+	for (int i=0; i<9; ++i)
+		CUB_LEDs_switch_on(i, 0, 0);
+	printf("Avant translation\n");
+	CUB_LEDs_print();
+	CUB_LEDs_translate(+1, 0, 0);
+	CUB_LEDs_translate(-1, 0, 0);
+	printf("Après translation\n");
+	CUB_LEDs_print();
+	CUB_LEDs_free();
 
 	return 0;
 }
