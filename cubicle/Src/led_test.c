@@ -3,35 +3,44 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "CUB_Display.h"
+#include "LEDs/CUB_LEDs.h"
 
 int main(void)
 {
-	struct led l;
-	led_init(&l, 9, 8, 10);
-	led_switch_on(&l, 0, 0, 0);
-	led_switch_on(&l, 1, 0, 0);
-	led_switch_on(&l, 2, 1, 0);
-	led_print(&l);
+	CUB_LEDs_init();
+	CUB_LEDs_switch_on(0, 0, 0);
+	CUB_LEDs_switch_on(1, 0, 0);
+	CUB_LEDs_switch_on(2, 1, 0);
+	CUB_LEDs_print();
 	printf("Translate x +1:\n");
-	CUB_translate(&l, 1, 0, 0);
-	led_print(&l);
+	CUB_LEDs_translate(1, 0, 0);
+	CUB_LEDs_print();
 	printf("Translate x -1:\n");
-	CUB_translate(&l, -1, 0, 0);
-	led_print(&l);
+	CUB_LEDs_translate(-1, 0, 0);
+	CUB_LEDs_print();
 	printf("Translate y +1:\n");
-	CUB_translate(&l, 0, 1, 0);
-	led_print(&l);
+	CUB_LEDs_translate(0, 1, 0);
+	CUB_LEDs_print();
 	printf("Translate y -1:\n");
-	CUB_translate(&l, 0, -1, 0);
-	led_print(&l);
+	CUB_LEDs_translate(0, -1, 0);
+	CUB_LEDs_print();
 	printf("Translate z +1:\n");
-	CUB_translate(&l, 0, 0, 1);
-	led_print(&l);
+	CUB_LEDs_translate(0, 0, 1);
+	CUB_LEDs_print();
 	printf("Translate z -1:\n");
-	CUB_translate(&l, 0, 0, -1);
-	led_print(&l);
-	led_free(&l);
+	CUB_LEDs_translate(0, 0, -1);
+	CUB_LEDs_print();
+
+	CUB_LEDs_clear();
+	for (int i=0; i<9; ++i)
+		CUB_LEDs_switch_on(i, 0, 0);
+	printf("Avant translation\n");
+	CUB_LEDs_print();
+	CUB_LEDs_translate(+1, 0, 0);
+	CUB_LEDs_translate(-1, 0, 0);
+	printf("Après translation\n");
+	CUB_LEDs_print();
+	CUB_LEDs_free();
 
 	return 0;
 }

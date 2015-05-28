@@ -19,6 +19,7 @@ void CUB_Init()
 {
 	CUB_EventInit();
 	CUB_TextInit(2, 20);
+	CUB_LEDs_init();
 }
 
 /**
