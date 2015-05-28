@@ -1,4 +1,6 @@
+#include <stddef.h>
 #include "CUB_point_list.h"
+#include "constant.h"
 
 void point_list_free(point_list_t *l)
 {
