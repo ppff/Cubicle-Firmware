@@ -3,6 +3,7 @@
 
 #include "cmsis_os.h"
 #include "event/CUB_event.h"
+#include "constant.h"
 
 #define MAX_EVENTS (1<<8)
 
@@ -184,7 +185,15 @@ static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btn
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
-	//treatBtnChange(GPIOA, GPIO_PIN_0, CUB_BTN_UP);
+	treatBtnChange(CONFIG_BTN_TOP_PORT,    CONFIG_BTN_TOP_PIN,    CUB_BTN_TOP);
+	treatBtnChange(CONFIG_BTN_BOTTOM_PORT, CONFIG_BTN_BOTTOM_PIN, CUB_BTN_BOTTOM);
+	treatBtnChange(CONFIG_BTN_UP_PORT,     CONFIG_BTN_UP_PIN,     CUB_BTN_UP);
+	treatBtnChange(CONFIG_BTN_LEFT_PORT,   CONFIG_BTN_LEFT_PIN,   CUB_BTN_LEFT);
+	treatBtnChange(CONFIG_BTN_DOWN_PORT,   CONFIG_BTN_DOWN_PIN,   CUB_BTN_DOWN);
+	treatBtnChange(CONFIG_BTN_RIGHT_PORT,  CONFIG_BTN_RIGHT_PIN,  CUB_BTN_RIGHT);
+	treatBtnChange(CONFIG_BTN_MENU_LEFT_PORT,      CONFIG_BTN_MENU_LEFT_PIN,      CUB_BTN_M_LEFT);
+	treatBtnChange(CONFIG_BTN_MENU_RIGHT_PORT,     CONFIG_BTN_MENU_RIGHT_PIN,     CUB_BTN_M_RIGHT);
+	treatBtnChange(CONFIG_BTN_SUB_MENU_LEFT_PORT,  CONFIG_BTN_SUB_MENU_LEFT_PIN,  CUB_BTN_SM_LEFT);
+	treatBtnChange(CONFIG_BTN_SUB_MENU_RIGHT_PORT, CONFIG_BTN_SUB_MENU_RIGHT_PIN, CUB_BTN_SM_RIGHT);
 }
 
