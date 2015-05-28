@@ -40,44 +40,41 @@ void snake_free(snake_t *snake)
 
 void snake_move_forward(snake_t *snake)
 {
+	point_t *last  = &(snake->body.last->p);
+	point_t *first = &(snake->body.first->p);
 	switch(snake->direction) {
 	case PLUS_X:
-		snake->body.last->p.x = snake->body.first->p.x + 1;
-		snake->body.last->p.y = snake->body.first->p.y;
-		snake->body.last->p.z = snake->body.first->p.z;
+		last->x = first->x + 1;
+		last->y = first->y;
+		last->z = first->z;
 		break;
 	case MINUS_X:
-		snake->body.last->p.x = snake->body.first->p.x - 1;
-		snake->body.last->p.y = snake->body.first->p.y;
-		snake->body.last->p.z = snake->body.first->p.z;
+		last->x = first->x - 1;
+		last->y = first->y;
+		last->z = first->z;
 		break;
 	case PLUS_Y:
-		snake->body.last->p.x = snake->body.first->p.x;
-		snake->body.last->p.y = snake->body.first->p.y + 1;
-		snake->body.last->p.z = snake->body.first->p.z;
+		last->x = first->x;
+		last->y = first->y + 1;
+		last->z = first->z;
 		break;
 	case MINUS_Y:
-		snake->body.last->p.x = snake->body.first->p.x;
-		snake->body.last->p.y = snake->body.first->p.y - 1;
-		snake->body.last->p.z = snake->body.first->p.z;
+		last->x = first->x;
+		last->y = first->y - 1;
+		last->z = first->z;
 		break;
 	case PLUS_Z:
-		snake->body.last->p.x = snake->body.first->p.x;
-		snake->body.last->p.y = snake->body.first->p.y;
-		snake->body.last->p.z = snake->body.first->p.z + 1;
+		last->x = first->x;
+		last->y = first->y;
+		last->z = first->z + 1;
 		break;
 	case MINUS_Z:
-		snake->body.last->p.x = snake->body.first->p.x;
-		snake->body.last->p.y = snake->body.first->p.y;
-		snake->body.last->p.z = snake->body.first->p.z - 1;
+		last->x = first->x;
+		last->y = first->y;
+		last->z = first->z - 1;
 		break;
 	}
-	point_list_element_t *previous_first = snake->body.first;
-	snake->body.last = snake->body.last->prev;
-	snake->body.last->next = NULL;
-	snake->body.first = snake->body.last;
-	snake->body.first->next = previous_first;
-	snake->body.first->prev = NULL;
+	point_list_queue_to_head(&(snake->body));
 }
 
 void snake_display(snake_t *s)
