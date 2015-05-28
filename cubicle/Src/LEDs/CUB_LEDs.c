@@ -89,7 +89,7 @@ void CUB_LEDs_free()
 	FREE(l->pointer_to_buffer);
 }
 
-inline bool CUB_LEDs_in_range(uint32_t x, uint32_t y, uint32_t z)
+bool CUB_LEDs_in_range(uint32_t x, uint32_t y, uint32_t z)
 {
 	return (x < SIZE_X && y < SIZE_Y && z < SIZE_Z);
 }
