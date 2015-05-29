@@ -149,6 +149,7 @@ void CUB_ApplicationRun()
 	while (true) {
 		snake_t snake;
 		food_t food;
+		uint32_t score = 0;
 		snake_init(&snake);
 		food_init(&food);
 		food_new(&food);
@@ -202,6 +203,11 @@ void CUB_ApplicationRun()
 			}
 			snake_move_forward(&snake);
 			if (!snake_consistent(&snake)) {
+				CUB_TextClear();
+				CUB_TextHome();
+				char score_string[16];
+				sprintf(score_string, "%u", score);
+				CUB_TextPrint(score_string);
 				for (uint32_t i=0; i<4; ++i) {
 					CUB_LEDs_clear();
 					snake_display(&snake);
@@ -219,6 +225,7 @@ void CUB_ApplicationRun()
 			food_display(&food);
 			if (point_list_is_in(&(snake.body), &(food.location))) {
 				snake_increase(&snake);
+				score++;
 				food_new(&food);
 			}
 			CUB_LEDs_update_display();
