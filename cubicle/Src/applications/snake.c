@@ -42,36 +42,43 @@ void snake_move_forward(snake_t *snake)
 {
 	point_t *last  = &(snake->body.last->p);
 	point_t *first = &(snake->body.first->p);
+	point_copy(last, first);
 	switch(snake->direction) {
 	case PLUS_X:
-		last->x = first->x + 1;
-		last->y = first->y;
-		last->z = first->z;
+		last->x += 1;
+		if (last->x == SIZE_X)
+			last->x = 0;
 		break;
 	case MINUS_X:
-		last->x = first->x - 1;
-		last->y = first->y;
-		last->z = first->z;
+		if (last->x != 0) {
+			last->x -= 1;
+		} else {
+			last->x = SIZE_X - 1;
+		}
 		break;
 	case PLUS_Y:
-		last->x = first->x;
-		last->y = first->y + 1;
-		last->z = first->z;
+		last->y += 1;
+		if (last->y == SIZE_Y)
+			last->y = 0;
 		break;
 	case MINUS_Y:
-		last->x = first->x;
-		last->y = first->y - 1;
-		last->z = first->z;
+		if (last->y != 0) {
+			last->y -= 1;
+		} else {
+			last->y = SIZE_Y - 1;
+		}
 		break;
 	case PLUS_Z:
-		last->x = first->x;
-		last->y = first->y;
-		last->z = first->z + 1;
+		last->z += 1;
+		if (last->z == SIZE_Z)
+			last->z = 0;
 		break;
 	case MINUS_Z:
-		last->x = first->x;
-		last->y = first->y;
-		last->z = first->z - 1;
+		if (last->z != 0) {
+			last->z -= 1;
+		} else {
+			last->z = SIZE_Z - 1;
+		}
 		break;
 	}
 	point_list_queue_to_head(&(snake->body));
