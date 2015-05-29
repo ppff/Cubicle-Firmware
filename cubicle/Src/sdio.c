@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : SDIO.c
-  * Date               : 26/05/2015 17:32:30
+  * Date               : 29/05/2015 10:25:40
   * Description        : This file provides code for the configuration
   *                      of the SDIO instances.
   ******************************************************************************
@@ -56,7 +56,7 @@ void MX_SDIO_SD_Init(void)
   hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
   hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
   hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
-  hsd.Init.ClockDiv = 0;
+  hsd.Init.ClockDiv = 255;
 
 }
 
@@ -78,21 +78,19 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     PC8     ------> SDIO_D0
     PC9     ------> SDIO_D1
     PC10     ------> SDIO_D2
-    PC11     ------> SDIO_D3
     PC12     ------> SDIO_CK
     PD2     ------> SDIO_CMD
     PB8     ------> SDIO_D4
     PB9     ------> SDIO_D5 
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11 
-                          |GPIO_PIN_12;
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
@@ -136,14 +134,13 @@ void HAL_SD_MspDeInit(SD_HandleTypeDef* hsd)
     PC8     ------> SDIO_D0
     PC9     ------> SDIO_D1
     PC10     ------> SDIO_D2
-    PC11     ------> SDIO_D3
     PC12     ------> SDIO_CK
     PD2     ------> SDIO_CMD
     PB8     ------> SDIO_D4
     PB9     ------> SDIO_D5 
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9 
-                          |GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12);
+                          |GPIO_PIN_10|GPIO_PIN_12);
 
     HAL_GPIO_DeInit(GPIOD, GPIO_PIN_2);
 
