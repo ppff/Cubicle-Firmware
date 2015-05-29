@@ -22,11 +22,13 @@ typedef enum direction {
 typedef struct snake {
 	point_list_t body;
 	direction_t direction;
+	uint32_t size;
 } snake_t;
 
 void snake_init(snake_t *snake)
 {
 	point_list_init(&snake->body);
+	snake->size = 4;
 	for (uint32_t i=0; i<4; ++i) {
 		point_t p = {3-i, 0, 0};
 		point_list_add_element(&(snake->body), &p);
@@ -45,6 +47,12 @@ bool snake_consistent(snake_t *snake)
 		cur = cur->next;
 	}
 	return true;
+}
+
+void snake_increase(snake_t *s)
+{
+	point_list_add_element(&(s->body), &(s->body.last->p));
+	s->size++;
 }
 
 void snake_free(snake_t *snake)
@@ -201,11 +209,11 @@ void CUB_ApplicationRun()
 			snake_display(&snake);
 			food_display(&food);
 			if (point_list_is_in(&(snake.body), &(food.location))) {
-				point_list_add_element(&(snake.body), &(snake.body.last->p));
+				snake_increase(&snake);
 				food_new(&food);
 			}
 			CUB_LEDs_update_display();
-			CUB_Sleep(250);
+			CUB_Sleep(300 - snake.size * 10);
 		}
 	}
 	CUB_LEDs_free();
