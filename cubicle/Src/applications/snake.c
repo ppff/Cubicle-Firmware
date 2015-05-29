@@ -56,6 +56,7 @@ void snake_init(snake_t *snake)
 	for (uint32_t i=0; i<4; ++i) {
 		point_t p = {3-i, 0, 0};
 		point_list_add_element(&(snake->body), &p);
+		CUB_LEDs_switch_on(p.x, p.y, p.z);
 	}
 	snake->direction = PLUS_X;
 }
@@ -88,6 +89,7 @@ void snake_move_forward(snake_t *snake)
 {
 	point_t *last  = &(snake->body.last->p);
 	point_t *first = &(snake->body.first->p);
+	CUB_LEDs_switch_off(last->x, last->y, last->z);
 	point_copy(last, first);
 	switch(snake->direction) {
 	case PLUS_X:
@@ -127,6 +129,7 @@ void snake_move_forward(snake_t *snake)
 		}
 		break;
 	}
+	CUB_LEDs_switch_on(last->x, last->y, last->z);
 	point_list_queue_to_head(&(snake->body));
 }
 
@@ -149,6 +152,7 @@ void food_init(food_t *f)
 	f->location.x = 4;
 	f->location.y = 4;
 	f->location.z = 4;
+	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
 }
 
 void food_new(food_t *f)
@@ -157,10 +161,6 @@ void food_new(food_t *f)
 	f->location.x = (f->location.y + 5) % (SIZE_X);
 	f->location.y = (f->location.z + 4) % (SIZE_Y);
 	f->location.z = (f->location.x + f->location.y + 3) % (SIZE_Z);
-}
-
-void food_display(food_t *f)
-{
 	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
 }
 
@@ -239,9 +239,6 @@ void CUB_ApplicationRun()
 				snake_free(&snake);
 				break;
 			}
-			CUB_LEDs_clear();
-			snake_display(&snake);
-			food_display(&food);
 			if (point_list_is_in(&(snake.body), &(food.location))) {
 				snake_increase(&snake);
 				score++;
