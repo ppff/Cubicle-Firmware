@@ -118,6 +118,18 @@ void CUB_LEDs_switch_off(uint32_t x, uint32_t y, uint32_t z)
 			l->data[z][SIZE_Y-1-y] ^= 1 << x;
 }
 
+/**
+ * line: 0000010101
+ * mask: 0000000100
+ * xor:  0000010001 <= LED off
+ */
+void CUB_LEDs_toggle(uint32_t x, uint32_t y, uint32_t z)
+{
+	CUB_LEDs *l = &mMainLEDs;
+	if (CUB_LEDs_in_range(x, y, z))
+		l->data[z][SIZE_Y-1-y] ^= 1 << x;
+}
+
 int CUB_LEDs_get(uint32_t x, uint32_t y, uint32_t z)
 {
 	CUB_LEDs *l = &mMainLEDs;
