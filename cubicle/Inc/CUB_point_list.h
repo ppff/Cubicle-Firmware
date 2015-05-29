@@ -14,6 +14,8 @@ typedef struct point_list {
 	point_list_element_t *last;
 } point_list_t;
 
+void point_list_init(point_list_t *l);
+
 void point_list_free(point_list_t *l);
 
 void point_list_add_element(point_list_t *l, point_t *p);

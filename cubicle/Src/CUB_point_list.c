@@ -2,6 +2,11 @@
 #include "CUB_point_list.h"
 #include "constant.h"
 
+void point_list_init(point_list_t *l)
+{
+	l->first = l->last = NULL;
+}
+
 void point_list_free(point_list_t *l)
 {
 	point_list_element_t *e = l->first;
@@ -20,6 +25,8 @@ void point_list_add_element(point_list_t *l, point_t *p)
 	l->last = (point_list_element_t *)MALLOC(sizeof(point_list_element_t));
 	l->last->prev = previous_last;
 	l->last->next = NULL;
+	if (l->first == NULL)
+		l->first = l->last;
 	point_copy(&(l->last->p), p);
 }
 
@@ -42,5 +49,6 @@ void point_list_queue_to_head(point_list_t *l)
 	l->last->next = NULL;
 	l->first->next = previous_first;
 	l->first->prev = NULL;
+	previous_first->prev = l->first;
 }
 

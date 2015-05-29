@@ -26,6 +26,7 @@ typedef struct snake {
 
 void snake_init(snake_t *snake)
 {
+	point_list_init(&snake->body);
 	for (uint32_t i=0; i<4; ++i) {
 		point_t p = {3-i, 0, 0};
 		point_list_add_element(&(snake->body), &p);
@@ -118,7 +119,6 @@ void CUB_ApplicationRun()
 	CUB_Event event;
 	snake_t snake;
 	food_t food;
-	CUB_LEDs_init();
 	snake_init(&snake);
 	food_new(&food);
 	for(;;) {
@@ -172,7 +172,7 @@ void CUB_ApplicationRun()
 			food_new(&food);
 		}
 		CUB_LEDs_update_display();
-		CUB_Sleep(500);
+		CUB_Sleep(250);
 	}
 	snake_free(&snake);
 	CUB_LEDs_free();
