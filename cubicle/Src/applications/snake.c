@@ -202,6 +202,15 @@ void CUB_ApplicationRun()
 			}
 			snake_move_forward(&snake);
 			if (!snake_consistent(&snake)) {
+				for (uint32_t i=0; i<4; ++i) {
+					CUB_LEDs_clear();
+					snake_display(&snake);
+					CUB_LEDs_update_display();
+					CUB_Sleep(250);
+					CUB_LEDs_clear();
+					CUB_LEDs_update_display();
+					CUB_Sleep(250);
+				}
 				snake_free(&snake);
 				break;
 			}
