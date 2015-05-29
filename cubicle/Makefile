@@ -6,9 +6,9 @@ SRCS+=Src/LEDs/CUB_LEDs.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
 SRCS+=Src/CUB.c
-#SRCS+=Src/application.c
 SRCS+=Src/CUB_point.c
 SRCS+=Src/CUB_point_list.c
+#SRCS+=Src/application.c
 SRCS+=Src/applications/snake.c
 
 # Normally you shouldn't need to change anything below this line!
