@@ -228,7 +228,8 @@ void CUB_ApplicationRun()
 				sprintf(score_string, "%u", score);
 				CUB_TextPrint(score_string);
 
-				food_new(&food);
+				while (point_list_is_in(&(snake.body), &(food.location)))
+					food_new(&food);
 			}
 			CUB_LEDs_update_display();
 			CUB_Sleep(300 - snake.size * 10);
