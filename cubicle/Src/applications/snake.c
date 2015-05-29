@@ -122,14 +122,14 @@ void food_init(food_t *f)
 void food_new(food_t *f)
 {
 	CUB_LEDs_switch_off(f->location.x, f->location.y, f->location.z);
-	f->location.x = f->location.y + 5 % SIZE_X;
-	f->location.y = f->location.z + 4 % SIZE_Y;
-	f->location.z = f->location.x + f->location.y + 3 % SIZE_Z;
+	f->location.x = (f->location.y + 5) % (SIZE_X);
+	f->location.y = (f->location.z + 4) % (SIZE_Y);
+	f->location.z = (f->location.x + f->location.y + 3) % (SIZE_Z);
 }
 
 void food_display(food_t *f)
 {
-	CUB_LEDs_toggle(f->location.x, f->location.y, f->location.z);
+	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
 }
 
 void CUB_ApplicationRun()
@@ -149,12 +149,12 @@ void CUB_ApplicationRun()
 				if (event.type == CUB_BUTTON_PRESSED) {
 					switch (event.button.id) {
 						case CUB_BTN_UP:
-							if (snake.direction != PLUS_X)
-								snake.direction = MINUS_X;
+							if (snake.direction != MINUS_Z)
+								snake.direction = PLUS_Z;
 							break;
 						case CUB_BTN_DOWN:
-							if (snake.direction != MINUS_X)
-								snake.direction = PLUS_X;
+							if (snake.direction != PLUS_Z)
+								snake.direction = MINUS_Z;
 							break;
 						case CUB_BTN_LEFT:
 							if (snake.direction != PLUS_Y)
@@ -165,12 +165,12 @@ void CUB_ApplicationRun()
 								snake.direction = PLUS_Y;
 							break;
 						case CUB_BTN_TOP:
-							if (snake.direction != MINUS_Z)
-								snake.direction = PLUS_Z;
+							if (snake.direction != PLUS_X)
+								snake.direction = MINUS_X;
 							break;
 						case CUB_BTN_BOTTOM:
-							if (snake.direction != PLUS_Z)
-								snake.direction = MINUS_Z;
+							if (snake.direction != MINUS_X)
+								snake.direction = PLUS_X;
 							break;
 						case CUB_BTN_M_LEFT:
 							break;
