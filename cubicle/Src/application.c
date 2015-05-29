@@ -11,6 +11,7 @@ void CUB_ApplicationRun()
 	CUB_Event event;
 	int count = 0;
 	int loop = 0;
+	bool up_state = false;
 	/* Infinite loop */
 	for(;;) {
 
@@ -22,6 +23,7 @@ void CUB_ApplicationRun()
 						CUB_TextClear();
 						CUB_TextPrint("UP pressed");
 						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 1);
+						up_state = true;
 						break;
 					case CUB_BTN_DOWN:
 						CUB_TextHome();
@@ -79,6 +81,7 @@ void CUB_ApplicationRun()
 						CUB_TextPrint("UP released");
 						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 0);
 						count++;
+						up_state = false;
 						break;
 					case CUB_BTN_DOWN:
 						CUB_TextHome();
@@ -137,7 +140,7 @@ void CUB_ApplicationRun()
 		CUB_LEDs_update_display();
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		CUB_Sleep(200);
+		CUB_Sleep(100);
 
 		loop++;
 	}

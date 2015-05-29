@@ -12,13 +12,6 @@
  * Define virtual state in fonction of
  * electric state.
  */
-#if BUTTONS_ARE_ACTIVATED_AT_HIGH_LEVEL
-	#define BTN_IS_ACTIVE GPIO_PIN_SET
-	#define BTN_IS_NOT_ACTIVE GPIO_PIN_RESET
-#else
-	#define BTN_IS_ACTIVE GPIO_PIN_RESET
-	#define BTN_IS_NOT_ACTIVE GPIO_PIN_SET
-#endif
 
 /**
  * Circular buffer
@@ -50,7 +43,7 @@ static bool mButtonWasReleased[CUB_BTN_LAST];
 /**
  * Old button values
  */
-static uint8_t mButtonOldValue[CUB_BTN_LAST];
+static bool mButtonOldValue[CUB_BTN_LAST];
 
 
 /**
@@ -74,7 +67,7 @@ void CUB_EventInit()
 		mButtonWasPressed[i] = false;
 		mButtonWasReleased[i] = false;
 		mButtonState[i] = false;
-		mButtonOldValue[i] = BTN_IS_NOT_ACTIVE;
+		mButtonOldValue[i] = false;
 	}
 }
 
@@ -102,6 +95,9 @@ static inline void releaseMutex()
 bool CUB_PollEvent(CUB_Event * event)
 {
     if (mSize == 0) {
+		if (event != NULL) {
+			event->type = CUB_NOEVENT;
+		}
         return false;
 	}
 
@@ -154,27 +150,17 @@ static void _idlePushBtnEvent(void const * arg)
 	CUB_Event event;
 	for(;;) {
 		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
-			switch (mButtonState[i]) {
-			case RELEASED:
-				if (mButtonWasPressed[i]) {
+			if (mButtonWasPressed[i]) {
 					mButtonWasPressed[i] = false;
-					mButtonState[i] = PRESSED;
-
 					event.type = CUB_BUTTON_PRESSED;
 					event.button.id = i;
 					CUB_PushEvent(&event);
-				}
-				break;
-			case PRESSED: 
-				if (mButtonWasReleased[i]) {
+			}
+			if (mButtonWasReleased[i]) {
 					mButtonWasReleased[i] = false;
-					mButtonState[i] = RELEASED;
-
 					event.type = CUB_BUTTON_RELEASED;
 					event.button.id = i;
 					CUB_PushEvent(&event);
-				}
-				break;
 			}
 		}
 		osDelay(50);
@@ -188,10 +174,13 @@ static void _idlePushBtnEvent(void const * arg)
  */
 static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btnId)
 {
-	uint8_t val = HAL_GPIO_ReadPin(port, pin);
-	if ((mButtonOldValue[btnId]==BTN_IS_NOT_ACTIVE) && (val==BTN_IS_ACTIVE)) { // virtual rising edge
+	bool val = (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET);
+#if BUTTONS_ARE_ACTIVATED_AT_LOW_LEVEL
+	val = !val;
+#endif
+	if (!mButtonOldValue[btnId] && val) { // virtual rising edge
 		mButtonWasPressed[btnId] = true;
-	} else if ((mButtonOldValue[btnId]==BTN_IS_ACTIVE) && (val==BTN_IS_NOT_ACTIVE)) { // virtual falling edge
+	} else if (mButtonOldValue[btnId] && !val) { // virtual falling edge
 		mButtonWasReleased[btnId] = true;
 	}
 	mButtonOldValue[btnId] = val;
