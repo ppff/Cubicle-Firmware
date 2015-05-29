@@ -34,6 +34,19 @@ void snake_init(snake_t *snake)
 	snake->direction = PLUS_X;
 }
 
+bool snake_consistent(snake_t *snake)
+{
+	point_list_element_t *cur = snake->body.first;
+	cur = cur->next;
+	while (cur != NULL) {
+		if (point_equals(&(snake->body.first->p), &(cur->p))) {
+			return false;
+		}
+		cur = cur->next;
+	}
+	return true;
+}
+
 void snake_free(snake_t *snake)
 {
 	point_list_free(&(snake->body));
@@ -125,65 +138,76 @@ void CUB_ApplicationRun()
 	CUB_TextPrint("Snake!");
 
 	CUB_Event event;
-	snake_t snake;
-	food_t food;
-	snake_init(&snake);
-	food_init(&food);
-	food_new(&food);
-	for(;;) {
-		while (CUB_PollEvent(&event)) {
-			if (event.type == CUB_BUTTON_PRESSED) {
-				switch (event.button.id) {
-				case CUB_BTN_UP:
-					snake.direction = MINUS_X;
-					break;
-				case CUB_BTN_DOWN:
-					snake.direction = PLUS_X;
-					break;
-				case CUB_BTN_LEFT:
-					snake.direction = MINUS_Y;
-					break;
-				case CUB_BTN_RIGHT:
-					snake.direction = PLUS_Y;
-					break;
-				case CUB_BTN_TOP:
-					snake.direction = PLUS_Z;
-					break;
-				case CUB_BTN_BOTTOM:
-					snake.direction = MINUS_Z;
-					break;
-				case CUB_BTN_M_LEFT:
-					break;
-				case CUB_BTN_M_RIGHT:
-					break;
-				case CUB_BTN_SM_LEFT:
-					break;
-				case CUB_BTN_SM_RIGHT:
-					break;
-				default:
-					;
-				}
-			} else if (event.type == CUB_BUTTON_RELEASED) {
-				switch (event.button.id) {
-				case CUB_BTN_UP:
-					break;
-				default:
-					;
+	while (true) {
+		snake_t snake;
+		food_t food;
+		snake_init(&snake);
+		food_init(&food);
+		food_new(&food);
+		for(;;) {
+			while (CUB_PollEvent(&event)) {
+				if (event.type == CUB_BUTTON_PRESSED) {
+					switch (event.button.id) {
+						case CUB_BTN_UP:
+							if (snake.direction != PLUS_X)
+								snake.direction = MINUS_X;
+							break;
+						case CUB_BTN_DOWN:
+							if (snake.direction != MINUS_X)
+								snake.direction = PLUS_X;
+							break;
+						case CUB_BTN_LEFT:
+							if (snake.direction != PLUS_Y)
+								snake.direction = MINUS_Y;
+							break;
+						case CUB_BTN_RIGHT:
+							if (snake.direction != MINUS_Y)
+								snake.direction = PLUS_Y;
+							break;
+						case CUB_BTN_TOP:
+							if (snake.direction != MINUS_Z)
+								snake.direction = PLUS_Z;
+							break;
+						case CUB_BTN_BOTTOM:
+							if (snake.direction != PLUS_Z)
+								snake.direction = MINUS_Z;
+							break;
+						case CUB_BTN_M_LEFT:
+							break;
+						case CUB_BTN_M_RIGHT:
+							break;
+						case CUB_BTN_SM_LEFT:
+							break;
+						case CUB_BTN_SM_RIGHT:
+							break;
+						default:
+							;
+					}
+				} else if (event.type == CUB_BUTTON_RELEASED) {
+					switch (event.button.id) {
+						case CUB_BTN_UP:
+							break;
+						default:
+							;
+					}
 				}
 			}
+			snake_move_forward(&snake);
+			if (!snake_consistent(&snake)) {
+				snake_free(&snake);
+				break;
+			}
+			CUB_LEDs_clear();
+			snake_display(&snake);
+			food_display(&food);
+			if (point_list_is_in(&(snake.body), &(food.location))) {
+				point_list_add_element(&(snake.body), &(snake.body.last->p));
+				food_new(&food);
+			}
+			CUB_LEDs_update_display();
+			CUB_Sleep(250);
 		}
-		snake_move_forward(&snake);
-		CUB_LEDs_clear();
-		snake_display(&snake);
-		food_display(&food);
-		if (point_list_is_in(&(snake.body), &(food.location))) {
-			point_list_add_element(&(snake.body), &(snake.body.last->p));
-			food_new(&food);
-		}
-		CUB_LEDs_update_display();
-		CUB_Sleep(250);
 	}
-	snake_free(&snake);
 	CUB_LEDs_free();
 }
 
