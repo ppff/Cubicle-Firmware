@@ -99,8 +99,16 @@ typedef struct food {
 	point_t location;
 } food_t;
 
+void food_init(food_t *f)
+{
+	f->location.x = 4;
+	f->location.y = 4;
+	f->location.z = 4;
+}
+
 void food_new(food_t *f)
 {
+	CUB_LEDs_switch_off(f->location.x, f->location.y, f->location.z);
 	f->location.x = f->location.y + 5 % SIZE_X;
 	f->location.y = f->location.z + 4 % SIZE_Y;
 	f->location.z = f->location.x + f->location.y + 3 % SIZE_Z;
@@ -120,6 +128,7 @@ void CUB_ApplicationRun()
 	snake_t snake;
 	food_t food;
 	snake_init(&snake);
+	food_init(&food);
 	food_new(&food);
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
