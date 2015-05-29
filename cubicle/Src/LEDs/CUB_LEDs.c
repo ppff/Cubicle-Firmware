@@ -20,7 +20,7 @@
 
 /**
  * Type used to store the content of a line. It must verify:
- * sizeof(line_t) >= LENGTH
+ * (size of (line_t) in bits) >= SIZE_X
  */
 typedef uint16_t line_t;
 
