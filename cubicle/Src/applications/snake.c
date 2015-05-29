@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "CUB.h"
 #include "stm32f4xx_hal_conf.h"
@@ -8,6 +9,29 @@
 #include "constant.h"
 #include "CUB_point.h"
 #include "CUB_point_list.h"
+
+void inverse(char s[]) {
+	int c, i, j;
+	for (i = 0, j = strlen(s)-1; i < j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+void my_itoa(int value, char str[]) 
+{
+	int i = 0;
+	if (value >= 0) {
+		do {
+			str[i++] = value % 10 + '0';
+		} while ((value /= 10) > 0);
+		str[i] = '\0';
+		inverse(str);
+	} else {
+		strcpy(str,"");
+	}
+}
 
 typedef enum direction {
 	PLUS_X=0,
@@ -225,7 +249,7 @@ void CUB_ApplicationRun()
 				CUB_TextClear();
 				CUB_TextHome();
 				char score_string[16];
-				sprintf(score_string, "%u", score);
+				my_itoa(score, score_string);
 				CUB_TextPrint(score_string);
 
 				while (point_list_is_in(&(snake.body), &(food.location)))
