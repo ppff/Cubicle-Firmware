@@ -241,7 +241,7 @@ void CUB_LEDs_display()
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
 
 		k = (k+1) % (SIZE_Z);
-		osDelay(10);
+		osDelay(2);
 	}
 }
 
