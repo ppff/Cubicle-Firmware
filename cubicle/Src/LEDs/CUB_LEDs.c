@@ -23,6 +23,14 @@
  * (size of (line_t) in bits) >= SIZE_X
  */
 typedef uint16_t line_t;
+/**
+ * Type used to store number of lightening LEDs
+ * per plan. It must verify:
+ * capacity of the type (e.g. 2**8, 2**16...) 
+ *   <= SIZE_X*SIZE_Y (e.g. LEDs number per plan)
+ */
+typedef uint8_t planCount_t;
+
 
 /**
  * Structure representing the LEDs of the cube.
@@ -107,8 +115,9 @@ bool CUB_LEDs_in_range(uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_on(uint32_t x, uint32_t y, uint32_t z)
 {
 	CUB_LEDs *l = &mMainLEDs;
-	if (CUB_LEDs_in_range(x, y, z))
+	if (CUB_LEDs_in_range(x, y, z)) {
 		l->data[z][SIZE_Y-1-y] |= 1 << x;
+	}
 }
 
 /**
@@ -119,9 +128,11 @@ void CUB_LEDs_switch_on(uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_off(uint32_t x, uint32_t y, uint32_t z)
 {
 	CUB_LEDs *l = &mMainLEDs;
-	if (CUB_LEDs_in_range(x, y, z))
-		if (l->data[z][SIZE_Y-1-y] & (1 << x))
+	if (CUB_LEDs_in_range(x, y, z)) {
+		if (l->data[z][SIZE_Y-1-y] & (1 << x)) {
 			l->data[z][SIZE_Y-1-y] ^= 1 << x;
+		}
+	}
 }
 
 int CUB_LEDs_get(uint32_t x, uint32_t y, uint32_t z)
@@ -222,8 +233,19 @@ void CUB_LEDs_display()
 {
 	CUB_LEDs *l = &mMainLEDs;
 	HAL_StatusTypeDef status;
-	uint32_t k=0;
+	uint32_t k=-1;
+	uint32_t column;
 	for (;;) {
+		// determine if there is a LED to display on that plan
+		do {
+			k = (k+1) % (SIZE_Z);
+			// project all columns into one column
+			// to determine if a LED is activated
+			for (uint32_t j=0; j < SIZE_Y ; ++j) {
+				column |= l->buffer[k][j];
+			}
+		} while (!column);
+
 		do {
 			status = HAL_SPI_Transmit(&hspi4, (uint8_t*)l->buffer[k], (SIZE_Y+1), 15);
 		} while (status != HAL_OK);
@@ -234,8 +256,7 @@ void CUB_LEDs_display()
 		for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
 
-		k = (k+1) % (SIZE_Z);
-		osDelay(10);
+		osDelay(100);
 	}
 }
 
