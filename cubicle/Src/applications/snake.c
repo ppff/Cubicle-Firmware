@@ -105,6 +105,10 @@ void food_new(food_t *f)
 	f->location.z = f->location.x + f->location.y + 3 % SIZE_Z;
 }
 
+void food_display(food_t *f)
+{
+	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
+}
 
 void CUB_ApplicationRun()
 {
@@ -113,8 +117,10 @@ void CUB_ApplicationRun()
 
 	CUB_Event event;
 	snake_t snake;
+	food_t food;
 	CUB_LEDs_init();
 	snake_init(&snake);
+	food_new(&food);
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
@@ -159,6 +165,11 @@ void CUB_ApplicationRun()
 			snake_move_forward(&snake);
 			CUB_LEDs_clear();
 			snake_display(&snake);
+			food_display(&food);
+			if (point_list_is_in(&(snake.body), &(food.location))) {
+				point_list_add_element(&(snake.body), &(snake.body.last->p));
+				food_new(&food);
+			}
 			CUB_LEDs_update_display();
 			CUB_Sleep(500);
 		}
