@@ -1,0 +1,56 @@
+
+== Introduction ==
+Ce document présente l'architecture globale du firmware Cubicle pour stm32.
+
+Le projet est décomposé en trois couches :
+- La couche dépendante de la carte électronique STM32F4
+- Notre framework Cubicle permettant d'abstraire la couche précédente
+- La couche applicative qui utilise les services du framework
+
+= STM32 Layer =
+La couche 0 est une couche très bas niveau, elle intéragit directement avec la carte et les composants.
+Cette couche est manipulable au travers des HAL.
+
+= Cubicle framework =
+Le framework permet d'abstraire l'utilisation de la carte et les actions électroniques (avec les pins par exemple), en proposant une API simple et intuitive pour la manipulation de la matrice de LEDs, de l'écran LCD, des boutons et du lecteur de carte SD.
+
+= Application =
+La couche application n'utilise donc que le framework pour manipuler le Cubicle. L'application basique a donc la structure suivante :
+
+[
+	toujours faire:
+		pour chaque événement:
+			traiter l'événement
+		fin pour
+		
+		mettre à jour l'état interne
+
+		mettre à jour la matrice de LEDs
+	fin toujours
+]
+
+
+== Cubicle framework ==
+
+Il existe plusieurs services.
+
+= Les événements =
+
+Lorsqu'il y a un appui ou un relachement d'un bouton, une interruption est déclenchée. Cette dernière met à jour un flag pour signaler ce changement.
+Il existe ensuite une tâche de priorité "AboveNormal" et de période 50ms qui analyse ces flags et créé les événements adéquats tels que :
+- Bouton appuyé
+- Bouton relâché
+Il est nécessaire que ce soit une tâche préemptible qui créé l'événement et l'ajoute à la file d'événement puisque l'ajout à la file nécessite l'acquisition d'un mutex (ce qui ne peut pas être fait depuis un traitant d'interruption).
+
+= Le rafraichissement des LEDs =
+
+Le matériel actuel pour le contrôle des LEDs autorise uniquement d'allumer les LEDs qui sont sur le même plan horizontal en même temps.
+On utilise donc une tâche pour rafraichir régulièrement.
+
+= L'application =
+
+Le code utilisateur de l'application est lancé dans une tâche autonome de priorité Normal.
+Dans cette tâche, l'utilisateur peut consommer les événements qui sont en attente.
+Puisque la strucutre des événements est partagée, l'acquisistion d'un mutex est obligatoire et peut donc stopper la tâche.
+
+
