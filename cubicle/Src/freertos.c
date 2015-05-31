@@ -68,7 +68,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-//	CUB_Init();
+	CUB_Init();
        
   /* USER CODE END Init */
 
@@ -116,7 +116,6 @@ void StartDefaultTask(void const * argument)
     if (CUB_fs_open(&file, "hello.txt", CUB_FILE_READ) != CUB_FS_OK)
         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
     else {
-        //if (f_read(&file, buff, sizeof(buff), &br) != FR_OK)
         if (CUB_fs_read_line(buff, sizeof(buff), &file) == NULL)
             HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
         else {
@@ -137,9 +136,7 @@ void StartDefaultTask(void const * argument)
         }
     }
 
-    while(1);
-        
-    //CUB_ApplicationRun();
+    CUB_ApplicationRun();
     /* Infinite loop */
     for(;;)
     {
