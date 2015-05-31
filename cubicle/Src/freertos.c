@@ -110,22 +110,33 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
     FATFS fs;
-    FIL file;
+    CUB_FILE file;
     char buff[64];
-    UINT br;
     f_mount(&fs, (TCHAR const*)SD_Path, 0);
-    if (f_open(&file, "hello.txt", FA_READ) != FR_OK)
+    if (CUB_fs_open(&file, "hello.txt", CUB_FILE_READ) != CUB_FS_OK)
         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
     else {
-        if (f_read(&file, buff, sizeof(buff), &br) != FR_OK)
+        //if (f_read(&file, buff, sizeof(buff), &br) != FR_OK)
+        if (CUB_fs_read_line(buff, sizeof(buff), &file) == NULL)
             HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
         else {
-            if (br == 13)
-                HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
-            else
-                HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
+            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
+        }
+        if (CUB_fs_close(&file) != CUB_FS_OK) {
+            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
+        } else {
+            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET); 
+            if (CUB_fs_open(&file, "hello.txt", CUB_FILE_WRITE) != CUB_FS_OK)
+                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
+            if (CUB_fs_seek(&file, f_size((FIL*)&file)) != CUB_FS_OK)
+                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
+            if (f_printf((FIL*)&file, "hey %d\n", 123) == -1)
+                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
+            if (CUB_fs_close(&file) != CUB_FS_OK)
+                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
         }
     }
+
     while(1);
         
     //CUB_ApplicationRun();

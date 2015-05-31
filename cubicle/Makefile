@@ -5,6 +5,7 @@ SRCS=Src/main.c
 SRCS+=Src/LEDs/CUB_LEDs.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
+SRCS+=Src/fs/CUB_fs.c
 SRCS+=Src/CUB.c
 SRCS+=Src/CUB_point.c
 SRCS+=Src/CUB_point_list.c
