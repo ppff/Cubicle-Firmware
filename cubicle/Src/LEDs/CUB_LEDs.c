@@ -234,17 +234,21 @@ void CUB_LEDs_display()
 	CUB_LEDs *l = &mMainLEDs;
 	HAL_StatusTypeDef status;
 	uint32_t k=-1;
-	uint32_t column;
+	bool disp;
 	for (;;) {
 		// determine if there is a LED to display on that plan
 		do {
 			k = (k+1) % (SIZE_Z);
 			// project all columns into one column
 			// to determine if a LED is activated
+			disp = false;
 			for (uint32_t j=0; j < SIZE_Y ; ++j) {
-				column |= l->buffer[k][j];
+				if (l->buffer[k][j]) {
+					disp = true;
+					break;
+				}
 			}
-		} while (!column);
+		} while (!disp);
 
 		do {
 			status = HAL_SPI_Transmit(&hspi4, (uint8_t*)l->buffer[k], (SIZE_Y+1), 15);
