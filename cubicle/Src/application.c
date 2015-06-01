@@ -137,10 +137,11 @@ void CUB_ApplicationRun()
 		CUB_LEDs_switch_on(loop, 0,    0);
 		CUB_LEDs_switch_on(0,    loop, 0);
 		CUB_LEDs_switch_on(0,    0,    loop);
+		CUB_LEDs_switch_on(loop,    loop,    loop);
 		CUB_LEDs_update_display();
 
 		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-		CUB_Sleep(100);
+		CUB_Sleep(1500);
 
 		loop++;
 	}
