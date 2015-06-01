@@ -31,9 +31,48 @@ typedef enum action {
 group_t   cur_group;
 pattern_t cur_pattern;
 uint32_t  nb_group;
+int status;
 
 void group_and_pattern_init();
 void group_and_pattern_update(action_t action);
+
+void status_update(CUB_Button b) {
+	switch (status) {
+	case 0:
+		status = (b == CUB_BTN_UP) ? 1 : 0;
+		break;
+	case 1:
+		status = (b == CUB_BTN_UP) ? 2 : 0;
+		break;
+	case 2:
+		status = (b == CUB_BTN_DOWN) ? 3 : 0;
+		break;
+	case 3:
+		status = (b == CUB_BTN_DOWN) ? 4 : 0;
+		break;
+	case 4:
+		status = (b == CUB_BTN_LEFT) ? 5 : 0;
+		break;
+	case 5:
+		status = (b == CUB_BTN_RIGHT) ? 6 : 0;
+		break;
+	case 6:
+		status = (b == CUB_BTN_LEFT) ? 7 : 0;
+		break;
+	case 7:
+		status = (b == CUB_BTN_RIGHT) ? 8 : 0;
+		break;
+	case 8:
+		status = (b == CUB_BTN_M_LEFT) ? 9 : 0;
+		break;
+	case 9:
+		status = (b == CUB_BTN_M_RIGHT) ? 10 : 0;
+		break;
+	default:
+		status = 0;
+		break;
+	}
+}
 
 void screen_display_update()
 {
@@ -83,6 +122,7 @@ void application_init()
 	group_and_pattern_init();
 	screen_display_update();
 	pattern_display_update();
+	status = 0;
 }
 
 void application_update(action_t action)
@@ -103,6 +143,10 @@ void CUB_ApplicationRun()
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
+				status_update(event.button.id);
+				if (status == 10) {
+					// TODO
+				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						break;
