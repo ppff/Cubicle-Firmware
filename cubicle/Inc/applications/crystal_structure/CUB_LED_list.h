@@ -1,3 +1,6 @@
+#ifndef CUB_LED_LIST_H
+#define CUB_LED_LIST_H
+
 #include <stdint.h>
 
 typedef struct CUB_LED {
@@ -18,3 +21,4 @@ void CUB_LED_list_add(CUB_LED_list_t *list, CUB_LED_t *LED);
 
 void CUB_LED_list_free(CUB_LED_list_t *list);
 
+#endif

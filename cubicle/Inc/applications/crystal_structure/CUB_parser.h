@@ -1,3 +1,6 @@
+#ifndef CUB_PARSER_H
+#define CUB_PARSER_H
+
 #define MAX_SUPPORTED_VERSION 1
 
 #ifdef CUBICLE_SOFTWARE
@@ -22,3 +25,4 @@
 
 int PARSE_FILE(filename);
 
+#endif
