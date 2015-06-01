@@ -64,6 +64,7 @@ void screen_display_update()
 void pattern_display_update()
 {
 	CUB_LED_list_t list;
+	CUB_LED_list_init(&list);
 	int status = CUB_parse_file(cur_pattern.path, &list);
 	if (status == 1) {
 		/* Do something */
