@@ -3,8 +3,11 @@
 Ce document présente l'architecture globale du firmware Cubicle pour stm32.
 
 Le projet est décomposé en trois couches :
+
 - La couche dépendante de la carte électronique STM32F4
+
 - Notre framework Cubicle permettant d'abstraire la couche précédente
+
 - La couche applicative qui utilise les services du framework
 
 = STM32 Layer =
@@ -17,6 +20,7 @@ Le framework permet d'abstraire l'utilisation de la carte et les actions électr
 = Application =
 La couche application n'utilise donc que le framework pour manipuler le Cubicle. L'application basique a donc la structure suivante :
 
+```bash
 [
 	toujours faire:
 		pour chaque événement:
@@ -28,7 +32,7 @@ La couche application n'utilise donc que le framework pour manipuler le Cubicle.
 		mettre à jour la matrice de LEDs
 	fin toujours
 ]
-
+```
 
 == Cubicle framework ==
 
