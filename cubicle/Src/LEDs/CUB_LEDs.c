@@ -229,38 +229,38 @@ void CUB_LEDs_update_display()
 		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*SIZE_Y);
 }
 
+inline static void _drawOnePlan(uint32_t zIndex)
+{
+	HAL_StatusTypeDef status;
+	do {
+		status = HAL_SPI_Transmit(&hspi4, (uint8_t*)mMainLEDs.buffer[zIndex], (SIZE_Y+1), 15);
+	} while (status != HAL_OK);
+
+	// latch enable
+	for (int i=0; i < 10; i++) ; 
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+	for (int i=0; i < 10; i++) ; // 40 tours de boucles == 3 µs
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+}
+
 void CUB_LEDs_display()
 {
-	CUB_LEDs *l = &mMainLEDs;
-	HAL_StatusTypeDef status;
 	uint32_t k=-1;
-	bool disp;
+	bool toDisp = false;
 	for (;;) {
-		// determine if there is a LED to display on that plan
-		do {
-			k = (k+1) % (SIZE_Z);
-			// project all columns into one column
-			// to determine if a LED is activated
-			disp = false;
-			for (uint32_t j=0; j < SIZE_Y ; ++j) {
-				if (l->buffer[k][j]) {
-					disp = true;
-					break;
-				}
+		k = (k == SIZE_Z-1) ? 0 : k+1; // e.q. k = (k+1) % SIZE_Z
+
+		// determine if a LED is activated
+		for (uint32_t j=0; j < SIZE_Y ; ++j) {
+			if (mMainLEDs.buffer[k][j]) {
+				// at least one LED is activated
+				toDisp = true;
+				break;
 			}
-		} while (!disp);
+		}
 
-		do {
-			status = HAL_SPI_Transmit(&hspi4, (uint8_t*)l->buffer[k], (SIZE_Y+1), 15);
-		} while (status != HAL_OK);
-
-		// latch enable
-		for (int i=0; i < 40; i++) ; 
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
-		for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
-
-		osDelay(100);
+		if (toDisp)
+			_drawOnePlan(k);
 	}
 }
 
