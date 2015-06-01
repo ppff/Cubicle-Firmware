@@ -1,7 +1,11 @@
+#include <string.h>
+#include <stdio.h>
+
 #include "CUB.h"
 #include "LEDs/CUB_LEDs.h"
-#include "string.h"
-#include "stdio.h"
+#define CUBICLE_FIRMWARE
+#include "applications/crystal_structure/CUB_parser.h"
+#include "applications/crystal_structure/CUB_LED_list.h"
 
 #define SCREEN_WIDTH 32
 
@@ -14,6 +18,7 @@ typedef struct group {
 typedef struct pattern {
 	char *name;
 	uint32_t index;
+	char *path;
 } pattern_t;
 
 typedef enum action {
@@ -56,23 +61,34 @@ void screen_display_update()
 	CUB_TextPrint(screen);
 }
 
-void pattern_update()
+void pattern_display_update()
 {
-	//CUB_parser(cur_pattern.name);
+	CUB_LED_list_t list;
+	int status = CUB_parse_file(cur_pattern.path, &list);
+	if (status == 1) {
+		/* Do something */
+	}
+	CUB_LEDs_clear();
+	CUB_LED_t *cur_led = list.first;
+	while (cur_led != NULL) {
+		CUB_LEDs_switch_on(cur_led->x, cur_led->y, cur_led->z);
+		cur_led = cur_led->next;
+	}
+	CUB_LEDs_update_display();
 }
 
 void application_init()
 {
 	group_and_pattern_init();
 	screen_display_update();
-	pattern_update();
+	pattern_display_update();
 }
 
 void application_update(action_t action)
 {
 	group_and_pattern_update(action);
 	screen_display_update();
-	pattern_update();
+	pattern_display_update();
 }
 
 void CUB_ApplicationRun()
