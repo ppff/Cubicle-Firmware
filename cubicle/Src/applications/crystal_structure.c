@@ -5,8 +5,6 @@
 
 #define SCREEN_WIDTH 32
 
-uint32_t ng;
-
 typedef struct group {
 	char *name;
 	uint32_t index;
@@ -18,28 +16,34 @@ typedef struct pattern {
 	uint32_t index;
 } pattern_t;
 
-uint32_t get_nb_group();
+typedef enum action {
+	NEXT_GROUP = 0,
+	PREV_GROUP,
+	NEXT_PATTERN,
+	PREV_PATTERN,
+} action_t;
 
-group_t *get_next_group();
-group_t *get_prev_group();
+group_t   cur_group;
+pattern_t cur_pattern;
+uint32_t  nb_group;
 
-pattern_t *get_next_pattern();
-pattern_t *get_prev_pattern();
+void group_and_pattern_init();
+void group_and_pattern_update(action_t action);
 
-void update_screen_display(group_t *g, pattern_t *p)
+void screen_display_update()
 {
-	char group_number_display[6 + 1]; // XX/XX  //
-	char group_name_display[SCREEN_WIDTH - 6 +1];
+	char group_number_display  [6 + 1]; // XX/XX  //
+	char group_name_display    [SCREEN_WIDTH - 6 +1];
 	char pattern_number_display[6 + 1];
-	char pattern_name_display[SCREEN_WIDTH - 6 +1];
-	char screen[SCREEN_WIDTH * 2 + 1];
+	char pattern_name_display  [SCREEN_WIDTH - 6 +1];
+	char screen                [SCREEN_WIDTH * 2 + 1];
 
-	sprintf(group_number_display, "%u/%u ", g->index, ng);
-	strncpy(group_name_display, g->name, 6);
+	sprintf(group_number_display, "%u/%u ", cur_group.index, nb_group);
+	strncpy(group_name_display, cur_group.name, 6);
 	group_name_display[SCREEN_WIDTH - 6] = '\0';
 
-	sprintf(group_number_display, "%u/%u ", p->index, g->nb_pattern);
-	strncpy(pattern_name_display, p->name, 6);
+	sprintf(group_number_display, "%u/%u ", cur_pattern.index, cur_group.nb_pattern);
+	strncpy(pattern_name_display, cur_pattern.name, 6);
 	pattern_name_display[SCREEN_WIDTH - 6] = '\0';
 
 	sprintf(screen, "%s%s\n%s%s",
@@ -52,11 +56,28 @@ void update_screen_display(group_t *g, pattern_t *p)
 	CUB_TextPrint(screen);
 }
 
+void pattern_update()
+{
+	//CUB_parser(cur_pattern.name);
+}
+
+void application_init()
+{
+	group_and_pattern_init();
+	screen_display_update();
+	pattern_update();
+}
+
+void application_update(action_t action)
+{
+	group_and_pattern_update(action);
+	screen_display_update();
+	pattern_update();
+}
+
 void CUB_ApplicationRun()
 {
-	group_t   *g = get_next_group();
-	pattern_t *p = get_next_pattern();
-	update_screen_display(g, p);
+	application_init();
 
 	CUB_Event event;
 	int count = 0;
@@ -67,55 +88,28 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_PRESSED) {
 				switch (event.button.id) {
 					case CUB_BTN_UP:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("UP pressed");
-						HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, 1);
 						break;
 					case CUB_BTN_DOWN:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("DOWN pressed");
 						break;
 					case CUB_BTN_LEFT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("LEFT pressed");
 						break;
 					case CUB_BTN_RIGHT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("RIGHT pressed");
 						break;
 					case CUB_BTN_TOP:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("TOP pressed");
 						break;
 					case CUB_BTN_BOTTOM:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("BOTTOM pressed");
 						break;
 					case CUB_BTN_M_LEFT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("M_LEFT pressed");
+						application_update(PREV_GROUP);
 						break;
 					case CUB_BTN_M_RIGHT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("M_RIGHT pressed");
+						application_update(NEXT_GROUP);
 						break;
 					case CUB_BTN_SM_LEFT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("SM_LEFT pressed");
+						application_update(PREV_PATTERN);
 						break;
 					case CUB_BTN_SM_RIGHT:
-						CUB_TextHome();
-						CUB_TextClear();
-						CUB_TextPrint("SM_RIGHT pressed");
+						application_update(NEXT_PATTERN);
 						break;
 					default:
 						;
