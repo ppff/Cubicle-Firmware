@@ -1,6 +1,6 @@
 #include "applications/crystal_structure/CUB_parser.h"
 
-int PARSE_FILE(filename)
+int CUB_parse_file(char *filename, LIST_TYPE)
 {
 	FOPEN(filename);
 	char buff[64];
