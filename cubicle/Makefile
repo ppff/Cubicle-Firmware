@@ -9,10 +9,9 @@ SRCS+=Src/fs/CUB_fs.c
 SRCS+=Src/CUB.c
 SRCS+=Src/CUB_point.c
 SRCS+=Src/CUB_point_list.c
-#SRCS+=Src/application.c
 SRCS+=Src/applications/snake.c
-#SRCS+=Src/application.c
 SRCS+=Src/applications/crystal_structure/*.c
+#SRCS+=Src/application.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
