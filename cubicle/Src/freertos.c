@@ -91,7 +91,7 @@ void MX_FREERTOS_Init(void) {
 
   /* definition and creation of myTask02 */
   osThreadDef(myTask02, StartTask02, osPriorityHigh, 0, 128);
-  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
+  //myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -109,33 +109,6 @@ void StartDefaultTask(void const * argument)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN StartDefaultTask */
-    FATFS fs;
-    CUB_FILE file;
-    char buff[64];
-    f_mount(&fs, (TCHAR const*)SD_Path, 0);
-    if (CUB_fs_open(&file, "hello.txt", CUB_FILE_READ) != CUB_FS_OK)
-        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
-    else {
-        if (CUB_fs_read_line(buff, sizeof(buff), &file) == NULL)
-            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
-        else {
-            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
-        }
-        if (CUB_fs_close(&file) != CUB_FS_OK) {
-            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
-        } else {
-            HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET); 
-            if (CUB_fs_open(&file, "hello.txt", CUB_FILE_WRITE) != CUB_FS_OK)
-                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
-            if (CUB_fs_seek(&file, f_size((FIL*)&file)) != CUB_FS_OK)
-                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
-            if (f_printf((FIL*)&file, "hey %d\n", 123) == -1)
-                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
-            if (CUB_fs_close(&file) != CUB_FS_OK)
-                        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET); 
-        }
-    }
-
     CUB_ApplicationRun();
     /* Infinite loop */
     for(;;)

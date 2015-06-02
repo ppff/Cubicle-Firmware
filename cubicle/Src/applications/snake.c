@@ -1,3 +1,5 @@
+#include "applications/snake.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -164,98 +166,96 @@ void food_new(food_t *f)
 	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
 }
 
-void CUB_ApplicationRun()
+void CUB_ApplicationRun_snake()
 {
 	CUB_TextHome();
 	CUB_TextPrint("Snake!");
+	CUB_LEDs_clear();
 
 	CUB_Event event;
-	while (true) {
-		snake_t snake;
-		food_t food;
-		uint32_t score = 0;
-		snake_init(&snake);
-		food_init(&food);
-		food_new(&food);
-		for(;;) {
-			while (CUB_PollEvent(&event)) {
-				if (event.type == CUB_BUTTON_PRESSED) {
-					switch (event.button.id) {
-						case CUB_BTN_UP:
-							if (snake.direction != MINUS_Z)
-								snake.direction = PLUS_Z;
-							break;
-						case CUB_BTN_DOWN:
-							if (snake.direction != PLUS_Z)
-								snake.direction = MINUS_Z;
-							break;
-						case CUB_BTN_LEFT:
-							if (snake.direction != PLUS_Y)
-								snake.direction = MINUS_Y;
-							break;
-						case CUB_BTN_RIGHT:
-							if (snake.direction != MINUS_Y)
-								snake.direction = PLUS_Y;
-							break;
-						case CUB_BTN_TOP:
-							if (snake.direction != PLUS_X)
-								snake.direction = MINUS_X;
-							break;
-						case CUB_BTN_BOTTOM:
-							if (snake.direction != MINUS_X)
-								snake.direction = PLUS_X;
-							break;
-						case CUB_BTN_M_LEFT:
-							break;
-						case CUB_BTN_M_RIGHT:
-							break;
-						case CUB_BTN_SM_LEFT:
-							break;
-						case CUB_BTN_SM_RIGHT:
-							break;
-						default:
-							;
-					}
-				} else if (event.type == CUB_BUTTON_RELEASED) {
-					switch (event.button.id) {
-						case CUB_BTN_UP:
-							break;
-						default:
-							;
-					}
+	snake_t snake;
+	food_t food;
+	uint32_t score = 0;
+	snake_init(&snake);
+	food_init(&food);
+	food_new(&food);
+	for(;;) {
+		while (CUB_PollEvent(&event)) {
+			if (event.type == CUB_BUTTON_PRESSED) {
+				switch (event.button.id) {
+					case CUB_BTN_UP:
+						if (snake.direction != MINUS_Z)
+							snake.direction = PLUS_Z;
+						break;
+					case CUB_BTN_DOWN:
+						if (snake.direction != PLUS_Z)
+							snake.direction = MINUS_Z;
+						break;
+					case CUB_BTN_LEFT:
+						if (snake.direction != PLUS_Y)
+							snake.direction = MINUS_Y;
+						break;
+					case CUB_BTN_RIGHT:
+						if (snake.direction != MINUS_Y)
+							snake.direction = PLUS_Y;
+						break;
+					case CUB_BTN_TOP:
+						if (snake.direction != PLUS_X)
+							snake.direction = MINUS_X;
+						break;
+					case CUB_BTN_BOTTOM:
+						if (snake.direction != MINUS_X)
+							snake.direction = PLUS_X;
+						break;
+					case CUB_BTN_M_LEFT:
+						break;
+					case CUB_BTN_M_RIGHT:
+						break;
+					case CUB_BTN_SM_LEFT:
+						break;
+					case CUB_BTN_SM_RIGHT:
+						break;
+					default:
+						;
+				}
+			} else if (event.type == CUB_BUTTON_RELEASED) {
+				switch (event.button.id) {
+					case CUB_BTN_UP:
+						break;
+					default:
+						;
 				}
 			}
-			snake_move_forward(&snake);
-			if (!snake_consistent(&snake)) {
-				for (uint32_t i=0; i<4; ++i) {
-					CUB_LEDs_clear();
-					snake_display(&snake);
-					CUB_LEDs_update_display();
-					CUB_Sleep(250);
-					CUB_LEDs_clear();
-					CUB_LEDs_update_display();
-					CUB_Sleep(250);
-				}
-				snake_free(&snake);
-				break;
-			}
-			if (point_list_is_in(&(snake.body), &(food.location))) {
-				snake_increase(&snake);
-				score++;
-
-				CUB_TextClear();
-				CUB_TextHome();
-				char score_string[16];
-				my_itoa(score, score_string);
-				CUB_TextPrint(score_string);
-
-				while (point_list_is_in(&(snake.body), &(food.location)))
-					food_new(&food);
-			}
-			CUB_LEDs_update_display();
-			CUB_Sleep(300 - snake.size * 10);
 		}
+		snake_move_forward(&snake);
+		if (!snake_consistent(&snake)) {
+			for (uint32_t i=0; i<4; ++i) {
+				CUB_LEDs_clear();
+				snake_display(&snake);
+				CUB_LEDs_update_display();
+				CUB_Sleep(250);
+				CUB_LEDs_clear();
+				CUB_LEDs_update_display();
+				CUB_Sleep(250);
+			}
+			snake_free(&snake);
+			break;
+		}
+		if (point_list_is_in(&(snake.body), &(food.location))) {
+			snake_increase(&snake);
+			score++;
+
+			CUB_TextClear();
+			CUB_TextHome();
+			char score_string[16];
+			my_itoa(score, score_string);
+			CUB_TextPrint(score_string);
+
+			while (point_list_is_in(&(snake.body), &(food.location)))
+				food_new(&food);
+		}
+		CUB_LEDs_update_display();
+		CUB_Sleep(300 - snake.size * 10);
 	}
-	CUB_LEDs_free();
 }
 

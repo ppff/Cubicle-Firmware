@@ -3,9 +3,9 @@
 
 #include "CUB.h"
 #include "LEDs/CUB_LEDs.h"
-#define CUBICLE_FIRMWARE
-#include "applications/crystal_structure/CUB_parser.h"
+#include "CUB_parser.h"
 #include "applications/crystal_structure/CUB_LED_list.h"
+#include "applications/snake.h"
 
 #define SCREEN_WIDTH 32
 
@@ -31,12 +31,13 @@ typedef enum action {
 group_t   cur_group;
 pattern_t cur_pattern;
 uint32_t  nb_group;
-int status;
+int       status;
 
-void group_and_pattern_init();
-void group_and_pattern_update(action_t action);
+//void group_and_pattern_init();
+//void group_and_pattern_update(action_t action);
 
-void status_update(CUB_Button b) {
+void status_update(CUB_Button b)
+{
 	switch (status) {
 	case 0:
 		status = (b == CUB_BTN_UP) ? 1 : 0;
@@ -117,6 +118,7 @@ void pattern_display_update()
 	CUB_LEDs_update_display();
 }
 
+/*
 void application_init()
 {
 	group_and_pattern_init();
@@ -131,11 +133,16 @@ void application_update(action_t action)
 	screen_display_update();
 	pattern_display_update();
 }
+*/
 
 void CUB_ApplicationRun()
 {
-	application_init();
+	//application_init();
 
+	CUB_LEDs_clear();
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrint("toto");
 	CUB_Event event;
 	int count = 0;
 	int loop = 0;
@@ -145,7 +152,8 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_PRESSED) {
 				status_update(event.button.id);
 				if (status == 10) {
-					// TODO
+					CUB_ApplicationRun_snake();
+					status = 0;
 				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
@@ -161,16 +169,16 @@ void CUB_ApplicationRun()
 					case CUB_BTN_BOTTOM:
 						break;
 					case CUB_BTN_M_LEFT:
-						application_update(PREV_GROUP);
+						//application_update(PREV_GROUP);
 						break;
 					case CUB_BTN_M_RIGHT:
-						application_update(NEXT_GROUP);
+						//application_update(NEXT_GROUP);
 						break;
 					case CUB_BTN_SM_LEFT:
-						application_update(PREV_PATTERN);
+						//application_update(PREV_PATTERN);
 						break;
 					case CUB_BTN_SM_RIGHT:
-						application_update(NEXT_PATTERN);
+						//application_update(NEXT_PATTERN);
 						break;
 					default:
 						;
