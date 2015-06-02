@@ -11,7 +11,7 @@ SRCS+=Src/CUB_point.c
 SRCS+=Src/CUB_point_list.c
 SRCS+=Src/applications/snake.c
 SRCS+=Src/applications/crystal_structure/*.c
-#SRCS+=Src/application.c
+SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -79,6 +79,7 @@ LDSCRIPT = SW4STM32/cubicle\ Configuration/STM32F429ZITx_FLASH.ld
 #########
 
 CFLAGS += -IInc
+CFLAGS += -IParseur-BDD-Cubicle/
 SRCS += Src/main.c
 SRCS += Src/stm32f4xx_hal_msp.c
 SRCS += Src/stm32f4xx_it.c

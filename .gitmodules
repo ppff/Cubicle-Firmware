@@ -1,0 +1,3 @@
+[submodule "cubicle/Parseur-BDD-Cubicle"]
+	path = cubicle/Parseur-BDD-Cubicle
+	url = https://github.com/ppff/Parseur-BDD-Cubicle.git

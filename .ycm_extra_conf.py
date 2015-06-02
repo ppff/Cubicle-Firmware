@@ -101,6 +101,7 @@ def FlagsForFile( filename, **kwargs ):
     '-Icubicle/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F',
     '-Icubicle/Middlewares/Third_Party/FreeRTOS/Source/include',
     '-Icubicle/Middlewares/Third_Party/FatFs/src',
+    '-Icubicle/Parseur-BDD-Cubicle',
     '-DNDEBUG',
     # You 100% do NOT need -DUSE_CLANG_COMPLETER in your flags; only the YCM
     # source code needs it.
