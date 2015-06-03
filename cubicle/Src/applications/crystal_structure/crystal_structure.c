@@ -38,10 +38,10 @@ void my_itoa2(int value, char str[])
 typedef struct pattern {
 	char *name;
 #ifdef FAKEDEMO
-	CUB_LED_list_t data;
 #else
 	char *path;
 #endif
+	CUB_LED_list_t data;
 } pattern_t;
 
 
@@ -63,6 +63,9 @@ group_t *groups;
 uint32_t  cur_group_id;
 uint32_t  cur_pattern_id;
 int status = 0;
+int32_t x_offset = 0;
+int32_t y_offset = 0;
+int32_t z_offset = 0;
 
 char * mystrdup(const char *src)
 {
@@ -130,6 +133,9 @@ void group_and_pattern_init()
 	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
 	cur_group_id = cur_pattern_id = 0;
 #endif
+	x_offset = 0;
+	y_offset = 0;
+	z_offset = 0;
 }
 
 void group_and_pattern_update(action_t action)
@@ -153,7 +159,9 @@ void group_and_pattern_update(action_t action)
 		cur_pattern_id = 0;
 		break;
 	}
-
+	x_offset = 0;
+	y_offset = 0;
+	z_offset = 0;
 }
 
 #define NB_STATE 10
@@ -219,34 +227,44 @@ void screen_display_update()
 	CUB_TextPrint(screen);
 }
 
-void pattern_display_update()
+void pattern_display_update(int32_t x, int32_t y, int32_t z)
 {
-	CUB_LED_list_t list;
-	CUB_LED_list_init(&list);
+	CUB_LED_list_t *list = &(groups[cur_group_id].patterns[cur_pattern_id].data);
+	x_offset += x;
+	y_offset += y;
+	z_offset += z;
+	//screen_display_update();
+	CUB_LEDs_clear();
+	CUB_LED_t *cur_led = list->first;
+	while (cur_led != NULL) {
+		CUB_LEDs_switch_on(
+				cur_led->x + x_offset,
+				cur_led->y + y_offset,
+				cur_led->z + z_offset);
+		cur_led = cur_led->next;
+	}
+	CUB_LEDs_update_display();
+}
+
+void fill_list(pattern_t *p)
+{
+	CUB_LED_list_t *list = &(p->data);
+	CUB_LED_list_init(list);
 #ifdef FAKEDEMO
 	int status = 0;
-	list.first = groups[cur_group_id].patterns[cur_pattern_id].data.first;
-	list.last = groups[cur_group_id].patterns[cur_pattern_id].data.last;
 #else
-	int status = CUB_parse_file(groups[cur_group_id].patterns[cur_pattern_id].path, &list);
+	int status = CUB_parse_file(groups[cur_group_id].patterns[cur_pattern_id].path, list);
 #endif
 	if (status == 1) {
 		/* Do something */
 	}
-	CUB_LEDs_clear();
-	CUB_LED_t *cur_led = list.first;
-	while (cur_led != NULL) {
-		CUB_LEDs_switch_on(cur_led->x, cur_led->y, cur_led->z);
-		cur_led = cur_led->next;
-	}
-	CUB_LEDs_update_display();
 }
 
 void application_init()
 {
 	group_and_pattern_init();
 	//screen_display_update();
-	pattern_display_update();
+	pattern_display_update(0, 0, 0);
 	status = 0;
 }
 
@@ -254,7 +272,7 @@ void application_update(action_t action)
 {
 	group_and_pattern_update(action);
 	//screen_display_update();
-	pattern_display_update();
+	pattern_display_update(0, 0, 0);
 }
 
 void CUB_ApplicationRun()
@@ -266,7 +284,6 @@ void CUB_ApplicationRun()
 	CUB_TextHome();
 	CUB_TextPrint("toto");
 	CUB_Event event;
-	int count = 0;
 	int loop = 0;
 	/* Infinite loop */
 	for(;;) {
@@ -276,16 +293,22 @@ void CUB_ApplicationRun()
 					CUB_ApplicationRun_snake();
 				switch (event.button.id) {
 					case CUB_BTN_UP:
+						pattern_display_update(1, 0, 0);
 						break;
 					case CUB_BTN_DOWN:
+						pattern_display_update(-1, 0, 0);
 						break;
 					case CUB_BTN_LEFT:
+						pattern_display_update(0, -1, 0);
 						break;
 					case CUB_BTN_RIGHT:
+						pattern_display_update(0, 1, 0);
 						break;
 					case CUB_BTN_TOP:
+						pattern_display_update(0, 0, 1);
 						break;
 					case CUB_BTN_BOTTOM:
+						pattern_display_update(0, 0, -1);
 						break;
 					case CUB_BTN_M_LEFT:
 						application_update(PREV_GROUP);
