@@ -55,53 +55,46 @@ typedef enum action {
 group_t   cur_group;
 pattern_t cur_pattern;
 uint32_t  nb_group;
-int       status;
+int       status = 0;
 
 //void group_and_pattern_init();
 //void group_and_pattern_update(action_t action);
 
-void status_update(CUB_Button b)
+#define NB_STATE 10
+int state_machine[NB_STATE] = {
+	CUB_BTN_UP,
+	CUB_BTN_UP,
+	CUB_BTN_DOWN,
+	CUB_BTN_DOWN,
+	CUB_BTN_LEFT,
+	CUB_BTN_RIGHT,
+	CUB_BTN_LEFT,
+	CUB_BTN_RIGHT,
+	CUB_BTN_M_LEFT,
+	CUB_BTN_M_RIGHT
+};
+
+bool status_update(CUB_Button b)
 {
-	switch (status) {
-	case 0:
-		status = (b == CUB_BTN_UP) ? 1 : 0;
-		break;
-	case 1:
-		status = (b == CUB_BTN_UP) ? 2 : 0;
-		break;
-	case 2:
-		status = (b == CUB_BTN_DOWN) ? 3 : 0;
-		break;
-	case 3:
-		status = (b == CUB_BTN_DOWN) ? 4 : 0;
-		break;
-	case 4:
-		status = (b == CUB_BTN_LEFT) ? 5 : 0;
-		break;
-	case 5:
-		status = (b == CUB_BTN_RIGHT) ? 6 : 0;
-		break;
-	case 6:
-		status = (b == CUB_BTN_LEFT) ? 7 : 0;
-		break;
-	case 7:
-		status = (b == CUB_BTN_RIGHT) ? 8 : 0;
-		break;
-	case 8:
-		status = (b == CUB_BTN_M_LEFT) ? 9 : 0;
-		break;
-	case 9:
-		status = (b == CUB_BTN_M_RIGHT) ? 10 : 0;
-		break;
-	default:
+	//status = (state_machine[status] == b) ? status + 1 : 0;
+	if (state_machine[status] == b) {
+		status++;
+	} else if (status > 0
+			&& state_machine[status-1] == b) {
+	} else {
 		status = 0;
-		break;
 	}
 	CUB_TextClear();
 	CUB_TextHome();
 	char score_string[16];
 	my_itoa2(status, score_string);
+	my_itoa2(b, score_string+8);
 	CUB_TextPrint(score_string);
+	if (status == NB_STATE) {
+		status = 0;
+		return true;
+	}
+	return false;
 }
 
 void screen_display_update()
@@ -179,11 +172,8 @@ void CUB_ApplicationRun()
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
-				status_update(event.button.id);
-				if (status == 10) {
+				if (status_update(event.button.id))
 					CUB_ApplicationRun_snake();
-					status = 0;
-				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						break;
