@@ -13,6 +13,8 @@ SRCS+=Src/applications/snake.c
 SRCS+=Src/applications/crystal_structure/*.c
 SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
 
+DEFINES=-DFAKEDEMO
+
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
 
@@ -40,6 +42,7 @@ CFLAGS += -I.
 CFLAGS += -I/usr/arm-none-eabi/lib
 
 CFLAGS += -lrdimon #--specs=rdimon.specs 
+CFLAGS += $(DEFINES)
 
 #########
 # ARM DEF
