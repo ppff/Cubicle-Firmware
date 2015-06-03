@@ -26,12 +26,6 @@ static void _idlePushBtnEvent(void const * arg);
 
 static osMutexId _mutex_events;
 
-
-/**
- * Button current states
- */
-enum {RELEASED=0, PRESSED};
-static uint8_t mButtonState[CUB_BTN_LAST];
 /**
  * Flag when button is pressed
  */
@@ -66,7 +60,6 @@ void CUB_EventInit()
 	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
 		mButtonWasPressed[i] = false;
 		mButtonWasReleased[i] = false;
-		mButtonState[i] = false;
 		mButtonOldValue[i] = false;
 	}
 }
