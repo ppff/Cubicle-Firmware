@@ -191,7 +191,7 @@ void pattern_display_update()
 void application_init()
 {
 	group_and_pattern_init();
-	screen_display_update();
+	//screen_display_update();
 	pattern_display_update();
 	status = 0;
 }
@@ -199,7 +199,7 @@ void application_init()
 void application_update(action_t action)
 {
 	group_and_pattern_update(action);
-	screen_display_update();
+	//screen_display_update();
 	pattern_display_update();
 }
 
@@ -252,12 +252,6 @@ void CUB_ApplicationRun()
 			// Cech if SD card is still in slot.
 		}
 
-		CUB_LEDs_switch_on(loop, 0,    0);
-		CUB_LEDs_switch_on(0,    loop, 0);
-		CUB_LEDs_switch_on(0,    0,    loop);
-		CUB_LEDs_update_display();
-
-		HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
 		CUB_Sleep(200);
 
 		loop++;
