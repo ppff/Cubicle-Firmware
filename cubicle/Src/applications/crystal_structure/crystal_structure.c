@@ -60,8 +60,8 @@ typedef enum action {
 
 uint32_t  nb_group;
 group_t *groups;
-uint32_t  group_id;
-uint32_t  pattern_id;
+uint32_t  cur_group_id;
+uint32_t  cur_pattern_id;
 int status = 0;
 
 char * mystrdup(const char *src)
@@ -74,14 +74,19 @@ char * mystrdup(const char *src)
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
-	nb_group = 1;
+	nb_group = 2;
 	groups = MALLOC(sizeof(group_t)*nb_group);
 
 	groups[0].name = mystrdup("Daniel");
+	groups[1].name = mystrdup("Florian");
 	groups[0].nb_pattern = 2;
+	groups[1].nb_pattern = 1;
 	groups[0].patterns = MALLOC(sizeof(pattern_t)*groups[0].nb_pattern);
+	groups[1].patterns = MALLOC(sizeof(pattern_t)*groups[1].nb_pattern);
 	groups[0].patterns[0].name = mystrdup("Premier motif");
+	groups[1].patterns[0].name = mystrdup("Premier motif");
 	CUB_LED_list_init(&groups[0].patterns[0].data);
+	CUB_LED_list_init(&groups[1].patterns[0].data);
 	CUB_LED_t led = {0,0,0,NULL};
 	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
 	led.z++;
@@ -93,12 +98,61 @@ void group_and_pattern_init()
 	led.z++;
 	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
 
-	group_id = pattern_id = 0;
+	led.x = 0;
+	led.y = 0;
+	led.z = 0;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 2;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.y = 2;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.z = 2;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.y = 0;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 0;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 0;
+	led.y = 2;
+	led.z = 0;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 2;
+	led.y = 0;
+	led.z = 2;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 0;
+	led.y = 2;
+	led.z = 2;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	led.x = 1;
+	led.y = 1;
+	led.z = 1;
+	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
+	cur_group_id = cur_pattern_id = 0;
 #endif
 }
 
 void group_and_pattern_update(action_t action)
 {
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrint("tata");
+	switch (action) {
+	case NEXT_PATTERN:
+		cur_pattern_id = (cur_pattern_id != groups[cur_group_id].nb_pattern - 1) ? cur_pattern_id + 1 : 0;
+		break;
+	case PREV_PATTERN:
+		cur_pattern_id = (cur_pattern_id != 0) ? cur_pattern_id - 1 : groups[cur_group_id].nb_pattern - 1;
+		break;
+	case NEXT_GROUP:
+		cur_group_id = (cur_group_id != nb_group - 1) ? cur_group_id + 1 : 0;
+		cur_pattern_id = 0;
+		break;
+	case PREV_GROUP:
+		cur_group_id = (cur_group_id != 0) ? cur_group_id - 1 : nb_group - 1;
+		cur_pattern_id = 0;
+		break;
+	}
 
 }
 
@@ -147,12 +201,12 @@ void screen_display_update()
 	char pattern_name_display  [SCREEN_WIDTH - 6 +1];
 	char screen                [SCREEN_WIDTH * 2 + 1];
 
-	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, group_id+1, nb_group);
-	strncpy(group_name_display, groups[group_id].name, 6);
+	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_group_id+1, nb_group);
+	strncpy(group_name_display, groups[cur_group_id].name, 6);
 	group_name_display[SCREEN_WIDTH - 6] = '\0';
 
-	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, pattern_id+1, groups[group_id].nb_pattern);
-	strncpy(pattern_name_display, groups[group_id].patterns[pattern_id].name, 6);
+	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_pattern_id+1, groups[cur_group_id].nb_pattern);
+	strncpy(pattern_name_display, groups[cur_group_id].patterns[cur_pattern_id].name, 6);
 	pattern_name_display[SCREEN_WIDTH - 6] = '\0';
 
 	sprintf(screen, "%s%s\n%s%s",
@@ -171,10 +225,10 @@ void pattern_display_update()
 	CUB_LED_list_init(&list);
 #ifdef FAKEDEMO
 	int status = 0;
-	list.first = groups[group_id].patterns[pattern_id].data.first;
-	list.last = groups[group_id].patterns[pattern_id].data.last;
+	list.first = groups[cur_group_id].patterns[cur_pattern_id].data.first;
+	list.last = groups[cur_group_id].patterns[cur_pattern_id].data.last;
 #else
-	int status = CUB_parse_file(cur_pattern.path, &list);
+	int status = CUB_parse_file(groups[cur_group_id].patterns[cur_pattern_id].path, &list);
 #endif
 	if (status == 1) {
 		/* Do something */
@@ -234,16 +288,16 @@ void CUB_ApplicationRun()
 					case CUB_BTN_BOTTOM:
 						break;
 					case CUB_BTN_M_LEFT:
-						//application_update(PREV_GROUP);
+						application_update(PREV_GROUP);
 						break;
 					case CUB_BTN_M_RIGHT:
-						//application_update(NEXT_GROUP);
+						application_update(NEXT_GROUP);
 						break;
 					case CUB_BTN_SM_LEFT:
-						//application_update(PREV_PATTERN);
+						application_update(PREV_PATTERN);
 						break;
 					case CUB_BTN_SM_RIGHT:
-						//application_update(NEXT_PATTERN);
+						application_update(NEXT_PATTERN);
 						break;
 					default:
 						;
