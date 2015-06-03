@@ -37,7 +37,6 @@ void my_itoa2(int value, char str[])
 
 typedef struct pattern {
 	char *name;
-	uint32_t index;
 #ifdef FAKEDEMO
 	CUB_LED_list_t data;
 #else
@@ -48,7 +47,6 @@ typedef struct pattern {
 
 typedef struct group {
 	char *name;
-	uint32_t index;
 	uint32_t nb_pattern;
 	pattern_t *patterns;	
 } group_t;
@@ -66,23 +64,29 @@ uint32_t  group_id;
 uint32_t  pattern_id;
 int status;
 
+char * mystrdup(const char *src)
+{
+	char * copy = MALLOC(strlen(src)+1);
+	strcpy(copy, src);
+	return copy;
+}
+
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
 	nb_group = 1;
 	groups = MALLOC(sizeof(group_t)*nb_group);
 
-	groups[0].name = strdup("Daniel");
-	groups[0].index = 0;
+	groups[0].name = mystrdup("Daniel");
 	groups[0].nb_pattern = 2;
 	groups[0].patterns = MALLOC(sizeof(pattern_t)*groups[0].nb_pattern);
-	groups[0].patterns[0].name = strdup("Premier motif");
+	groups[0].patterns[0].name = mystrdup("Premier motif");
 	CUB_LED_list_init(&groups[0].patterns[0].data);
 	CUB_LED_t led = {0,0,0,NULL};
 	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
 	led.z++;
 	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
-	groups[0].patterns[1].name = strdup("Premier motif");
+	groups[0].patterns[1].name = mystrdup("Deuxieme motif");
 	CUB_LED_list_init(&groups[0].patterns[1].data);
 	led.z++;
 	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
