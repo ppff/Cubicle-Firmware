@@ -9,6 +9,30 @@
 
 #define SCREEN_WIDTH 32
 
+void inverse2(char s[])
+{
+	int c, i, j;
+	for (i = 0, j = strlen(s)-1; i < j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+void my_itoa2(int value, char str[]) 
+{
+	int i = 0;
+	if (value >= 0) {
+		do {
+			str[i++] = value % 10 + '0';
+		} while ((value /= 10) > 0);
+		str[i] = '\0';
+		inverse2(str);
+	} else {
+		strcpy(str,"");
+	}
+}
+
 typedef struct group {
 	char *name;
 	uint32_t index;
@@ -73,6 +97,11 @@ void status_update(CUB_Button b)
 		status = 0;
 		break;
 	}
+	CUB_TextClear();
+	CUB_TextHome();
+	char score_string[16];
+	my_itoa2(status, score_string);
+	CUB_TextPrint(score_string);
 }
 
 void screen_display_update()
