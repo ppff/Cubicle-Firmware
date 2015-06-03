@@ -267,6 +267,8 @@ void CUB_LEDs_display()
 
 		if (toDisp)
 			_drawOnePlan(k);
+
+		osDelay(1);
 	}
 }
 
