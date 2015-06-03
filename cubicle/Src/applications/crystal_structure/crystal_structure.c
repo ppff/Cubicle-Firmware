@@ -33,17 +33,24 @@ void my_itoa2(int value, char str[])
 	}
 }
 
-typedef struct group {
-	char *name;
-	uint32_t index;
-	uint32_t nb_pattern;
-} group_t;
 
 typedef struct pattern {
 	char *name;
 	uint32_t index;
+#ifdef FAKEDEMO
+	CUB_LED_list_t data;
+#else
 	char *path;
+#endif
 } pattern_t;
+
+
+typedef struct group {
+	char *name;
+	uint32_t index;
+	uint32_t nb_pattern;
+	pattern_t *patterns;	
+} group_t;
 
 typedef enum action {
 	NEXT_GROUP = 0,
@@ -55,10 +62,31 @@ typedef enum action {
 group_t   cur_group;
 pattern_t cur_pattern;
 uint32_t  nb_group;
-int       status;
+group_t *groups;
+int status;
 
-//void group_and_pattern_init();
-//void group_and_pattern_update(action_t action);
+void group_and_pattern_init()
+{
+#ifdef FAKEDEMO
+	nb_group = 3;
+	groups = MALLOC(sizeof(group_t)*nb_group);
+
+	groups[0].name, strdup("Daniel");
+	groups[0].index = 0;
+	groups[0].nb_pattern = 3;
+	groups[0].patterns = MALLOC(sizeof(pattern_t)*3);
+	groups[0].patterns[0].name = strdup("Premier motif");
+	CUB_LED_list_init(&groups[0].patterns[0].data);
+	CUB_LED_list_add(&groups[0].patterns[0].data, {0,0,0});
+	CUB_LED_list_add(&groups[0].patterns[0].data, {2,2,2});
+
+#endif
+}
+
+void group_and_pattern_update(action_t action)
+{
+
+}
 
 void status_update(CUB_Button b)
 {
@@ -181,8 +209,14 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_PRESSED) {
 				status_update(event.button.id);
 				if (status == 10) {
+<<<<<<< Updated upstream
 					CUB_ApplicationRun_snake();
 					status = 0;
+=======
+					// TODO
+					CUB_TextHome();
+					CUB_TextPrint("OK");
+>>>>>>> Stashed changes
 				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
