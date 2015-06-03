@@ -6,6 +6,7 @@
 #include "CUB_parser.h"
 #include "applications/crystal_structure/CUB_LED_list.h"
 #include "applications/snake.h"
+#include "constant.h"
 
 #define SCREEN_WIDTH 32
 
@@ -59,27 +60,36 @@ typedef enum action {
 	PREV_PATTERN,
 } action_t;
 
-group_t   cur_group;
-pattern_t cur_pattern;
 uint32_t  nb_group;
 group_t *groups;
+uint32_t  group_id;
+uint32_t  pattern_id;
 int status;
 
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
-	nb_group = 3;
+	nb_group = 1;
 	groups = MALLOC(sizeof(group_t)*nb_group);
 
-	groups[0].name, strdup("Daniel");
+	groups[0].name = strdup("Daniel");
 	groups[0].index = 0;
-	groups[0].nb_pattern = 3;
-	groups[0].patterns = MALLOC(sizeof(pattern_t)*3);
+	groups[0].nb_pattern = 2;
+	groups[0].patterns = MALLOC(sizeof(pattern_t)*groups[0].nb_pattern);
 	groups[0].patterns[0].name = strdup("Premier motif");
 	CUB_LED_list_init(&groups[0].patterns[0].data);
-	CUB_LED_list_add(&groups[0].patterns[0].data, {0,0,0});
-	CUB_LED_list_add(&groups[0].patterns[0].data, {2,2,2});
+	CUB_LED_t led = {0,0,0,NULL};
+	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
+	led.z++;
+	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
+	groups[0].patterns[1].name = strdup("Premier motif");
+	CUB_LED_list_init(&groups[0].patterns[1].data);
+	led.z++;
+	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
+	led.z++;
+	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
 
+	group_id = pattern_id = 0;
 #endif
 }
 
@@ -140,12 +150,12 @@ void screen_display_update()
 	char pattern_name_display  [SCREEN_WIDTH - 6 +1];
 	char screen                [SCREEN_WIDTH * 2 + 1];
 
-	sprintf(group_number_display, "%u/%u ", cur_group.index, nb_group);
-	strncpy(group_name_display, cur_group.name, 6);
+	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, group_id+1, nb_group);
+	strncpy(group_name_display, groups[group_id].name, 6);
 	group_name_display[SCREEN_WIDTH - 6] = '\0';
 
-	sprintf(group_number_display, "%u/%u ", cur_pattern.index, cur_group.nb_pattern);
-	strncpy(pattern_name_display, cur_pattern.name, 6);
+	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, pattern_id+1, groups[group_id].nb_pattern);
+	strncpy(pattern_name_display, groups[group_id].patterns[pattern_id].name, 6);
 	pattern_name_display[SCREEN_WIDTH - 6] = '\0';
 
 	sprintf(screen, "%s%s\n%s%s",
@@ -162,7 +172,13 @@ void pattern_display_update()
 {
 	CUB_LED_list_t list;
 	CUB_LED_list_init(&list);
+#ifdef FAKEDEMO
+	int status = 0;
+	list.first = groups[group_id].patterns[pattern_id].data.first;
+	list.last = groups[group_id].patterns[pattern_id].data.last;
+#else
 	int status = CUB_parse_file(cur_pattern.path, &list);
+#endif
 	if (status == 1) {
 		/* Do something */
 	}
@@ -175,7 +191,6 @@ void pattern_display_update()
 	CUB_LEDs_update_display();
 }
 
-/*
 void application_init()
 {
 	group_and_pattern_init();
@@ -190,11 +205,10 @@ void application_update(action_t action)
 	screen_display_update();
 	pattern_display_update();
 }
-*/
 
 void CUB_ApplicationRun()
 {
-	//application_init();
+	application_init();
 
 	CUB_LEDs_clear();
 	CUB_TextClear();
@@ -209,14 +223,8 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_PRESSED) {
 				status_update(event.button.id);
 				if (status == 10) {
-<<<<<<< Updated upstream
 					CUB_ApplicationRun_snake();
 					status = 0;
-=======
-					// TODO
-					CUB_TextHome();
-					CUB_TextPrint("OK");
->>>>>>> Stashed changes
 				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
