@@ -4,9 +4,9 @@
 #include <stdint.h>
 
 typedef struct CUB_LED {
-	uint32_t x;
-	uint32_t y;
-	uint32_t z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 	struct CUB_LED *next;
 } CUB_LED_t;
 
