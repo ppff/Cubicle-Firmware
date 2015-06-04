@@ -112,6 +112,9 @@ static void _idlePushBtnEvent(void const * arg)
 	for(;;) {
 		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
             bool set = (HAL_GPIO_ReadPin(ports[i],pins[i])==GPIO_PIN_SET);
+#ifdef BUTTONS_ARE_ACTIVATED_AT_LOW_LEVEL 
+			set = !set;
+#endif
             if (!mButtonOldValue[i] && set) 
             {
                 mButtonOldValue[i] = !mButtonOldValue[i];
