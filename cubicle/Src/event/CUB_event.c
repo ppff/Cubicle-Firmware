@@ -19,27 +19,9 @@
  */
 xQueueHandle eventQueue;
 
-/**
- * Circular buffer
- */
-static CUB_Event mEvents[MAX_EVENTS];
-static uint16_t mWriter;
-static uint16_t mReader;
-static uint16_t mSize;
-
 static osThreadId idlePushEvtTaskHandle;
 static void _idlePushBtnEvent(void const * arg);
 
-static osMutexId _mutex_events;
-
-/**
- * Flag when button is pressed
- */
-static bool mButtonWasPressed[CUB_BTN_LAST];
-/**
- * Flag when button is released
- */
-static bool mButtonWasReleased[CUB_BTN_LAST];
 /**
  * Old button values
  */
@@ -55,38 +37,18 @@ void CUB_EventInit()
 	osThreadDef(IDLE_PUSH_EVT_TASK, _idlePushBtnEvent, osPriorityAboveNormal, 0, 128);
 	idlePushEvtTaskHandle = osThreadCreate(osThread(IDLE_PUSH_EVT_TASK), NULL);
 
-	// Create mutex to share event structure.
-	osMutexDef(MUTEX_EVENTS);
-	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
-
     // Init Queue
     eventQueue = xQueueCreate(MAX_EVENTS, sizeof(CUB_Event));
 
-	// Init circular buffer
-	mWriter = mReader = mSize = 0;
-
 	// Init flags
-	for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
-		mButtonWasPressed[i] = false;
-		mButtonWasReleased[i] = false;
+	for(uint32_t i=0; i < CUB_BTN_LAST; i++)
 		mButtonOldValue[i] = false;
-	}
 }
 
 void CUB_EventQuit()
 {
-	osMutexDelete(_mutex_events);
 }
 
-static inline void takeMutex()
-{
-	while (osMutexWait(_mutex_events, 0) != osOK);
-}
-
-static inline void releaseMutex()
-{
-	osMutexRelease(_mutex_events);
-}
 
 /**
  * Polls for currently pending events, and returns true if there are any pending
@@ -96,20 +58,6 @@ static inline void releaseMutex()
  */
 bool CUB_PollEvent(CUB_Event * event)
 {
-    //if (mSize == 0) {
-	//	if (event != NULL) {
-	//		event->type = CUB_NOEVENT;
-	//	}
-    //    return false;
-	//}
-
-	//takeMutex();
-	//if (event != NULL) {
-	//	memcpy(event, &mEvents[mReader], sizeof(CUB_Event));
-    //}
-	//mReader = (mReader+1) % MAX_EVENTS;
-	//mSize--;
-	//releaseMutex();
     portBASE_TYPE res = xQueueReceive(eventQueue, event, 0);
     return res == pdPASS;
 }
@@ -122,21 +70,6 @@ bool CUB_PollEvent(CUB_Event * event)
  */
 bool CUB_PushEvent(CUB_Event * event)
 {
-    //if (event == NULL) {
-    //    return true;
-	//}
-
-	//bool ret = false;
-	//takeMutex();
-    //if (mSize == MAX_EVENTS) {
-    //    ret = false;
-	//} else {
-    //	memcpy(&mEvents[mWriter], event, sizeof(CUB_Event));
-	//	mWriter = (mWriter+1) % MAX_EVENTS;
-    //	mSize++;
-	//	ret = true;
-	//}
-	//releaseMutex();
     portBASE_TYPE res = xQueueSend(eventQueue, event, 0);
     return res == pdPASS;
 }
@@ -152,55 +85,47 @@ bool CUB_PushEvent(CUB_Event * event)
 static void _idlePushBtnEvent(void const * arg)
 {
 	CUB_Event event;
+    GPIO_TypeDef* ports[] = {
+                       CONFIG_BTN_UP_PORT,
+                       CONFIG_BTN_DOWN_PORT,
+                       CONFIG_BTN_LEFT_PORT,
+                       CONFIG_BTN_RIGHT_PORT,
+                       CONFIG_BTN_TOP_PORT,
+                       CONFIG_BTN_BOTTOM_PORT,
+                       CONFIG_BTN_MENU_LEFT_PORT,
+                       CONFIG_BTN_MENU_RIGHT_PORT,
+                       CONFIG_BTN_SUB_MENU_LEFT_PORT,
+                       CONFIG_BTN_SUB_MENU_RIGHT_PORT
+                        };
+    uint16_t pins[] = {
+                       CONFIG_BTN_UP_PIN,
+                       CONFIG_BTN_DOWN_PIN,
+                       CONFIG_BTN_LEFT_PIN,
+                       CONFIG_BTN_RIGHT_PIN,
+                       CONFIG_BTN_TOP_PIN,
+                       CONFIG_BTN_BOTTOM_PIN,
+                       CONFIG_BTN_MENU_LEFT_PIN,
+                       CONFIG_BTN_MENU_RIGHT_PIN,
+                       CONFIG_BTN_SUB_MENU_LEFT_PIN,
+                       CONFIG_BTN_SUB_MENU_RIGHT_PIN
+                    }; 
 	for(;;) {
 		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
-			if (mButtonWasPressed[i]) {
-					mButtonWasPressed[i] = false;
-					event.type = CUB_BUTTON_PRESSED;
-					event.button.id = i;
-					CUB_PushEvent(&event);
-			}
-			if (mButtonWasReleased[i]) {
-					mButtonWasReleased[i] = false;
-					event.type = CUB_BUTTON_RELEASED;
-					event.button.id = i;
-					CUB_PushEvent(&event);
-			}
+            bool set = (HAL_GPIO_ReadPin(ports[i],pins[i])==GPIO_PIN_SET);
+            if (!mButtonOldValue[i] && set) 
+            {
+                mButtonOldValue[i] = !mButtonOldValue[i];
+			    event.type = CUB_BUTTON_PRESSED;
+			    event.button.id = i;
+			    CUB_PushEvent(&event);
+            } else if (mButtonOldValue[i] && !set) {
+                mButtonOldValue[i] = !mButtonOldValue[i];
+			    event.type = CUB_BUTTON_RELEASED;
+			    event.button.id = i;
+			    CUB_PushEvent(&event);
+            }
 		}
-		osDelay(50);
+		osDelay(40);
 	}
-}
-
-
-
-/**
- * 
- */
-static inline void treatBtnChange(GPIO_TypeDef* port, uint16_t pin, uint32_t btnId)
-{
-	bool val = (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET);
-#if BUTTONS_ARE_ACTIVATED_AT_LOW_LEVEL
-	val = !val;
-#endif
-	if (!mButtonOldValue[btnId] && val) { // virtual rising edge
-		mButtonWasPressed[btnId] = true;
-	} else if (mButtonOldValue[btnId] && !val) { // virtual falling edge
-		mButtonWasReleased[btnId] = true;
-	}
-	mButtonOldValue[btnId] = val;
-}
-
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	treatBtnChange(CONFIG_BTN_TOP_PORT,    CONFIG_BTN_TOP_PIN,    CUB_BTN_TOP);
-	treatBtnChange(CONFIG_BTN_BOTTOM_PORT, CONFIG_BTN_BOTTOM_PIN, CUB_BTN_BOTTOM);
-	treatBtnChange(CONFIG_BTN_UP_PORT,     CONFIG_BTN_UP_PIN,     CUB_BTN_UP);
-	treatBtnChange(CONFIG_BTN_LEFT_PORT,   CONFIG_BTN_LEFT_PIN,   CUB_BTN_LEFT);
-	treatBtnChange(CONFIG_BTN_DOWN_PORT,   CONFIG_BTN_DOWN_PIN,   CUB_BTN_DOWN);
-	treatBtnChange(CONFIG_BTN_RIGHT_PORT,  CONFIG_BTN_RIGHT_PIN,  CUB_BTN_RIGHT);
-	treatBtnChange(CONFIG_BTN_MENU_LEFT_PORT,      CONFIG_BTN_MENU_LEFT_PIN,      CUB_BTN_M_LEFT);
-	treatBtnChange(CONFIG_BTN_MENU_RIGHT_PORT,     CONFIG_BTN_MENU_RIGHT_PIN,     CUB_BTN_M_RIGHT);
-	treatBtnChange(CONFIG_BTN_SUB_MENU_LEFT_PORT,  CONFIG_BTN_SUB_MENU_LEFT_PIN,  CUB_BTN_SM_LEFT);
-	treatBtnChange(CONFIG_BTN_SUB_MENU_RIGHT_PORT, CONFIG_BTN_SUB_MENU_RIGHT_PIN, CUB_BTN_SM_RIGHT);
 }
 

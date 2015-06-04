@@ -329,7 +329,7 @@ void CUB_ApplicationRun()
 			// Cech if SD card is still in slot.
 		}
 
-		CUB_Sleep(200);
+		CUB_Sleep(50);
 
 		loop++;
 	}
