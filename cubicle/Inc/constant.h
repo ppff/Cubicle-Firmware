@@ -16,6 +16,12 @@
 #define BUTTONS_ARE_ACTIVATED_AT_LOW_LEVEL 1
 
 /**
+ * Time to sleep (in ms) between
+ * two polling iteration.
+ */
+#define BUTTON_POLLING_PERIOD 40
+
+/**
  * Button pins configuration
  */
 

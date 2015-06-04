@@ -27,6 +27,14 @@ static void _idlePushBtnEvent(void const * arg);
  */
 static bool mButtonOldValue[CUB_BTN_LAST];
 
+/**
+ * Button repeat feature
+ */
+bool mBREnabled;
+int32_t mBRDelay;
+int32_t mBRInterval;
+int32_t mBRTimer[CUB_BTN_LAST];
+
 
 /**
  * Initialize the event module.
@@ -43,6 +51,13 @@ void CUB_EventInit()
 	// Init flags
 	for(uint32_t i=0; i < CUB_BTN_LAST; i++)
 		mButtonOldValue[i] = false;
+
+	// Init button repeat feature
+	mBREnabled = false;
+	mBRDelay = 0;
+	mBRInterval = 0;
+	for(uint32_t i=0; i < CUB_BTN_LAST; i++)
+		mBRTimer[i] = 0;
 }
 
 void CUB_EventQuit()
@@ -75,8 +90,39 @@ bool CUB_PushEvent(CUB_Event * event)
 }
 
 /**
+ * Enables or disables the button repeat rate.
+ * 'delay' specifies how long the key must be pressed
+ * before it begins repeating, it then repeats at the
+ * speed specified by 'interval'.
+ * Both 'delay' and 'interval' are expressed in milliseconds.
+ * Setting delay to 0 disables key repeating completely.
+ * The repeatition time can be not very accurate.
+ */
+void CUB_EnableButtonRepeat(uint16_t delay, uint16_t interval)
+{
+	if (delay == 0) {
+		mBREnabled = false;
+		return;
+	}
+
+	mBREnabled = true;
+	mBRDelay = (int32_t)delay;
+	mBRInterval = (int32_t)interval;
+}
+
+
+/**
  * Private
  */
+
+inline static void _butEvent(CUB_Button id, CUB_EventType ev_type)
+{
+	CUB_Event event;
+	event.type = ev_type;
+	event.button.id = id;
+	CUB_PushEvent(&event);
+}
+
 
 /**
  * Examine flags and create
@@ -84,31 +130,30 @@ bool CUB_PushEvent(CUB_Event * event)
  */
 static void _idlePushBtnEvent(void const * arg)
 {
-	CUB_Event event;
     GPIO_TypeDef* ports[] = {
-                       CONFIG_BTN_UP_PORT,
-                       CONFIG_BTN_DOWN_PORT,
-                       CONFIG_BTN_LEFT_PORT,
-                       CONFIG_BTN_RIGHT_PORT,
-                       CONFIG_BTN_TOP_PORT,
-                       CONFIG_BTN_BOTTOM_PORT,
-                       CONFIG_BTN_MENU_LEFT_PORT,
-                       CONFIG_BTN_MENU_RIGHT_PORT,
-                       CONFIG_BTN_SUB_MENU_LEFT_PORT,
-                       CONFIG_BTN_SUB_MENU_RIGHT_PORT
-                        };
+        CONFIG_BTN_UP_PORT,
+        CONFIG_BTN_DOWN_PORT,
+        CONFIG_BTN_LEFT_PORT,
+        CONFIG_BTN_RIGHT_PORT,
+        CONFIG_BTN_TOP_PORT,
+        CONFIG_BTN_BOTTOM_PORT,
+        CONFIG_BTN_MENU_LEFT_PORT,
+        CONFIG_BTN_MENU_RIGHT_PORT,
+        CONFIG_BTN_SUB_MENU_LEFT_PORT,
+        CONFIG_BTN_SUB_MENU_RIGHT_PORT
+    };
     uint16_t pins[] = {
-                       CONFIG_BTN_UP_PIN,
-                       CONFIG_BTN_DOWN_PIN,
-                       CONFIG_BTN_LEFT_PIN,
-                       CONFIG_BTN_RIGHT_PIN,
-                       CONFIG_BTN_TOP_PIN,
-                       CONFIG_BTN_BOTTOM_PIN,
-                       CONFIG_BTN_MENU_LEFT_PIN,
-                       CONFIG_BTN_MENU_RIGHT_PIN,
-                       CONFIG_BTN_SUB_MENU_LEFT_PIN,
-                       CONFIG_BTN_SUB_MENU_RIGHT_PIN
-                    }; 
+        CONFIG_BTN_UP_PIN,
+        CONFIG_BTN_DOWN_PIN,
+        CONFIG_BTN_LEFT_PIN,
+        CONFIG_BTN_RIGHT_PIN,
+        CONFIG_BTN_TOP_PIN,
+        CONFIG_BTN_BOTTOM_PIN,
+        CONFIG_BTN_MENU_LEFT_PIN,
+        CONFIG_BTN_MENU_RIGHT_PIN,
+        CONFIG_BTN_SUB_MENU_LEFT_PIN,
+        CONFIG_BTN_SUB_MENU_RIGHT_PIN
+    };
 	for(;;) {
 		for(uint32_t i=0; i < CUB_BTN_LAST; i++) {
             bool set = (HAL_GPIO_ReadPin(ports[i],pins[i])==GPIO_PIN_SET);
@@ -118,17 +163,30 @@ static void _idlePushBtnEvent(void const * arg)
             if (!mButtonOldValue[i] && set) 
             {
                 mButtonOldValue[i] = !mButtonOldValue[i];
-			    event.type = CUB_BUTTON_PRESSED;
-			    event.button.id = i;
-			    CUB_PushEvent(&event);
+				_butEvent(i, CUB_BUTTON_PRESSED);
+				if (mBREnabled) {
+					mBRTimer[i] = mBRDelay;
+				}
             } else if (mButtonOldValue[i] && !set) {
                 mButtonOldValue[i] = !mButtonOldValue[i];
-			    event.type = CUB_BUTTON_RELEASED;
-			    event.button.id = i;
-			    CUB_PushEvent(&event);
-            }
+				_butEvent(i, CUB_BUTTON_RELEASED);
+				if (mBREnabled) {
+					mBRTimer[i] = 0;
+				}
+            } else if (mBREnabled) {
+				if (mBRTimer[i] > 0) {
+					mBRTimer[i] -= BUTTON_POLLING_PERIOD;
+					if (mBRTimer[i] <= 0) {
+						_butEvent(i, CUB_BUTTON_RELEASED);
+						_butEvent(i, CUB_BUTTON_PRESSED);
+						mBRTimer[i] = mBRInterval;
+					}
+				}	
+			}
 		}
-		osDelay(40);
+		osDelay(BUTTON_POLLING_PERIOD);
 	}
 }
+
+
 

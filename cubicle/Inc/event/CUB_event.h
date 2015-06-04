@@ -51,5 +51,16 @@ bool CUB_PollEvent(CUB_Event * event);
  */
 bool CUB_PushEvent(CUB_Event * event);
 
+/**
+ * Enables or disables the button repeat rate.
+ * 'delay' specifies how long the key must be pressed
+ * before it begins repeating, it then repeats at the
+ * speed specified by 'interval'.
+ * Both 'delay' and 'interval' are expressed in milliseconds.
+ * Setting delay to 0 disables key repeating completely.
+ * The repeatition time can be not very accurate.
+ */
+void CUB_EnableButtonRepeat(uint16_t delay, uint16_t interval);
+
 #endif
 
