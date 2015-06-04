@@ -5,6 +5,7 @@
 #include "stm32f4xx_hal.h"
 #include "event/CUB_event.h"
 #include "constant.h"
+#include "queue.h"
 
 #define MAX_EVENTS (1<<8)
 
@@ -12,6 +13,11 @@
  * Define virtual state in fonction of
  * electric state.
  */
+
+/**
+ * using a FreeRTOS queue instead
+ */
+xQueueHandle eventQueue;
 
 /**
  * Circular buffer
@@ -53,6 +59,9 @@ void CUB_EventInit()
 	osMutexDef(MUTEX_EVENTS);
 	_mutex_events = osMutexCreate(osMutex(MUTEX_EVENTS));
 
+    // Init Queue
+    eventQueue = xQueueCreate(MAX_EVENTS, sizeof(CUB_Event));
+
 	// Init circular buffer
 	mWriter = mReader = mSize = 0;
 
@@ -87,21 +96,22 @@ static inline void releaseMutex()
  */
 bool CUB_PollEvent(CUB_Event * event)
 {
-    if (mSize == 0) {
-		if (event != NULL) {
-			event->type = CUB_NOEVENT;
-		}
-        return false;
-	}
+    //if (mSize == 0) {
+	//	if (event != NULL) {
+	//		event->type = CUB_NOEVENT;
+	//	}
+    //    return false;
+	//}
 
-	takeMutex();
-	if (event != NULL) {
-		memcpy(event, &mEvents[mReader], sizeof(CUB_Event));
-    }
-	mReader = (mReader+1) % MAX_EVENTS;
-	mSize--;
-	releaseMutex();
-    return true;
+	//takeMutex();
+	//if (event != NULL) {
+	//	memcpy(event, &mEvents[mReader], sizeof(CUB_Event));
+    //}
+	//mReader = (mReader+1) % MAX_EVENTS;
+	//mSize--;
+	//releaseMutex();
+    portBASE_TYPE res = xQueueReceive(eventQueue, event, 0);
+    return res == pdPASS;
 }
 
 /**
@@ -112,22 +122,23 @@ bool CUB_PollEvent(CUB_Event * event)
  */
 bool CUB_PushEvent(CUB_Event * event)
 {
-    if (event == NULL) {
-        return true;
-	}
+    //if (event == NULL) {
+    //    return true;
+	//}
 
-	bool ret = false;
-	takeMutex();
-    if (mSize == MAX_EVENTS) {
-        ret = false;
-	} else {
-    	memcpy(&mEvents[mWriter], event, sizeof(CUB_Event));
-		mWriter = (mWriter+1) % MAX_EVENTS;
-    	mSize++;
-		ret = true;
-	}
-	releaseMutex();
-    return ret;
+	//bool ret = false;
+	//takeMutex();
+    //if (mSize == MAX_EVENTS) {
+    //    ret = false;
+	//} else {
+    //	memcpy(&mEvents[mWriter], event, sizeof(CUB_Event));
+	//	mWriter = (mWriter+1) % MAX_EVENTS;
+    //	mSize++;
+	//	ret = true;
+	//}
+	//releaseMutex();
+    portBASE_TYPE res = xQueueSend(eventQueue, event, 0);
+    return res == pdPASS;
 }
 
 /**
