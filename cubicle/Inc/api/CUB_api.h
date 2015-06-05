@@ -7,7 +7,16 @@
  * API commands
  */
 typedef enum {
+	/** No command */
 	CUB_API_NO_CMD = 0,
+
+	/** Reset API state (future use).
+	 * Can be used to start API communication */
+	CUB_API_RESET,
+
+	/** Close the API communication */
+	CUB_API_CLOSE,
+
 	CUB_API_GET_VERSION,
 
 	CUB_API_CLEAR_LEDS,
