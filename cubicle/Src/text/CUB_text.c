@@ -91,7 +91,7 @@ static void command(uint8_t);
 static void send(uint8_t, uint8_t);
 static void write4bits(uint8_t);
 static void pulseEnable();
-static void write(uint8_t);
+static void _write(uint8_t);
 
 static uint16_t _data_pins[4];
 static uint8_t _displayfunction;
@@ -115,6 +115,11 @@ static uint8_t _currline;
 //	va_end(ap);
 //}
 
+//int fputc(int ch, FILE *f) {
+//    write(ch);
+//    return ch;
+//}
+
 static void delayMicroseconds(uint32_t i)
 {
 	i <<= 5;
@@ -129,7 +134,7 @@ inline static void digitalWrite(uint16_t gpioPin, uint8_t state)
 void CUB_TextPrint(const char *str)
 {
 	while (*str)
-		write(*str++);
+		_write(*str++);
 }
 
 void CUB_TextInit(uint8_t nbRows, uint8_t nbColumns)
@@ -206,7 +211,7 @@ void CUB_TextHome()
   	delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void CUB_SetCursor(uint8_t col, uint8_t row)
+void CUB_TextSetCursor(uint8_t col, uint8_t row)
 {
   	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
   	if ( row > _numlines ) {
@@ -301,12 +306,82 @@ void CUB_TextCreateChar(uint8_t location, uint8_t charmap[])
   	location &= 0x7; // we only have 8 locations 0-7
   	command(LCD_SETCGRAMADDR | (location << 3));
   	for (int i=0; i<8; i++) {
-    	write(charmap[i]);
+    	_write(charmap[i]);
   	}
 }
 
 void CUB_TextQuit()
 {
+}
+
+void CUB_TextWrite(const char c)
+{
+    _write(c);
+}
+
+void inverse2(char s[])
+{
+	int c, i, j;
+	for (i = 0, j = strlen(s)-1; i < j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+
+void my_itoa2(int value, char str[]) 
+{
+	int i = 0;
+	if (value >= 0) {
+		do {
+			str[i++] = value % 10 + '0';
+		} while ((value /= 10) > 0);
+		str[i] = '\0';
+		inverse2(str);
+	} else {
+		strcpy(str,"");
+	}
+}
+
+void CUB_TextPrintf(char *str, ...)
+{
+    va_list vl;
+    va_start(vl, str);
+    while(*str)
+    {
+        switch(*str){
+        case '\n':
+            CUB_TextSetCursor(0,1);
+            CUB_TextPrint("                    ");
+            CUB_TextSetCursor(0,1);
+            break;
+        case '%':
+            str++;
+            switch(*str){
+            case 'i':
+                {
+                    int i = va_arg(vl, int);
+                    char c[2];
+                    my_itoa2(i,c);
+                    CUB_TextPrint(c);
+                    break;
+                }
+            case 's':
+                {
+                    char *str = va_arg(vl, char*);
+                    CUB_TextPrint(str);
+                    break;
+                }
+            default:;
+            }
+            break;
+        default:
+            _write(*str);
+        }
+        str++;
+    }
+    va_end(vl);
 }
 
 /*********** mid level commands, for sending data/cmds */
@@ -316,7 +391,7 @@ inline static void command(uint8_t value)
   	send(value, LOW);
 }
 
-inline static void write(uint8_t value)
+inline static void _write(uint8_t value)
 {
   	send(value, HIGH);
 }

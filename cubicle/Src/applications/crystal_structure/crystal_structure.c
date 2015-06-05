@@ -10,29 +10,6 @@
 
 #define SCREEN_WIDTH 32
 
-void inverse2(char s[])
-{
-	int c, i, j;
-	for (i = 0, j = strlen(s)-1; i < j; i++, j--) {
-		c = s[i];
-		s[i] = s[j];
-		s[j] = c;
-	}
-}
-
-void my_itoa2(int value, char str[]) 
-{
-	int i = 0;
-	if (value >= 0) {
-		do {
-			str[i++] = value % 10 + '0';
-		} while ((value /= 10) > 0);
-		str[i] = '\0';
-		inverse2(str);
-	} else {
-		strcpy(str,"");
-	}
-}
 
 
 typedef struct pattern {
@@ -140,9 +117,6 @@ void group_and_pattern_init()
 
 void group_and_pattern_update(action_t action)
 {
-	CUB_TextClear();
-	CUB_TextHome();
-	CUB_TextPrint("tata");
 	switch (action) {
 	case NEXT_PATTERN:
 		cur_pattern_id = (cur_pattern_id != groups[cur_group_id].nb_pattern - 1) ? cur_pattern_id + 1 : 0;
@@ -193,7 +167,7 @@ bool status_update(CUB_Button b)
 	char score_string[16];
 	my_itoa2(status, score_string);
 	my_itoa2(b, score_string+8);
-	CUB_TextPrint(score_string);
+	//CUB_TextPrint(score_string);
 	if (status == NB_STATE) {
 		status = 0;
 		return true;
@@ -203,28 +177,33 @@ bool status_update(CUB_Button b)
 
 void screen_display_update()
 {
-	char group_number_display  [6 + 1]; // XX/XX  //
-	char group_name_display    [SCREEN_WIDTH - 6 +1];
-	char pattern_number_display[6 + 1];
-	char pattern_name_display  [SCREEN_WIDTH - 6 +1];
-	char screen                [SCREEN_WIDTH * 2 + 1];
+    CUB_TextPrintf("%i/%i %s\n%i/%i %s",
+                    cur_group_id+1, nb_group,
+                    groups[cur_group_id].name,
+                    cur_pattern_id+1, groups[cur_group_id].nb_pattern,
+                    groups[cur_group_id].patterns[cur_pattern_id].name);
+	//char group_number_display  [6 + 1]; // XX/XX  //
+	//char group_name_display    [SCREEN_WIDTH - 6 +1];
+	//char pattern_number_display[6 + 1];
+	//char pattern_name_display  [SCREEN_WIDTH - 6 +1];
+	//char screen                [SCREEN_WIDTH * 2 + 1];
 
-	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_group_id+1, nb_group);
-	strncpy(group_name_display, groups[cur_group_id].name, 6);
-	group_name_display[SCREEN_WIDTH - 6] = '\0';
+	//sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_group_id+1, nb_group);
+	//strncpy(group_name_display, groups[cur_group_id].name, 6);
+	//group_name_display[SCREEN_WIDTH - 6] = '\0';
 
-	sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_pattern_id+1, groups[cur_group_id].nb_pattern);
-	strncpy(pattern_name_display, groups[cur_group_id].patterns[cur_pattern_id].name, 6);
-	pattern_name_display[SCREEN_WIDTH - 6] = '\0';
+	//sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_pattern_id+1, groups[cur_group_id].nb_pattern);
+	//strncpy(pattern_name_display, groups[cur_group_id].patterns[cur_pattern_id].name, 6);
+	//pattern_name_display[SCREEN_WIDTH - 6] = '\0';
 
-	sprintf(screen, "%s%s\n%s%s",
-			group_number_display,
-			group_name_display,
-			pattern_number_display,
-			pattern_name_display);
-	CUB_TextClear();
-	CUB_TextHome();
-	CUB_TextPrint(screen);
+	//sprintf(screen, "%s%s\n%s%s",
+	//		group_number_display,
+	//		group_name_display,
+	//		pattern_number_display,
+	//		pattern_name_display);
+	//CUB_TextClear();
+	//CUB_TextHome();
+	//CUB_TextPrint(screen);
 }
 
 void pattern_display_update(int32_t x, int32_t y, int32_t z)
@@ -233,7 +212,7 @@ void pattern_display_update(int32_t x, int32_t y, int32_t z)
 	x_offset += x;
 	y_offset += y;
 	z_offset += z;
-	//screen_display_update();
+	screen_display_update();
 	CUB_LEDs_clear();
 	CUB_LED_t *cur_led = list->first;
 	while (cur_led != NULL) {
@@ -266,7 +245,7 @@ void fill_list(pattern_t *p)
 void application_init()
 {
 	group_and_pattern_init();
-	//screen_display_update();
+	screen_display_update();
 	pattern_display_update(0, 0, 0);
 	status = 0;
 }
@@ -274,7 +253,7 @@ void application_init()
 void application_update(action_t action)
 {
 	group_and_pattern_update(action);
-	//screen_display_update();
+	screen_display_update();
 	pattern_display_update(0, 0, 0);
 }
 
@@ -286,7 +265,7 @@ void CUB_ApplicationRun()
 	CUB_LEDs_clear();
 	CUB_TextClear();
 	CUB_TextHome();
-	CUB_TextPrint("toto");
+	CUB_TextPrint("Crystallo");
 	CUB_Event event;
 	int loop = 0;
 	/* Infinite loop */
