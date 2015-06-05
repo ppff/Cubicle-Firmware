@@ -1,6 +1,8 @@
 #ifndef _CUBICLE_CONSTANTS_H_
 #define _CUBICLE_CONSTANTS_H_
 
+#define CUBICLE_VERSION 1
+#define CUBICLE_VERSION_TXT "1"
 
 /*
  * If you want to use a LENGTH >= 16 LEDs, you will have to update the type
