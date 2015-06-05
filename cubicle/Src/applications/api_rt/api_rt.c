@@ -16,28 +16,72 @@ void apiRealTimeRun()
 		while (CUB_ApiGetNextCommand(&cmd)) {
 			switch (cmd) {
 			case CUB_API_RESET:
+				//CUB_ApiReset();
 				break;
 			case CUB_API_CLOSE:
+				// return to caller application
+				return;
 				break;
 			case CUB_API_GET_VERSION:
 				CUB_ApiSend2("v", CUBICLE_VERSION_TXT);
 				break;
+	
 			case CUB_API_CLEAR_LEDS:
+				CUB_LEDs_clear();
 				break;
-			case CUB_API_LED_ON:
+			case CUB_API_LED_ON: {
+				uint32_t x, y, z;
+				x = CUB_ApiGetNextUint32();
+				y = CUB_ApiGetNextUint32();
+				z = CUB_ApiGetNextUint32();
+				CUB_LEDs_switch_on(x, y, z);
+				} break;
+			case CUB_API_LED_OFF: {
+				uint32_t x, y, z;
+				x = CUB_ApiGetNextUint32();
+				y = CUB_ApiGetNextUint32();
+				z = CUB_ApiGetNextUint32();
+				CUB_LEDs_switch_off(x, y, z);
+				} break;
+			case CUB_API_UPDATE_LED_DISPLAY:
+				CUB_LEDs_update_display();
 				break;
-			case CUB_API_LED_OFF:
-				break;
-			case CUB_API_UP_LED_DISPLAY:
-				break;
+			case CUB_API_IMM_LED_ON: {
+				uint32_t x, y, z;
+				x = CUB_ApiGetNextUint32();
+				y = CUB_ApiGetNextUint32();
+				z = CUB_ApiGetNextUint32();
+				CUB_LEDs_switch_on(x, y, z);
+				CUB_LEDs_update_display();
+				} break;
+			case CUB_API_IMM_LED_OFF: {
+				uint32_t x, y, z;
+				x = CUB_ApiGetNextUint32();
+				y = CUB_ApiGetNextUint32();
+				z = CUB_ApiGetNextUint32();
+				CUB_LEDs_switch_off(x, y, z);
+				CUB_LEDs_update_display();
+				} break;
+
 			case CUB_API_CLEAR_LCD:
+				CUB_TextClear();
 				break;
 			case CUB_API_SET_CURSOR:
 				break;
-			case CUB_API_PRINT:
-				break;
-			case CUB_API_ENABLE_BTN_REPEAT:
-				break;
+			case CUB_API_PRINT: {
+				uint8_t c;
+				while ((c = CUB_ApiGetNextUint8())) {
+//					CUB_TextPrintChar((char)c);
+				}
+				} break;
+
+			case CUB_API_ENABLE_BTN_REPEAT: {
+				uint16_t delay, interval;
+				delay = CUB_ApiGetNextUint16();
+				interval = CUB_ApiGetNextUint16();
+				CUB_EnableButtonRepeat(delay, interval);
+				} break;
+
 			case CUB_API_PUSH_EVENT:
 				break;
 			default:
@@ -99,7 +143,7 @@ void apiRealTimeRun()
 			}
 		}
 
-		CUB_Sleep(50);
+		CUB_Sleep(10);
 	}
 }
 
