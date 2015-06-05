@@ -13,6 +13,7 @@ SRCS+=Src/applications/snake.c
 SRCS+=Src/applications/crystal_structure/*.c
 SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
 SRCS+=Src/api/CUB_api.c
+SRCS+=Src/applications/api_rt/api_rt.c
 
 DEFINES=-DFAKEDEMO
 
