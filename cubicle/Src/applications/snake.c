@@ -267,7 +267,7 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 
 			CUB_TextClear();
 			CUB_TextHome();
-            CUB_TextPrintf("SCORE     %i\nHIGHSCORE     %i", score, bestscore);
+            CUB_TextPrintf("SCORE     %i\nHIGHSCORE     %i", score, best_score);
 
 			while (point_list_is_in(&(snake.body), &(food.location))) {
 				food_new(&food);
