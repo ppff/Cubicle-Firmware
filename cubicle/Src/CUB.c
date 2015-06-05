@@ -28,7 +28,6 @@ void CUB_Init()
 void CUB_Quit()
 {
 	CUB_TextQuit();
-	CUB_EventQuit();
 }
 
 /**

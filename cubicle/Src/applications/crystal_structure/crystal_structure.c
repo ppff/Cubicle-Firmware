@@ -281,6 +281,7 @@ void application_update(action_t action)
 void CUB_ApplicationRun()
 {
 	application_init();
+	CUB_EnableButtonRepeat(700, 80);
 
 	CUB_LEDs_clear();
 	CUB_TextClear();
@@ -299,7 +300,7 @@ void CUB_ApplicationRun()
 						pattern_display_update(-1, 0, 0);
 						break;
 					case CUB_BTN_DOWN:
-						pattern_display_update(+1, 0, 0);
+						pattern_display_update(1, 0, 0);
 						break;
 					case CUB_BTN_LEFT:
 						pattern_display_update(0, -1, 0);
@@ -332,7 +333,7 @@ void CUB_ApplicationRun()
 			// Cech if SD card is still in slot.
 		}
 
-		CUB_Sleep(200);
+		CUB_Sleep(50);
 
 		loop++;
 	}
