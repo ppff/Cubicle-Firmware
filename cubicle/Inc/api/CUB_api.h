@@ -2,6 +2,7 @@
 #define _CUBICLE_API_H_
 
 #include <stdbool.h>
+#include <inttypes.h>
 
 /**
  * API commands
