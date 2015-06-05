@@ -235,8 +235,10 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 					case CUB_BTN_M_RIGHT:
 					case CUB_BTN_SM_LEFT:
 					case CUB_BTN_SM_RIGHT:
+						if (score > best_score)
+							best_score = score;
 						snake_free(&snake);
-						return score;
+						return best_score;
 						break;
 					default:
 						;
@@ -265,7 +267,7 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 			if (score > best_score)
 				best_score = score;
 			CUB_TextClear();
-			CUB_TextPrintf("<YES  REPLAY?    NO>\nSCORE:%i  BEST:%i", score, best_score);
+			CUB_TextPrintf("<YES   REPLAY?   NO>\nSCORE:%i   BEST:%i", score, best_score);
 			CUB_Sleep(1000);
 			while(1) {
 				CUB_PollEvent(&event);
@@ -284,7 +286,7 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 			}
 			end_game:
 			snake_free(&snake);
-			return score;
+			return best_score;
 		}
 		if (point_list_is_in(&(snake.body), &(food.location))) {
 			snake_increase(&snake);
