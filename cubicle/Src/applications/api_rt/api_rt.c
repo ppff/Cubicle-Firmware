@@ -33,13 +33,38 @@ void apiRealTimeRun()
 					break;
 				case CUB_BTN_DOWN:
 					break;
+				case CUB_BTN_TOP:
+					break;
+				case CUB_BTN_BOTTOM:
+					break;
 				case CUB_BTN_LEFT:
 					break;
 				case CUB_BTN_RIGHT:
 					break;
+				case CUB_BTN_M_LEFT:
+					break;
+				case CUB_BTN_M_RIGHT:
+					break;
+				case CUB_BTN_SM_LEFT:
+					break;
+				case CUB_BTN_SM_RIGHT:
+					break;
+				default:
+					;
+				}
+			} else if (event.type == CUB_BUTTON_RELEASED) {
+				switch (event.button.id) {
+				case CUB_BTN_UP:
+					break;
+				case CUB_BTN_DOWN:
+					break;
 				case CUB_BTN_TOP:
 					break;
 				case CUB_BTN_BOTTOM:
+					break;
+				case CUB_BTN_LEFT:
+					break;
+				case CUB_BTN_RIGHT:
 					break;
 				case CUB_BTN_M_LEFT:
 					break;
