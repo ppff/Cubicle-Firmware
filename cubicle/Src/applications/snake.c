@@ -208,12 +208,11 @@ void CUB_ApplicationRun_snake()
 							snake.direction = PLUS_X;
 						break;
 					case CUB_BTN_M_LEFT:
-						break;
 					case CUB_BTN_M_RIGHT:
-						break;
 					case CUB_BTN_SM_LEFT:
-						break;
 					case CUB_BTN_SM_RIGHT:
+						snake_free(&snake);
+						return;
 						break;
 					default:
 						;
@@ -239,7 +238,7 @@ void CUB_ApplicationRun_snake()
 				CUB_Sleep(250);
 			}
 			snake_free(&snake);
-			break;
+			return;
 		}
 		if (point_list_is_in(&(snake.body), &(food.location))) {
 			snake_increase(&snake);
