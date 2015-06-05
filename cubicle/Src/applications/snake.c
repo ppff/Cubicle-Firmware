@@ -54,7 +54,7 @@ typedef struct snake {
 void snake_init(snake_t *snake)
 {
 	point_list_init(&snake->body);
-	snake->size = 4;
+	snake->size = 0;
 	for (uint32_t i=0; i<4; ++i) {
 		point_t p = {3-i, 0, 0};
 		point_list_add_element(&(snake->body), &p);
@@ -190,7 +190,6 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 	snake_t snake;
 	food_t food;
 	uint32_t score = 0;
-	uint32_t size = 0;
 	snake_init(&snake);
 	food_init(&food);
 	food_new(&food);
@@ -260,18 +259,18 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 		}
 		if (point_list_is_in(&(snake.body), &(food.location))) {
 			snake_increase(&snake);
-			size++;
 			uint32_t step_diff = nb_step - md;
-			uint32_t tmp = (step_diff < 10) ? (10 - step_diff) : 1;
-			score = size + tmp;
+			uint32_t tmp = (step_diff < 20) ? (20 - step_diff) : 1;
+			score += snake.size + tmp;
 
 			CUB_TextClear();
 			CUB_TextHome();
-            CUB_TextPrintf("SCORE     %i\nHIGHSCORE     %i", score, best_score);
+			CUB_TextPrintf("SCORE     %i\nHIGHSCORE     %i", score, best_score);
 
 			while (point_list_is_in(&(snake.body), &(food.location))) {
 				food_new(&food);
 				md = manhattan_distance(&snake, &food);
+				nb_step = 0;
 			}
 		}
 		CUB_LEDs_update_display();
