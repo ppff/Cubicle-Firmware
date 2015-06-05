@@ -92,4 +92,18 @@ uint32_t CUB_ApiGetNextUint32();
  */
 int32_t CUB_ApiGetNextInt32();
 
+void CUB_ApiSend(const char * msg);
+
+void CUB_ApiSend2(const char * msg, const char * msg2)
+{
+	CUB_ApiSend(msg);
+	CUB_ApiSend(msg2);
+}
+
+void CUB_ApiSend3(const char * msg, const char * msg2, const char * msg3)
+{
+	CUB_ApiSend2(msg, msg2);
+	CUB_ApiSend(msg3);
+}
+
 #endif

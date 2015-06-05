@@ -91,3 +91,9 @@ int32_t CUB_ApiGetNextInt32()
 	return 0;
 }
 
+
+void CUB_ApiSend(const char * msg)
+{
+
+}
+
