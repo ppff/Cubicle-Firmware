@@ -13,18 +13,37 @@ void apiRealTimeRun()
 	/* Infinite loop */
 	for(;;) {
 
-//		while ((cmd = CUB_ApiGetNextCommand()) != CUB_API_NO_CMD) {
-//			switch (cmd) {
-//			case CUB_API_GET_VERSION:
-//				CUB_ApiSend2("v", CUBICLE_VERSION_TXT);
-//
-//				break;
-//
-//			}
-//
-//
-//		}
-//		uint8_t cmd = CUB_ApiGetNextByte();
+		while (CUB_ApiGetNextCommand(&cmd)) {
+			switch (cmd) {
+			case CUB_API_RESET:
+				break;
+			case CUB_API_CLOSE:
+				break;
+			case CUB_API_GET_VERSION:
+				CUB_ApiSend2("v", CUBICLE_VERSION_TXT);
+				break;
+			case CUB_API_CLEAR_LEDS:
+				break;
+			case CUB_API_LED_ON:
+				break;
+			case CUB_API_LED_OFF:
+				break;
+			case CUB_API_UP_LED_DISPLAY:
+				break;
+			case CUB_API_CLEAR_LCD:
+				break;
+			case CUB_API_SET_CURSOR:
+				break;
+			case CUB_API_PRINT:
+				break;
+			case CUB_API_ENABLE_BTN_REPEAT:
+				break;
+			case CUB_API_PUSH_EVENT:
+				break;
+			default:
+				;
+			}
+		}
 
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
