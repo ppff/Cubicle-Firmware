@@ -46,6 +46,10 @@ void apiRealTimeRun()
 			case CUB_API_UPDATE_LED_DISPLAY:
 				CUB_LEDs_update_display();
 				break;
+			case CUB_API_IMM_CLEAR_LEDS:
+				CUB_LEDs_clear();
+				CUB_LEDs_update_display();
+				break;
 			case CUB_API_IMM_LED_ON: {
 				uint32_t x, y, z;
 				x = CUB_ApiGetNextUint32();

@@ -24,6 +24,8 @@ typedef enum {
 	CUB_API_LED_ON,
 	CUB_API_LED_OFF,
 	CUB_API_UPDATE_LED_DISPLAY,
+
+	CUB_API_IMM_CLEAR_LEDS, // immediate update
 	CUB_API_IMM_LED_ON, // immediate update
 	CUB_API_IMM_LED_OFF, // immediate update
 	
