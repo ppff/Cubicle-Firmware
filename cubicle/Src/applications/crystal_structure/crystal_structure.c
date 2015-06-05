@@ -294,10 +294,10 @@ void CUB_ApplicationRun()
 					CUB_ApplicationRun_snake();
 				switch (event.button.id) {
 					case CUB_BTN_UP:
-						pattern_display_update(1, 0, 0);
+						pattern_display_update(-1, 0, 0);
 						break;
 					case CUB_BTN_DOWN:
-						pattern_display_update(-1, 0, 0);
+						pattern_display_update(1, 0, 0);
 						break;
 					case CUB_BTN_LEFT:
 						pattern_display_update(0, -1, 0);
