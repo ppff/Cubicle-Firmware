@@ -166,6 +166,20 @@ void food_new(food_t *f)
 	CUB_LEDs_switch_on(f->location.x, f->location.y, f->location.z);
 }
 
+int manhattan_distance(snake_t *s, food_t *f)
+{
+	uint32_t dx = (f->location.x > s->body.first->p.x)?
+		(f->location.x - s->body.first->p.x):
+		(s->body.first->p.x - f->location.x);
+	uint32_t dy = (f->location.y > s->body.first->p.y)?
+		(f->location.y - s->body.first->p.y):
+		(s->body.first->p.y - f->location.y);
+	uint32_t dz = (f->location.z > s->body.first->p.z)?
+		(f->location.z - s->body.first->p.z):
+		(s->body.first->p.z - f->location.z);
+	return (dx + dy + dz);
+}
+
 void CUB_ApplicationRun_snake()
 {
 	CUB_TextHome();
@@ -176,9 +190,12 @@ void CUB_ApplicationRun_snake()
 	snake_t snake;
 	food_t food;
 	uint32_t score = 0;
+	uint32_t size = 0;
 	snake_init(&snake);
 	food_init(&food);
 	food_new(&food);
+	uint32_t md = manhattan_distance(&snake, &food);
+	uint32_t nb_step = 0;
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
@@ -227,6 +244,7 @@ void CUB_ApplicationRun_snake()
 			}
 		}
 		snake_move_forward(&snake);
+		nb_step++;
 		if (!snake_consistent(&snake)) {
 			for (uint32_t i=0; i<4; ++i) {
 				CUB_LEDs_clear();
@@ -242,7 +260,10 @@ void CUB_ApplicationRun_snake()
 		}
 		if (point_list_is_in(&(snake.body), &(food.location))) {
 			snake_increase(&snake);
-			score++;
+			size++;
+			uint32_t step_diff = nb_step - md;
+			uint32_t tmp = (step_diff < 10) ? (10 - step_diff) : 1;
+			score = size + tmp;
 
 			CUB_TextClear();
 			CUB_TextHome();
@@ -250,8 +271,10 @@ void CUB_ApplicationRun_snake()
 			my_itoa(score, score_string);
 			CUB_TextPrint(score_string);
 
-			while (point_list_is_in(&(snake.body), &(food.location)))
+			while (point_list_is_in(&(snake.body), &(food.location))) {
 				food_new(&food);
+				md = manhattan_distance(&snake, &food);
+			}
 		}
 		CUB_LEDs_update_display();
 		CUB_Sleep(300 - snake.size * 10);
