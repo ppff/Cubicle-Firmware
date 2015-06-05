@@ -30,6 +30,8 @@ typedef enum {
 	CUB_API_PRINT,
 	// ...
 	
+	CUB_API_ENABLE_BTN_REPEAT,
+
 	CUB_API_PUSH_EVENT,
 
 	CUB_API_NB_COMMANDS // internal use
