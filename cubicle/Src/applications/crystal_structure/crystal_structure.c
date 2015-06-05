@@ -253,7 +253,10 @@ void fill_list(pattern_t *p)
 #ifdef FAKEDEMO
 	int status = 0;
 #else
-	int status = CUB_parse_file(groups[cur_group_id].patterns[cur_pattern_id].path, list);
+	FIL *file = NULL;
+	f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
+	int status = CUB_parser_parse_file(list, file);
+	f_close(file);
 #endif
 	if (status == 1) {
 		/* Do something */
@@ -293,10 +296,10 @@ void CUB_ApplicationRun()
 					CUB_ApplicationRun_snake();
 				switch (event.button.id) {
 					case CUB_BTN_UP:
-						pattern_display_update(1, 0, 0);
+						pattern_display_update(-1, 0, 0);
 						break;
 					case CUB_BTN_DOWN:
-						pattern_display_update(-1, 0, 0);
+						pattern_display_update(+1, 0, 0);
 						break;
 					case CUB_BTN_LEFT:
 						pattern_display_update(0, -1, 0);

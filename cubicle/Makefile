@@ -11,6 +11,7 @@ SRCS+=Src/CUB_point.c
 SRCS+=Src/CUB_point_list.c
 SRCS+=Src/applications/snake.c
 SRCS+=Src/applications/crystal_structure/*.c
+SRCS+=Src/CUB_parser_def.c
 SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
 
 DEFINES=-DFAKEDEMO
