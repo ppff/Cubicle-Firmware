@@ -41,6 +41,7 @@ void CUB_TextCreateChar(uint8_t location, uint8_t charmap[]);
 void CUB_TextSetCursor(uint8_t col, uint8_t row);
 void CUB_TextQuit();
 
+void CUB_TextPrintRight(char* str, uint32_t line);
 void my_itoa2(int value, char str[]);
 
 #endif

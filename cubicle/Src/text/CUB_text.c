@@ -100,26 +100,6 @@ static uint8_t _displaymode;
 static uint8_t _numlines;
 static uint8_t _currline;
 
-//#include <stdarg.h>
-//#define PRINTF_BUF 80 // define the tmp buffer size (change if desired)
-
-//void CUB_printf(const char *format, ...)
-//{
-//	char buf[PRINTF_BUF];
-//	va_list ap;
-//	va_start(ap, format);
-//	vsnprintf(buf, sizeof(buf), format, ap);
-//	for(char *p = &buf[0]; *p; p++) { // emulate cooked mode for newlines
-//		write(*p);
-//	}
-//	va_end(ap);
-//}
-
-//int fputc(int ch, FILE *f) {
-//    write(ch);
-//    return ch;
-//}
-
 static void delayMicroseconds(uint32_t i)
 {
 	i <<= 5;
@@ -329,6 +309,15 @@ void inverse2(char s[])
 	}
 }
 
+void CUB_TextPrintRight(char* str, uint32_t line)
+{
+	CUB_TextRightToLeft();
+	inverse2(str);
+	CUB_TextSetCursor(19, line);
+	CUB_TextPrint(str);
+	CUB_TextLeftToRight();
+	inverse2(str);
+}
 
 void my_itoa2(int value, char str[]) 
 {

@@ -177,33 +177,12 @@ bool status_update(CUB_Button b)
 
 void screen_display_update()
 {
-    CUB_TextPrintf("%i/%i %s\n%i/%i %s",
-                    cur_group_id+1, nb_group,
-                    groups[cur_group_id].name,
-                    cur_pattern_id+1, groups[cur_group_id].nb_pattern,
-                    groups[cur_group_id].patterns[cur_pattern_id].name);
-	//char group_number_display  [6 + 1]; // XX/XX  //
-	//char group_name_display    [SCREEN_WIDTH - 6 +1];
-	//char pattern_number_display[6 + 1];
-	//char pattern_name_display  [SCREEN_WIDTH - 6 +1];
-	//char screen                [SCREEN_WIDTH * 2 + 1];
-
-	//sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_group_id+1, nb_group);
-	//strncpy(group_name_display, groups[cur_group_id].name, 6);
-	//group_name_display[SCREEN_WIDTH - 6] = '\0';
-
-	//sprintf(group_number_display, "%"PRIu32"/%"PRIu32, cur_pattern_id+1, groups[cur_group_id].nb_pattern);
-	//strncpy(pattern_name_display, groups[cur_group_id].patterns[cur_pattern_id].name, 6);
-	//pattern_name_display[SCREEN_WIDTH - 6] = '\0';
-
-	//sprintf(screen, "%s%s\n%s%s",
-	//		group_number_display,
-	//		group_name_display,
-	//		pattern_number_display,
-	//		pattern_name_display);
-	//CUB_TextClear();
-	//CUB_TextHome();
-	//CUB_TextPrint(screen);
+	CUB_TextClear();
+    CUB_TextPrintf("%i/%i", cur_group_id+1, nb_group);
+	CUB_TextPrintRight(groups[cur_group_id].name, 0);
+	CUB_TextPrintf("\n");
+	CUB_TextPrintf("%i/%i",cur_pattern_id+1, groups[cur_group_id].nb_pattern);
+	CUB_TextPrintRight(groups[cur_group_id].patterns[cur_pattern_id].name, 1);
 }
 
 void pattern_display_update(int32_t x, int32_t y, int32_t z)
