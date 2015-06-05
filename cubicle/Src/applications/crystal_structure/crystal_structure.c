@@ -278,6 +278,7 @@ void application_update(action_t action)
 void CUB_ApplicationRun()
 {
 	application_init();
+	CUB_EnableButtonRepeat(700, 80);
 
 	CUB_LEDs_clear();
 	CUB_TextClear();
