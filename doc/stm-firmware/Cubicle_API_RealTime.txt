@@ -60,3 +60,32 @@ CUB_API_ENABLE_BTN_REPEAT,
 
 CUB_API_PUSH_EVENT,
 
+III - Events
+------------
+
+The API RealTime allows user to be notified when an event occurs in the cubicle like button press and release events.
+
+An event is send to the usdr via the means of communication, like the result of a command is send (e.g. GET_VERSION).
+The format of an event is "e %T %P0 %P1" where 'e' indicates that it's an event, %T the type of the event (like button pressed), %P0 and %P1 some other parameters.
+For exemple, the event 'e btn_p 1' describes the button pressed event of the button with id 1.
+
+Events:
+-------
+
+e btn_p (u32)id
+	When a button is pressed. Its id is 'id'.
+	Button ids:
+    	UP       = 0
+    	DOWN     = 1
+    	LEFT     = 2
+    	RIGHT    = 3
+    	TOP      = 4
+    	BOTTOM   = 5
+    	MENU_LEFT      = 6
+    	MENU_RIGHT     = 7
+    	SUB_MENU_LEFT  = 8
+    	SUB_MENU_RIGHT = 9
+
+e btn_r (u32)id
+	When a button is released. Its id is 'id'.
+
