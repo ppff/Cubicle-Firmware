@@ -25,6 +25,11 @@ void CUB_LEDs_switch_on(uint32_t x, uint32_t y, uint32_t z);
 void CUB_LEDs_switch_off(uint32_t x, uint32_t y, uint32_t z);
 
 /**
+ * Toggle the LED (x,y,z)
+ */
+void CUB_LEDs_toggle(uint32_t x, uint32_t y, uint32_t z);
+
+/**
  * Translate display (fill with 0).
  */
 void CUB_LEDs_translate(int32_t x, int32_t y, int32_t z);

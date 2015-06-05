@@ -4,25 +4,27 @@
 
 #include "LEDs/CUB_LEDs.h"
 
-#ifdef STANDARD_COMPILATION
-#include <stdio.h>
-#define MALLOC malloc
-#define FREE   free
-#else
+#ifndef STANDARD_COMPILATION
 #include "FreeRTOS.h"
 #include "spi.h"
 #include "cmsis_os.h"
-#define MALLOC pvPortMalloc
-#define FREE   vPortFree
 #endif
 
 #include "constant.h"
 
 /**
  * Type used to store the content of a line. It must verify:
- * sizeof(line_t) >= LENGTH
+ * (size of (line_t) in bits) >= SIZE_X
  */
 typedef uint16_t line_t;
+/**
+ * Type used to store number of lightening LEDs
+ * per plan. It must verify:
+ * capacity of the type (e.g. 2**8, 2**16...) 
+ *   <= SIZE_X*SIZE_Y (e.g. LEDs number per plan)
+ */
+typedef uint8_t planCount_t;
+
 
 /**
  * Structure representing the LEDs of the cube.
@@ -107,8 +109,9 @@ bool CUB_LEDs_in_range(uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_on(uint32_t x, uint32_t y, uint32_t z)
 {
 	CUB_LEDs *l = &mMainLEDs;
-	if (CUB_LEDs_in_range(x, y, z))
+	if (CUB_LEDs_in_range(x, y, z)) {
 		l->data[z][SIZE_Y-1-y] |= 1 << x;
+	}
 }
 
 /**
@@ -119,9 +122,23 @@ void CUB_LEDs_switch_on(uint32_t x, uint32_t y, uint32_t z)
 void CUB_LEDs_switch_off(uint32_t x, uint32_t y, uint32_t z)
 {
 	CUB_LEDs *l = &mMainLEDs;
-	if (CUB_LEDs_in_range(x, y, z))
-		if (l->data[z][SIZE_Y-1-y] & (1 << x))
+	if (CUB_LEDs_in_range(x, y, z)) {
+		if (l->data[z][SIZE_Y-1-y] & (1 << x)) {
 			l->data[z][SIZE_Y-1-y] ^= 1 << x;
+		}
+	}
+}
+
+/**
+ * line: 0000010101
+ * mask: 0000000100
+ * xor:  0000010001 <= LED off
+ */
+void CUB_LEDs_toggle(uint32_t x, uint32_t y, uint32_t z)
+{
+	CUB_LEDs *l = &mMainLEDs;
+	if (CUB_LEDs_in_range(x, y, z))
+		l->data[z][SIZE_Y-1-y] ^= 1 << x;
 }
 
 int CUB_LEDs_get(uint32_t x, uint32_t y, uint32_t z)
@@ -218,24 +235,40 @@ void CUB_LEDs_update_display()
 		memcpy(l->buffer[k], l->data[k], sizeof(line_t)*SIZE_Y);
 }
 
+inline static void _drawOnePlan(uint32_t zIndex)
+{
+	HAL_StatusTypeDef status;
+	do {
+		status = HAL_SPI_Transmit(&hspi4, (uint8_t*)mMainLEDs.buffer[zIndex], (SIZE_Y+1), 15);
+	} while (status != HAL_OK);
+
+	// latch enable
+	for (int i=0; i < 10; i++) ; 
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+	for (int i=0; i < 10; i++) ; // 40 tours de boucles == 3 µs
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+}
+
 void CUB_LEDs_display()
 {
-	CUB_LEDs *l = &mMainLEDs;
-	HAL_StatusTypeDef status;
-	uint32_t k=0;
+	uint32_t k=-1;
+	bool toDisp = false;
 	for (;;) {
-		do {
-			status = HAL_SPI_Transmit(&hspi4, (uint8_t*)l->buffer[k], (SIZE_Y+1), 15);
-		} while (status != HAL_OK);
+		k = (k == SIZE_Z-1) ? 0 : k+1; // e.q. k = (k+1) % SIZE_Z
 
-		// latch enable
-		for (int i=0; i < 40; i++) ; 
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
-		for (int i=0; i < 40; i++) ; // 40 tours de boucles == 3 µs
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+		// determine if a LED is activated
+		for (uint32_t j=0; j < SIZE_Y ; ++j) {
+			if (mMainLEDs.buffer[k][j]) {
+				// at least one LED is activated
+				toDisp = true;
+				break;
+			}
+		}
 
-		k = (k+1) % (SIZE_Z);
-		osDelay(10);
+		if (toDisp)
+			_drawOnePlan(k);
+
+		osDelay(1);
 	}
 }
 

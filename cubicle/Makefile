@@ -5,8 +5,15 @@ SRCS=Src/main.c
 SRCS+=Src/LEDs/CUB_LEDs.c
 SRCS+=Src/event/CUB_event.c
 SRCS+=Src/text/CUB_text.c
+SRCS+=Src/fs/CUB_fs.c
 SRCS+=Src/CUB.c
-SRCS+=Src/application.c
+SRCS+=Src/CUB_point.c
+SRCS+=Src/CUB_point_list.c
+SRCS+=Src/applications/snake.c
+SRCS+=Src/applications/crystal_structure/*.c
+SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
+
+DEFINES=-DFAKEDEMO
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
@@ -35,6 +42,7 @@ CFLAGS += -I.
 CFLAGS += -I/usr/arm-none-eabi/lib
 
 CFLAGS += -lrdimon #--specs=rdimon.specs 
+CFLAGS += $(DEFINES)
 
 #########
 # ARM DEF
@@ -74,6 +82,7 @@ LDSCRIPT = SW4STM32/cubicle\ Configuration/STM32F429ZITx_FLASH.ld
 #########
 
 CFLAGS += -IInc
+CFLAGS += -IParseur-BDD-Cubicle/
 SRCS += Src/main.c
 SRCS += Src/stm32f4xx_hal_msp.c
 SRCS += Src/stm32f4xx_it.c

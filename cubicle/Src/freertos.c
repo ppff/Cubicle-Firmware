@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : freertos.c
-  * Date               : 27/05/2015 10:40:54
+  * Date               : 29/05/2015 10:25:40
   * Description        : Code for freertos applications
   ******************************************************************************
   *
@@ -42,6 +42,7 @@
 #include <stdint.h>
 #include "stm32f4xx_hal_conf.h"
 #include "CUB.h"
+#include "fatfs.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -90,7 +91,7 @@ void MX_FREERTOS_Init(void) {
 
   /* definition and creation of myTask02 */
   osThreadDef(myTask02, StartTask02, osPriorityHigh, 0, 128);
-//  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
+  //myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -244,7 +245,7 @@ void StartTask02(void const * argument)
     for (int i=0; i < 8000; i++) ; // 40 tours de boucles == 3 µs
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
     plan = (plan + 1)%9;
-    osDelay(1);
+    osDelay(10000);
   }
   /* USER CODE END StartTask02 */
 }
