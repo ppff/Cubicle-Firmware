@@ -1,3 +1,7 @@
+#ifndef _CUBICLE_CONSTANTS_H_
+#define _CUBICLE_CONSTANTS_H_
+
+
 /*
  * If you want to use a LENGTH >= 16 LEDs, you will have to update the type
  * definition of "line_t" in led.h to uint32_t or more.
@@ -65,4 +69,6 @@
 #include "FreeRTOS.h"
 #define MALLOC pvPortMalloc
 #define FREE   vPortFree
-#endif
+#endif // STANDARD_COMPILATION
+
+#endif // _CUBICLE_CONSTANTS_H_
