@@ -1,0 +1,91 @@
+Cubicle API RealTime documentation
+==================================
+
+I - Introduction
+----------------
+
+The API allows a user to manipulate the Cubicle from a computer, through means of communication like USART.
+When the Cubicle is started, the Crystallo application is launched. Regularly, it checks if some data are available for the API module. If some data are available, the API mode is started and the Crystallo application is overriden by the API RealTime application.
+
+II - Commands
+-------------
+
+The format of a command is an operation code followed by some data.
+
+For example, the command 'mycommand data1 data2' performs the opeation associated to 'mycommand' with two parameters which are 'data1' and 'data2'.
+
+CUB_API_NO_CMD
+	No operation to do. Equivalent to a NOP.
+
+CUB_API_RESET
+	Reset the API state of the Cubicle. Can be used to awake the API module.
+
+CUB_API_CLOSE
+	Close the communication. Go back to Crystallo mode.
+
+CUB_API_GET_VERSION
+	Request the Cubicle Firmware version.
+	Returns (via sending feature of the communication) a result with the format "v%X" where %X is replaced by the version in decimal.
+	E.g. "v1", "v2", "v10" 
+
+CUB_API_CLEAR_LEDS
+	Clear the LEDs buffer. Used to switch off all the LEDs.
+	Note: the LEDs buffer allows to manipulate the future render before updating the real matrix.
+	To commit changes to the LEDs buffer, it is needed to call CUB_API_UPDATE_LED_DISPLAY.
+
+CUB_API_LED_ON (u32)x (u32)y (u32)z
+	Switch on one LED in the LEDs buffer. The three parameters are the coordinates of the LED to switch on.
+	The type of these parameters is an unsigned integer on 32 bits.
+
+CUB_API_LED_OFF (u32)x (u32)y (u32)z
+	Switch off one LED in the LEDs buffer.
+
+CUB_API_UPDATE_LED_DISPLAY
+	Commit changes from the LEDs buffer to the real matrix.
+
+CUB_API_IMM_CLEAR_LEDS
+	Clear the LEDs buffer and commit changes. It's equivalent to CUB_API_CLEAR_LEDS followed by CUB_API_UPDATE_LED_DISPLAY.
+
+CUB_API_IMM_LED_ON (u32)x (u32)y (u32)z
+	Immediatly switching on. Equivalent to CUB_API_LED_ON and CUB_API_UPDATE_LED_DISPLAY. 
+
+CUB_API_IMM_LED_OFF (u32)x (u32)y (u32)z
+	Immediatly switching off. Equivalent to CUB_API_LED_OFF and CUB_API_UPDATE_LED_DISPLAY. 
+
+CUB_API_CLEAR_LCD,
+CUB_API_SET_CURSOR,
+CUB_API_PRINT,
+
+CUB_API_ENABLE_BTN_REPEAT,
+
+CUB_API_PUSH_EVENT,
+
+III - Events
+------------
+
+The API RealTime allows user to be notified when an event occurs in the cubicle like button press and release events.
+
+An event is send to the usdr via the means of communication, like the result of a command is send (e.g. GET_VERSION).
+The format of an event is "e %T %P0 %P1" where 'e' indicates that it's an event, %T the type of the event (like button pressed), %P0 and %P1 some other parameters.
+For exemple, the event 'e btn_p 1' describes the button pressed event of the button with id 1.
+
+Events:
+-------
+
+e btn_p (u32)id
+	When a button is pressed. Its id is 'id'.
+	Button ids:
+    	UP       = 0
+    	DOWN     = 1
+    	LEFT     = 2
+    	RIGHT    = 3
+    	TOP      = 4
+    	BOTTOM   = 5
+    	MENU_LEFT      = 6
+    	MENU_RIGHT     = 7
+    	SUB_MENU_LEFT  = 8
+    	SUB_MENU_RIGHT = 9
+
+e btn_r (u32)id
+	When a button is released. Its id is 'id'.
+
