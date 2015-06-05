@@ -268,12 +268,13 @@ void CUB_ApplicationRun()
 	CUB_TextPrint("Crystallo");
 	CUB_Event event;
 	int loop = 0;
+	uint32_t best_score;
 	/* Infinite loop */
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
 				if (status_update(event.button.id))
-					CUB_ApplicationRun_snake();
+					best_score = CUB_ApplicationRun_snake(best_score);
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						pattern_display_update(-1, 0, 0);

@@ -180,7 +180,7 @@ int manhattan_distance(snake_t *s, food_t *f)
 	return (dx + dy + dz);
 }
 
-void CUB_ApplicationRun_snake()
+uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 {
 	CUB_TextHome();
 	CUB_TextPrint("Snake!");
@@ -229,7 +229,7 @@ void CUB_ApplicationRun_snake()
 					case CUB_BTN_SM_LEFT:
 					case CUB_BTN_SM_RIGHT:
 						snake_free(&snake);
-						return;
+						return score;
 						break;
 					default:
 						;
@@ -256,7 +256,7 @@ void CUB_ApplicationRun_snake()
 				CUB_Sleep(250);
 			}
 			snake_free(&snake);
-			return;
+			return score;
 		}
 		if (point_list_is_in(&(snake.body), &(food.location))) {
 			snake_increase(&snake);
