@@ -189,10 +189,18 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 	CUB_Event event;
 	snake_t snake;
 	food_t food;
-	uint32_t score = 0;
+	uint32_t score;
+	new_game:
+	score = 0;
 	snake_init(&snake);
 	food_init(&food);
 	food_new(&food);
+	CUB_TextClear();
+	CUB_TextPrintf("       SNAKE!       \nHIGHSCORE : %i", best_score);
+	CUB_Sleep(2000);
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrintf("SCORE     %i\nHIGHSCORE     %i", score, best_score);
 	uint32_t md = manhattan_distance(&snake, &food);
 	uint32_t nb_step = 0;
 	for(;;) {
@@ -254,6 +262,27 @@ uint32_t CUB_ApplicationRun_snake(uint32_t best_score)
 				CUB_LEDs_update_display();
 				CUB_Sleep(250);
 			}
+			if (score > best_score)
+				best_score = score;
+			CUB_TextClear();
+			CUB_TextPrintf("<YES  REPLAY?    NO>\nSCORE:%i  BEST:%i", score, best_score);
+			CUB_Sleep(1000);
+			while(1) {
+				CUB_PollEvent(&event);
+				if (event.type == CUB_BUTTON_PRESSED) {
+					switch(event.button.id) {
+						case CUB_BTN_LEFT:
+							goto new_game;
+							break;
+						case CUB_BTN_RIGHT:
+							goto end_game;
+							break;
+						default:
+							;
+					}
+				}
+			}
+			end_game:
 			snake_free(&snake);
 			return score;
 		}
