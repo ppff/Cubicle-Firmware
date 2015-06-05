@@ -1,6 +1,8 @@
 #ifndef _CUBICLE_API_H_
 #define _CUBICLE_API_H_
 
+#include <stdbool.h>
+
 /**
  * API commands
  */
@@ -22,5 +24,14 @@ typedef enum {
 
 	CUB_API_NB_COMMANDS // internal use
 } CUB_ApiCommand;
+
+/**
+ * Pull the next data as api command.
+ * It returns 'true' when there is a cmd
+ * to treat. Else 'false'.
+ * If 'cmd' is not null, the command
+ * is copied into that memory area.
+ */
+bool CUB_ApiGetNextCommand(CUB_ApiCommand * cmd);
 
 #endif
