@@ -9,6 +9,8 @@
 #include "constant.h"
 
 #define SCREEN_WIDTH 32
+#define BTN_REPEAT_DELAY 700
+#define BTN_REPEAT_INTERVAL 80
 
 
 
@@ -239,7 +241,7 @@ void application_update(action_t action)
 void CUB_ApplicationRun()
 {
 	application_init();
-	CUB_EnableButtonRepeat(700, 80);
+	CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 
 	CUB_LEDs_clear();
 	CUB_TextClear();
@@ -252,8 +254,11 @@ void CUB_ApplicationRun()
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
 			if (event.type == CUB_BUTTON_PRESSED) {
-				if (status_update(event.button.id))
+				if (status_update(event.button.id)) {
+					CUB_EnableButtonRepeat(0, 0); // disable btn repeat
 					best_score = CUB_ApplicationRun_snake(best_score);
+					CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
+				}
 				switch (event.button.id) {
 					case CUB_BTN_UP:
 						pattern_display_update(-1, 0, 0);
