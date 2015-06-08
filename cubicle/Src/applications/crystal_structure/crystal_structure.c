@@ -248,7 +248,6 @@ void CUB_ApplicationRun()
 	CUB_TextHome();
 	CUB_TextPrint("Crystallo");
 	CUB_Event event;
-	int loop = 0;
 	uint32_t best_score;
 	/* Infinite loop */
 	for(;;) {
@@ -294,11 +293,9 @@ void CUB_ApplicationRun()
 						;
 				}
 			}
-			// Cech if SD card is still in slot.
+			// Check if SD card is still in slot.
 		}
 
 		CUB_Sleep(50);
-
-		loop++;
 	}
 }
