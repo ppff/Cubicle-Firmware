@@ -7,6 +7,7 @@
 #include "applications/crystal_structure/CUB_LED_list.h"
 #include "applications/snake.h"
 #include "constant.h"
+#include "fs/myspi.h"
 
 #define SCREEN_WIDTH 32
 #define BTN_REPEAT_DELAY 700
@@ -15,12 +16,13 @@
 typedef struct pattern {
 	char *name;
 #ifdef FAKEDEMO
+#elif ARDUINODEMO
+	char *buffer;
 #else
 	char *path;
 #endif
 	CUB_LED_list_t data;
 } pattern_t;
-
 
 typedef struct group {
 	char *name;
@@ -51,19 +53,34 @@ char * mystrdup(const char *src)
 	return copy;
 }
 
+#ifdef ARDUINODEMO
 void initFromMySPI()
 {
-
+	nb_group = CUB_MGetNbGroups();
+	groups = MALLOC(sizeof(group_t)*nb_group);
+	for (uint8_t i=0;i<nb_group;i++) {
+		groups[i].name = MALLOC(32);
+		CUB_MSelectGroup(i, groups[i].name);
+		groups[i].nb_pattern = CUB_MGetNbPatterns();
+		groups[i].patterns = MALLOC(sizeof(pattern_t)*groups[i].nb_pattern);
+		for (uint8_t j=0;j<groups[i].nb_pattern;j++) {
+			groups[i].patterns[j].name = MALLOC(32);
+			CUB_MGetPatternName(j, groups[i].patterns[j].name);
+			groups[i].patterns[j].buffer = MALLOC(512);
+			CUB_MGetPattern(j, groups[i].patterns[j].buffer);
+		}
+	}
 }
+#endif // ARDUINODEMO
 
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
 #include "files.h"
+#elif ARDUINODEMO
+	initFromMySPI();
 #else
 	// Initialize pattern->pf to NULL
-	
-	initFromMySPI();
 #endif
 	x_offset = 0;
 	y_offset = 0;
@@ -168,6 +185,10 @@ void fill_list(pattern_t *p)
 {
 #ifdef FAKEDEMO
 	int status = 0;
+#elif ARDUINODEMO
+	CUB_LED_list_init(&(p->data));
+//	CUB_parser_parse_buffer(pf, pf->buffer);
+	status = 0;
 #else
 	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
 	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));

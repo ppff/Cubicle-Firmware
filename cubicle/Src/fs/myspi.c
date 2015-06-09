@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <inttypes.h>
 #include <cmsis_os.h>
 #include "stm32f4xx_hal.h"
@@ -11,6 +12,11 @@ const uint16_t pinMiso = FS_GPIO_MISO_PIN;
 const int CMD_LS = 0x2;
 const int CMD_CAT = 0x3;
 const int CMD_INIT = 0x4;
+const int CMD_NB_GROUPS = 0x5;
+const int CMD_GET_GROUP = 0x6;
+const int CMD_NB_PATTERNS      = 0x7;
+const int CMD_GET_PATTERN_NAME = 0x8;
+const int CMD_GET_PATTERN      = 0x9;
 
 const uint8_t RET_ERR = 0x0;
 const uint8_t RET_OK  = 0x1;
@@ -118,15 +124,15 @@ void CUB_MySPIInit()
 	// init clk
 	digitalWrite(pinClk, 0);
 
-	uint8_t ret;
+	uint8_t ret = RET_ERR;
 	do {
 		send4(CMD_INIT);
 		osDelay(100);
 		recv4();
-	} while (ret = RET_ERR);
+	} while (ret == RET_ERR);
 }
 
-inline static d()
+inline static void d()
 {
 	osDelay(1);
 }
@@ -153,6 +159,15 @@ uint8_t CUB_MGetNbPatterns()
 	send4(CMD_NB_PATTERNS);
 	d();
 	return recv8();
+}
+
+void CUB_MGetPatternName(uint8_t id, char *outName)
+{
+	send4(CMD_GET_PATTERN_NAME);
+	d();
+	send8(id);
+	d();
+	recvString(outName);
 }
 
 void CUB_MGetPattern(uint8_t id, char *out)

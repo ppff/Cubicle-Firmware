@@ -12,6 +12,7 @@ void CUB_MSelectGroup(uint8_t id, char *outName);
 
 uint8_t CUB_MGetNbPatterns();
 
+void CUB_MGetPatternName(uint8_t id, char *outName);
 void CUB_MGetPattern(uint8_t id, char *out);
 
 
