@@ -9,14 +9,12 @@ const uint16_t pinClk = FS_GPIO_CLK_PIN;
 const uint16_t pinMosi = FS_GPIO_MOSI_PIN;
 const uint16_t pinMiso = FS_GPIO_MISO_PIN;
 
-const int CMD_LS = 0x2;
-const int CMD_CAT = 0x3;
-const int CMD_INIT = 0x4;
-const int CMD_NB_GROUPS = 0x5;
-const int CMD_GET_GROUP = 0x6;
-const int CMD_NB_PATTERNS      = 0x7;
-const int CMD_GET_PATTERN_NAME = 0x8;
-const int CMD_GET_PATTERN      = 0x9;
+const int CMD_INIT = 0x1;
+const int CMD_NB_GROUPS = 0x2;
+const int CMD_GET_GROUP = 0x3;
+const int CMD_NB_PATTERNS      = 0x4;
+const int CMD_GET_PATTERN_NAME = 0x5;
+const int CMD_GET_PATTERN      = 0x6;
 
 const uint8_t RET_ERR = 0x0;
 const uint8_t RET_OK  = 0x1;
@@ -182,12 +180,12 @@ void CUB_MGetPattern(uint8_t id, char *out)
 
 void CUB_FsList(const char *dirpath)
 {
-	send4(CMD_LS);
-	sendString(dirpath);
-	osDelay(100);
-	recvString(bufferList);
-	_listI = 0;
-	osDelay(100);
+//	send4(CMD_LS);
+//	sendString(dirpath);
+//	osDelay(100);
+//	recvString(bufferList);
+//	_listI = 0;
+//	osDelay(100);
 }
 
 /**
@@ -231,11 +229,11 @@ bool CUB_FsNextChild(char *out, bool *isDir)
 
 void CUB_FsCat(const char *filepath, char *output)
 {
-	send4(CMD_CAT);
-	sendString(filepath);
-	osDelay(100);
-	recvString(buffer);
-	osDelay(100);
+//	send4(CMD_CAT);
+//	sendString(filepath);
+//	osDelay(100);
+//	recvString(buffer);
+//	osDelay(100);
 }
 
 
