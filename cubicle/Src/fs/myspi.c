@@ -2,6 +2,7 @@
 #include <cmsis_os.h>
 #include "stm32f4xx_hal.h"
 #include "constant.h"
+#include "fs/myspi.h"
 
 const uint16_t pinClk = FS_GPIO_CLK_PIN;
 const uint16_t pinMosi = FS_GPIO_MOSI_PIN;
@@ -63,7 +64,7 @@ int recv4()
 	return data;
 }
 
-int recv8()
+uint8_t recv8()
 {
 	int h = recv4();
 	int l = recv4();
@@ -112,15 +113,57 @@ char buffer[MAX_PATH];
 char bufferList[MAX_PATH*4];
 uint32_t _listI;
 
-void CUB_FsInit()
+void CUB_MySPIInit()
 {
 	// init clk
 	digitalWrite(pinClk, 0);
 
-	send4(CMD_INIT);
-	uint8_t ret = recv4();
-	osDelay(100);
+	uint8_t ret;
+	do {
+		send4(CMD_INIT);
+		osDelay(100);
+		recv4();
+	} while (ret = RET_ERR);
 }
+
+inline static d()
+{
+	osDelay(1);
+}
+
+uint8_t CUB_MGetNbGroups()
+{
+	send4(CMD_NB_GROUPS);
+	d();
+	return recv8();
+}
+
+void CUB_MSelectGroup(uint8_t id, char *outName)
+{
+	send4(CMD_GET_GROUP);
+	d();
+	send8(id);
+	d();
+	recvString(outName);
+	d();
+}
+
+uint8_t CUB_MGetNbPatterns()
+{
+	send4(CMD_NB_PATTERNS);
+	d();
+	return recv8();
+}
+
+void CUB_MGetPattern(uint8_t id, char *out)
+{
+	send4(CMD_GET_PATTERN);
+	d();
+	send8(id);
+	d();
+	recvString(out);
+}
+
 
 void CUB_FsList(const char *dirpath)
 {

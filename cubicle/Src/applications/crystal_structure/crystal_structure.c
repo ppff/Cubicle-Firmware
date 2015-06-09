@@ -51,12 +51,19 @@ char * mystrdup(const char *src)
 	return copy;
 }
 
+void initFromMySPI()
+{
+
+}
+
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
 #include "files.h"
 #else
 	// Initialize pattern->pf to NULL
+	
+	initFromMySPI();
 #endif
 	x_offset = 0;
 	y_offset = 0;
