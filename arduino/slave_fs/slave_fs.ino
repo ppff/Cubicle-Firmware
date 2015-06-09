@@ -146,7 +146,6 @@ void s_command() {
 		} else {
 			send4(RET_ERR);
 		}
-Serial.println("finish send string");
 	}
 }
 
