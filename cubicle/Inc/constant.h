@@ -14,6 +14,11 @@
 
 #define SIZE_Z 9
 
+#define FS_GPIO_PORT GPIOG
+#define FS_GPIO_CLK_PIN GPIO_PIN_0
+#define FS_GPIO_MOSI_PIN GPIO_PIN_0
+#define FS_GPIO_MISO_PIN GPIO_PIN_0
+
 /**
  * Define relation between button state 
  * and electrical value.
