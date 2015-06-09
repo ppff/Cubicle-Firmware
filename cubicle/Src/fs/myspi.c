@@ -128,7 +128,7 @@ void CUB_MInit()
 	do {
 		send4(CMD_INIT);
 		osDelay(100);
-		recv4();
+		ret = recv4();
 	} while (ret == RET_ERR);
 }
 
