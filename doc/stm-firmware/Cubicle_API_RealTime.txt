@@ -56,7 +56,10 @@ CUB_API_CLEAR_LCD,
 CUB_API_SET_CURSOR,
 CUB_API_PRINT,
 
-CUB_API_ENABLE_BTN_REPEAT,
+CUB_API_ENABLE_BTN_REPEAT (u16)delay (u16)interval
+	Enable button repeatition. Delay is the duration the button has to be pressed in order to begin repetition.
+	Interval is the period between each repetition. A repetition consists in inserting RELEASED and PRESSED events.
+	To disable repetition, set delay to zero.
 
 CUB_API_PUSH_EVENT,
 
