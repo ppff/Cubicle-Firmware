@@ -11,6 +11,9 @@ const int CMD_LS = 0x2;
 const int CMD_CAT = 0x3;
 const int CMD_INIT = 0x4;
 
+const uint8_t RET_ERR = 0x0;
+const uint8_t RET_OK  = 0x1;
+
 const int clkDelay = 1000;
 
 inline static void digitalWrite(uint16_t gpioPin, uint8_t state)
@@ -105,7 +108,9 @@ void sendString(const char *buffer)
 
 #define MAX_PATH 64
 char buffer[MAX_PATH];
-char bufferList[MAX_PATH];
+// List
+char bufferList[MAX_PATH*4];
+uint32_t _listI;
 
 void CUB_FsInit()
 {
@@ -123,12 +128,34 @@ void CUB_FsList(const char *dirpath)
 	sendString(dirpath);
 	osDelay(100);
 	recvString(bufferList);
+	_listI = 0;
 	osDelay(100);
 }
 
-void CUB_FsNextChild(char *out, bool *isDir)
+/**
+ * Get the next child name of the previous
+ * listed directory.
+ * out - will contain the file name
+ * isDir - will indicates if it's a subdirectory
+ * returns true if the output is valid or
+ * false if there was no more child.
+ */
+bool CUB_FsNextChild(char *out, bool *isDir)
 {
+	bool go = true;
+	bool ret = true;
+	uint32_t i = 0;
+	do {
+		out[i] = bufferList[_listI];
+		if (out[i] == '\0') {
+			go = false;
+			if (i==0) ret = false;
+		} else if (
 
+		i++;
+	} while (go);
+
+	return ret;
 }
 
 void CUB_FsCat(const char *filepath, char *output)
