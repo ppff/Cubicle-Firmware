@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+
+import os
+import os.path
+import sys
+
+src = sys.argv[1]
+dest = "cubicle/Inc/files.h"
+d = open(dest, 'w')
+d.write('CUB_LED_t led = {0,0,0,NULL};\n')
+
+nb_group = len(os.listdir(src))
+d.write(
+		"nb_group = {0};\n"
+		"groups = MALLOC(sizeof(group_t)*{0});\n"
+		.format(nb_group))
+
+for group in os.listdir(src):
+	group_id, group_name = group.split("_")
+	group_path = os.path.join(src, group)
+	nb_pattern = len(os.listdir(group_path))
+	d.write('groups[{0}].name = mystrdup("{1}");\n'.format(group_id, group_name))
+	d.write('groups[{0}].nb_pattern = {1};\n'.format(group_id, nb_pattern))
+	d.write('groups[{0}].patterns = MALLOC(sizeof(pattern_t)*groups[{0}].nb_pattern);\n'.format(group_id))
+	for pattern in os.listdir(group_path):
+		pattern_id, pattern_name = pattern.split("_")
+		path = os.path.join(group_path, pattern)
+		d.write('groups[{0}].patterns[{1}].name = mystrdup("{2}");\n'.format(group_id, pattern_id, pattern_name))
+		d.write('CUB_LED_list_init(&(groups[{0}].patterns[{0}].data));\n'.format(group_id, pattern_id))
+		f = open(path, 'r')
+		line = f.readline()
+		while 1:
+			line = f.readline()
+			if line == '':
+				break
+			d.write(
+					"led.x = {0};\n"
+					"led.y = {1};\n"
+					"led.z = {2};\n"
+					"CUB_LED_list_add(&(groups[{3}].patterns[{4}].data), &led);\n".format(
+						line.split()[0], line.split()[1], line.split()[2],
+						group_id, pattern_id))
+
+f.close()
+d.close()

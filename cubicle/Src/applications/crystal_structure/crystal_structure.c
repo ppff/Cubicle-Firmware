@@ -10,8 +10,6 @@
 
 #define SCREEN_WIDTH 32
 
-
-
 typedef struct pattern {
 	char *name;
 #ifdef FAKEDEMO
@@ -54,61 +52,9 @@ char * mystrdup(const char *src)
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
-	nb_group = 2;
-	groups = MALLOC(sizeof(group_t)*nb_group);
-
-	groups[0].name = mystrdup("Daniel");
-	groups[1].name = mystrdup("Florian");
-	groups[0].nb_pattern = 2;
-	groups[1].nb_pattern = 1;
-	groups[0].patterns = MALLOC(sizeof(pattern_t)*groups[0].nb_pattern);
-	groups[1].patterns = MALLOC(sizeof(pattern_t)*groups[1].nb_pattern);
-	groups[0].patterns[0].name = mystrdup("Premier motif");
-	groups[1].patterns[0].name = mystrdup("Premier motif");
-	CUB_LED_list_init(&groups[0].patterns[0].data);
-	CUB_LED_list_init(&groups[1].patterns[0].data);
-	CUB_LED_t led = {0,0,0,NULL};
-	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
-	led.z++;
-	CUB_LED_list_add(&groups[0].patterns[0].data, &led);
-	groups[0].patterns[1].name = mystrdup("Deuxieme motif");
-	CUB_LED_list_init(&groups[0].patterns[1].data);
-	led.z++;
-	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
-	led.z++;
-	CUB_LED_list_add(&groups[0].patterns[1].data, &led);
-
-	led.x = 0;
-	led.y = 0;
-	led.z = 0;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 2;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.y = 2;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.z = 2;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.y = 0;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 0;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 0;
-	led.y = 2;
-	led.z = 0;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 2;
-	led.y = 0;
-	led.z = 2;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 0;
-	led.y = 2;
-	led.z = 2;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	led.x = 1;
-	led.y = 1;
-	led.z = 1;
-	CUB_LED_list_add(&groups[1].patterns[0].data, &led);
-	cur_group_id = cur_pattern_id = 0;
+#include "files.h"
+#else
+	// Initialize pattern->pf to NULL
 #endif
 	x_offset = 0;
 	y_offset = 0;
@@ -136,6 +82,11 @@ void group_and_pattern_update(action_t action)
 	x_offset = 0;
 	y_offset = 0;
 	z_offset = 0;
+}
+
+void group_and_patter_free()
+{
+	// Free every pattern->pf if not NULL
 }
 
 #define NB_STATE 10
@@ -206,14 +157,15 @@ void pattern_display_update(int32_t x, int32_t y, int32_t z)
 
 void fill_list(pattern_t *p)
 {
-	CUB_LED_list_t *list = &(p->data);
-	CUB_LED_list_init(list);
 #ifdef FAKEDEMO
 	int status = 0;
 #else
+	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
+	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));
+	CUB_LED_list_init(&(p->data));
 	FIL *file = NULL;
 	f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
-	int status = CUB_parser_parse_file(list, file);
+	int status = CUB_parser_parse_file(pf, file);
 	f_close(file);
 #endif
 	if (status == 1) {
