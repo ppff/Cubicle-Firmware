@@ -145,14 +145,27 @@ bool CUB_FsNextChild(char *out, bool *isDir)
 	bool go = true;
 	bool ret = true;
 	uint32_t i = 0;
+	*isDir = false;
 	do {
 		out[i] = bufferList[_listI];
 		if (out[i] == '\0') {
 			go = false;
 			if (i==0) ret = false;
-		} else if (
-
-		i++;
+		} else if (out[i] == '/') {
+			*isDir = true;
+			out[i] = '\0';
+			go = false;
+			_listI++;
+			if (bufferList[_listI] == ':')
+				_listI++;
+		} else if (out[i] == ':') {
+			out[i] = '\0';
+			go = false;
+			_listI++;
+		} else {
+			i++;
+			_listI++;
+		}
 	} while (go);
 
 	return ret;
