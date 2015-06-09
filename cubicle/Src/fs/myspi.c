@@ -119,7 +119,7 @@ char buffer[MAX_PATH];
 char bufferList[MAX_PATH*4];
 uint32_t _listI;
 
-void CUB_MySPIInit()
+void CUB_MInit()
 {
 	// init clk
 	digitalWrite(pinClk, 0);
