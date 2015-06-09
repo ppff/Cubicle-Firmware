@@ -74,8 +74,8 @@ int recv4() {
                 //Serial.print("recv4 b");
                 //Serial.println(bit);
 	}
-	Serial.print("recv4 ");
-	Serial.println(data);
+	//Serial.print("recv4 ");
+	//Serial.println(data);
         
         //while (Serial.available() == 0);
         //data = Serial.read();
@@ -103,8 +103,8 @@ void send4(int data) {
 }
 
 void send8(int data) {
-        Serial.print("send8 d=");
-        Serial.println(data);
+        //Serial.print("send8 d=");
+        //Serial.println(data);
 	send4((data & 0xF0) >> 4);
 	send4(data & 0x0F);
 }
@@ -239,9 +239,12 @@ void s_command() {
           
                 int pattern_num = recv8();
                 File pattern = get_pattern(pattern_num);
+                Serial.print("Sending content of");
                 Serial.println(pattern.name());
                 while(pattern.available()) {
-                  send8(pattern.read());
+                  char data = pattern.read();
+                  send8(data);
+                  //Serial.println(data);
                 }
                 send8(0);
                 Serial.print("received CMD_PATTERN ");
