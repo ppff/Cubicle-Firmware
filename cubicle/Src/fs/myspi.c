@@ -19,7 +19,7 @@ const int CMD_GET_PATTERN      = 0x6;
 const uint8_t RET_ERR = 0x0;
 const uint8_t RET_OK  = 0x1;
 
-const int clkDelay = 1000;
+const int clkDelay = 2500;
 
 inline static void digitalWrite(uint16_t gpioPin, uint8_t state)
 {
@@ -175,6 +175,7 @@ void CUB_MGetPattern(uint8_t id, char *out)
 	send8(id);
 	d();
 	recvString(out);
+	d();
 }
 
 
