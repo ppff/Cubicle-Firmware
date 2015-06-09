@@ -184,19 +184,19 @@ void pattern_display_update(int32_t x, int32_t y, int32_t z)
 
 void fill_list(pattern_t *p)
 {
-#ifdef FAKEDEMO
 	int status = 0;
+#ifdef FAKEDEMO
 #elif ARDUINODEMO
 	CUB_LED_list_init(&(p->data));
-//	CUB_parser_parse_buffer(pf, pf->buffer);
-	status = 0;
+	char **buffer = &(p->buffer);
+	status = CUB_parser_parse_file((void*)&buffer, (void*)&p->data);
 #else
 	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
 	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));
 	CUB_LED_list_init(&(p->data));
 	FIL *file = NULL;
 	f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
-	int status = CUB_parser_parse_file(pf, file);
+	status = CUB_parser_parse_file(pf, file);
 	f_close(file);
 #endif
 	if (status == 1) {
