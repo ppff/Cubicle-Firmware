@@ -239,6 +239,12 @@ void application_update(action_t action)
 	pattern_display_update(0, 0, 0);
 }
 
+void consumesAllEvents()
+{
+	CUB_Event event;
+	while(CUB_PollEvent(&event));
+}
+
 void CUB_ApplicationRun()
 {
 	application_init();
@@ -252,7 +258,9 @@ void CUB_ApplicationRun()
 			if (event.type == CUB_BUTTON_PRESSED) {
 				if (status_update(event.button.id)) {
 					CUB_EnableButtonRepeat(0, 0); // disable btn repeat
+					consumesAllEvents();
 					best_score = CUB_ApplicationRun_snake(best_score);
+					consumesAllEvents();
 					CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 				}
 				switch (event.button.id) {
