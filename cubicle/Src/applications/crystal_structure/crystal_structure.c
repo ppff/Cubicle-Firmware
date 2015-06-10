@@ -59,16 +59,31 @@ char * mystrdup(const char *src)
 #ifdef ARDUINODEMO
 void initFromMySPI()
 {
-	CUB_TextPrint("Loading patterns...");
+	CUB_TextPrint("Loading patterns...\n0");
 	CUB_MInit();
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrintf("Loading patterns...\n1");
 	nb_group = CUB_MGetNbGroups();
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrintf("Loading patterns...\n2");
 	groups = MALLOC(sizeof(group_t)*nb_group);
+	CUB_TextClear();
+	CUB_TextHome();
+	CUB_TextPrintf("Loading patterns...\n3");
 	for (uint8_t i=0;i<nb_group;i++) {
+		CUB_TextClear();
+		CUB_TextHome();
+		CUB_TextPrintf("Loading patterns...\nGroup %i", i+1);
 		groups[i].name = MALLOC(32);
 		CUB_MSelectGroup(i, groups[i].name);
 		groups[i].nb_pattern = CUB_MGetNbPatterns();
 		groups[i].patterns = MALLOC(sizeof(pattern_t)*groups[i].nb_pattern);
 		for (uint8_t j=0;j<groups[i].nb_pattern;j++) {
+			CUB_TextClear();
+			CUB_TextHome();
+			CUB_TextPrintf("Loading patterns...\nGroup %i; Pattern %i", i+1, j+1);
 			groups[i].patterns[j].name = MALLOC(32);
 			CUB_MGetPatternName(j, groups[i].patterns[j].name);
 			groups[i].patterns[j].buffer = MALLOC(512);
@@ -145,12 +160,6 @@ bool status_update(CUB_Button b)
 	} else {
 		status = 0;
 	}
-	CUB_TextClear();
-	CUB_TextHome();
-	char score_string[16];
-	my_itoa2(status, score_string);
-	my_itoa2(b, score_string+8);
-	//CUB_TextPrint(score_string);
 	if (status == NB_STATE) {
 		status = 0;
 		return true;
@@ -161,28 +170,34 @@ bool status_update(CUB_Button b)
 void screen_display_update()
 {
 	CUB_TextClear();
-    CUB_TextPrintf("%i/%i", cur_group_id+1, nb_group);
+	CUB_TextPrintf("%i/%i", cur_group_id+1, nb_group);
 	CUB_TextPrintRight(groups[cur_group_id].name, 0);
 	CUB_TextPrintf("\n");
-	CUB_TextPrintf("%i/%i",cur_pattern_id+1, groups[cur_group_id].nb_pattern);
-	CUB_TextPrintRight(groups[cur_group_id].patterns[cur_pattern_id].name, 1);
+	if (groups[cur_group_id].nb_pattern == 0) {
+		CUB_TextPrintf("0/%i", groups[cur_group_id].nb_pattern);
+		CUB_TextPrintRight(".nrettap oN", 1);
+	} else {
+		CUB_TextPrintf("%i/%i",cur_pattern_id+1, groups[cur_group_id].nb_pattern);
+		CUB_TextPrintRight(groups[cur_group_id].patterns[cur_pattern_id].name, 1);
+	}
 }
 
 void pattern_display_update(int32_t x, int32_t y, int32_t z)
 {
-	CUB_LED_list_t *list = &(groups[cur_group_id].patterns[cur_pattern_id].data);
-	x_offset += x;
-	y_offset += y;
-	z_offset += z;
-	screen_display_update();
 	CUB_LEDs_clear();
-	CUB_LED_t *cur_led = list->first;
-	while (cur_led != NULL) {
-		CUB_LEDs_switch_on(
-				cur_led->x + x_offset,
-				cur_led->y + y_offset,
-				cur_led->z + z_offset);
-		cur_led = cur_led->next;
+	if (groups[cur_group_id].nb_pattern != 0) {
+		CUB_LED_list_t *list = &(groups[cur_group_id].patterns[cur_pattern_id].data);
+		x_offset += x;
+		y_offset += y;
+		z_offset += z;
+		CUB_LED_t *cur_led = list->first;
+		while (cur_led != NULL) {
+			CUB_LEDs_switch_on(
+					cur_led->x + x_offset,
+					cur_led->y + y_offset,
+					cur_led->z + z_offset);
+			cur_led = cur_led->next;
+		}
 	}
 	CUB_LEDs_update_display();
 }
@@ -229,10 +244,6 @@ void CUB_ApplicationRun()
 	application_init();
 	CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 
-	CUB_LEDs_clear();
-	CUB_TextClear();
-	CUB_TextHome();
-	CUB_TextPrint("Crystallo");
 	CUB_Event event;
 	uint32_t best_score;
 	/* Infinite loop */
