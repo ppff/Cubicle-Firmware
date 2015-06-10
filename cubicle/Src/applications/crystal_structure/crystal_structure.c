@@ -7,6 +7,7 @@
 #include "applications/crystal_structure/CUB_LED_list.h"
 #include "applications/snake.h"
 #include "constant.h"
+#include "fs/myspi.h"
 
 #define SCREEN_WIDTH 32
 #define BTN_REPEAT_DELAY 700
@@ -15,12 +16,13 @@
 typedef struct pattern {
 	char *name;
 #ifdef FAKEDEMO
+#elif ARDUINODEMO
+	char *buffer;
 #else
 	char *path;
 #endif
 	CUB_LED_list_t data;
 } pattern_t;
-
 
 typedef struct group {
 	char *name;
@@ -44,6 +46,9 @@ int32_t x_offset = 0;
 int32_t y_offset = 0;
 int32_t z_offset = 0;
 
+
+void fill_list(pattern_t *p);
+
 char * mystrdup(const char *src)
 {
 	char * copy = MALLOC(strlen(src)+1);
@@ -51,10 +56,34 @@ char * mystrdup(const char *src)
 	return copy;
 }
 
+#ifdef ARDUINODEMO
+void initFromMySPI()
+{
+	CUB_MInit();
+	nb_group = CUB_MGetNbGroups();
+	groups = MALLOC(sizeof(group_t)*nb_group);
+	for (uint8_t i=0;i<nb_group;i++) {
+		groups[i].name = MALLOC(32);
+		CUB_MSelectGroup(i, groups[i].name);
+		groups[i].nb_pattern = CUB_MGetNbPatterns();
+		groups[i].patterns = MALLOC(sizeof(pattern_t)*groups[i].nb_pattern);
+		for (uint8_t j=0;j<groups[i].nb_pattern;j++) {
+			groups[i].patterns[j].name = MALLOC(32);
+			CUB_MGetPatternName(j, groups[i].patterns[j].name);
+			groups[i].patterns[j].buffer = MALLOC(512);
+			CUB_MGetPattern(j, groups[i].patterns[j].buffer);
+			fill_list(&(groups[i].patterns[j]));
+		}
+	}
+}
+#endif // ARDUINODEMO
+
 void group_and_pattern_init()
 {
 #ifdef FAKEDEMO
 #include "files.h"
+#elif ARDUINODEMO
+	initFromMySPI();
 #else
 	// Initialize pattern->pf to NULL
 #endif
@@ -159,15 +188,19 @@ void pattern_display_update(int32_t x, int32_t y, int32_t z)
 
 void fill_list(pattern_t *p)
 {
-#ifdef FAKEDEMO
 	int status = 0;
+#ifdef FAKEDEMO
+#elif ARDUINODEMO
+	CUB_LED_list_init(&(p->data));
+	char **buffer = &(p->buffer);
+	status = CUB_parser_parse_file((void*)buffer, (void*)&p->data);
 #else
 	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
 	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));
 	CUB_LED_list_init(&(p->data));
 	FIL *file = NULL;
 	f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
-	int status = CUB_parser_parse_file(pf, file);
+	status = CUB_parser_parse_file(pf, file);
 	f_close(file);
 #endif
 	if (status == 1) {

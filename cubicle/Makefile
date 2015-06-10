@@ -15,8 +15,9 @@ SRCS+=Src/CUB_parser_def.c
 SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
 SRCS+=Src/api/CUB_api.c
 SRCS+=Src/applications/api_rt/api_rt.c
+SRCS+=Src/fs/myspi.c
 
-DEFINES=-DFAKEDEMO
+DEFINES=-DARDUINODEMO
 
 # Normally you shouldn't need to change anything below this line!
 #######################################################################################
