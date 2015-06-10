@@ -117,6 +117,13 @@ char buffer[MAX_PATH];
 char bufferList[MAX_PATH*4];
 uint32_t _listI;
 
+
+inline static void d()
+{
+	//osDelay(1);
+	delayMicroseconds(clkDelay);
+}
+
 void CUB_MInit()
 {
 	// init clk
@@ -127,12 +134,8 @@ void CUB_MInit()
 		send4(CMD_INIT);
 		osDelay(100);
 		ret = recv4();
+		d();
 	} while (ret == RET_ERR);
-}
-
-inline static void d()
-{
-	osDelay(1);
 }
 
 uint8_t CUB_MGetNbGroups()
