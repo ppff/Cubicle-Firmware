@@ -245,7 +245,7 @@ void CUB_ApplicationRun()
 	CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 
 	CUB_Event event;
-	uint32_t best_score;
+	uint32_t best_score = 0;
 	/* Infinite loop */
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
