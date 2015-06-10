@@ -169,6 +169,7 @@ void CUB_MGetPatternName(uint8_t id, char *outName)
 	send8(id);
 	d();
 	recvString(outName);
+	d();
 }
 
 void CUB_MGetPattern(uint8_t id, char *out)

@@ -59,6 +59,7 @@ char * mystrdup(const char *src)
 #ifdef ARDUINODEMO
 void initFromMySPI()
 {
+	CUB_TextPrint("Loading patterns...");
 	CUB_MInit();
 	nb_group = CUB_MGetNbGroups();
 	groups = MALLOC(sizeof(group_t)*nb_group);
