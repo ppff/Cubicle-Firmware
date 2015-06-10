@@ -67,8 +67,8 @@ void CUB_EventQuit()
 
 /**
  * Polls for currently pending events, and returns true if there are any pending
- * events, or false if there are none available.  If 'event' is not NULL, the next
- * event is removed from the queue and stored in that memory area.
+ * events, or false if there are none available. The next
+ * event is removed from the queue and stored in 'event' parameter memory area.
  * This function can be blocked.
  */
 bool CUB_PollEvent(CUB_Event * event)
