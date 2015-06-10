@@ -46,6 +46,9 @@ int32_t x_offset = 0;
 int32_t y_offset = 0;
 int32_t z_offset = 0;
 
+
+void fill_list(pattern_t *p);
+
 char * mystrdup(const char *src)
 {
 	char * copy = MALLOC(strlen(src)+1);
@@ -69,6 +72,7 @@ void initFromMySPI()
 			CUB_MGetPatternName(j, groups[i].patterns[j].name);
 			groups[i].patterns[j].buffer = MALLOC(512);
 			CUB_MGetPattern(j, groups[i].patterns[j].buffer);
+			fill_list(&(groups[i].patterns[j]));
 		}
 	}
 }
@@ -189,7 +193,7 @@ void fill_list(pattern_t *p)
 #elif ARDUINODEMO
 	CUB_LED_list_init(&(p->data));
 	char **buffer = &(p->buffer);
-	status = CUB_parser_parse_file((void*)&buffer, (void*)&p->data);
+	status = CUB_parser_parse_file((void*)buffer, (void*)&p->data);
 #else
 	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
 	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));
