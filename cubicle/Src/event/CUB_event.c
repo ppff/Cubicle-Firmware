@@ -100,14 +100,13 @@ bool CUB_PushEvent(CUB_Event * event)
  */
 void CUB_EnableButtonRepeat(uint16_t delay, uint16_t interval)
 {
-	if (delay == 0) {
-		mBREnabled = false;
-		return;
-	}
-
-	mBREnabled = true;
+	mBREnabled = (delay != 0);
 	mBRDelay = (int32_t)delay;
 	mBRInterval = (int32_t)interval;
+
+	for(uint32_t i = 0; i < CUB_BTN_LAST; i++) {
+		mBRTimer[i] = 0;
+	}
 }
 
 
