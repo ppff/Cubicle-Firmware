@@ -2,6 +2,9 @@
 #include <SD.h>
 #define MAX_PATH 64
 
+#define DEBUG
+//#define MY_SERIAL
+
 // Software spi pins
 const byte pinClk = 5;
 const byte pinMosi = 6;
@@ -34,7 +37,9 @@ void setup() {
 	pinMode(pinMiso, OUTPUT);
 
         // Serial for debug purposes
+        #ifdef DEBUG
 	Serial.begin(9600);
+        #endif
 }
 
 int getClk() {
@@ -66,20 +71,20 @@ void wRClk() {
 int recv4() {
 	int data = 0;
 	
+        #ifdef MY_SERIAL
+        while (Serial.available() == 0);
+        data = Serial.read();
+        return data-'0';
+        #else
 	wLClk();
 	for (int i=0; i<4;i++) {
 		wRClk();
 		int bit = digitalRead(pinMosi);
 		data = (data << 1) | bit;
-                //Serial.print("recv4 b");
-                //Serial.println(bit);
+                
 	}
-	//Serial.print("recv4 ");
-	//Serial.println(data);
-        
-        //while (Serial.available() == 0);
-        //data = Serial.read();
-	return data/*-'0'*/;
+ 	return data;
+        #endif
 }
 
 int recv8() {
@@ -91,6 +96,8 @@ int recv8() {
 void send4(int data) {
   //Serial.print("send4 d=");
   //Serial.println(data);
+  //*
+  #ifndef MY_SERIAL
 	wLClk();
 	for (int i=0; i<4;i++) {
                 int b = (data & 0x8) >> 3;
@@ -100,6 +107,8 @@ void send4(int data) {
                 //Serial.println(b);
 		wFClk();
 	}
+  #endif
+  //*/
 }
 
 void send8(int data) {
@@ -115,15 +124,19 @@ void recvString(char *buffer) {
 		buffer[i] = recv8();
 		i++;
 	} while (buffer[i-1] != '\0');
+        #ifdef DEBUG
 	Serial.print("recv String: '");
 	Serial.print(buffer);
         Serial.println("'");
+        #endif
 }
 
 void sendString(const char *buffer) {
+        #ifdef DEBUG
         Serial.print("send String: '");
         Serial.print(buffer);
         Serial.println("'");
+        #endif
 	int i=0;
 	do {
 		send8(buffer[i]);
@@ -201,71 +214,101 @@ void update_current_group_name(int num)
 void s_command() {
     int command;
     while (true) {
+        #ifdef DEBUG
         Serial.println("wait for command");
+        #endif
 	command = recv4();
 
 	if (command == CMD_NB_GROUPS) {
   
                 int response = count_groups();
                 send8(response);
+                #ifdef DEBUG
 		Serial.print("received CMD_NB_GROUPS and sent ");
                 Serial.println(response);
+                #endif
                 
 	} else if (command == CMD_GROUP) {
   
 		current_group_num = recv8();
                 update_current_group_name(current_group_num);
                 sendString(current_group.name());
+                #ifdef DEBUG
 		Serial.print("received CMD_GROUP ");
                 Serial.print(current_group_num);
                 Serial.print(" and sent ");
                 Serial.println(current_group.name());
+                #endif
                 
         } else if (command == CMD_NB_PATTERNS) {
                 
                 current_group_num_patterns = count_patterns(current_group);
                 send8(current_group_num_patterns);
+                #ifdef DEBUG
                 Serial.print("received CMD_NB_PATTERNS and sent ");
                 Serial.println(current_group_num_patterns);
+                #endif
                 
         } else if (command == CMD_PATTERN_NAME) {
           
                 int pattern_num = recv8();
                 File pattern = get_pattern(pattern_num);
+                #ifdef DEBUG
                 Serial.print("received CMD_PATTERN_NAME and sent ");
+                #endif
                 sendString(pattern.name());
                 
         } else if (command == CMD_PATTERN) {
           
                 int pattern_num = recv8();
                 File pattern = get_pattern(pattern_num);
-                Serial.print("Sending content of");
-                Serial.println(pattern.name());
+                #ifdef DEBUG
+                Serial.print("Sending content of ");
+                Serial.print(pattern.name());
+                Serial.print(" of size ");
+                Serial.println(pattern.size());
+                long t1=millis();
+                #endif
+                
                 while(pattern.available()) {
                   char data = pattern.read();
                   send8(data);
-                  //Serial.println(data);
                 }
                 send8(0);
+                
+                #ifdef DEBUG
+                long t2=millis();
+                Serial.print("Transfert time dt = ");
+                Serial.print(t2-t1);
+                Serial.println(" milliseconds");
                 Serial.print("received CMD_PATTERN ");
                 Serial.println(pattern_num);
+                #endif
                 
 	} else if (command == CMD_INIT) {
   
+                #ifdef DEBUG
 		Serial.println("receive INIT");
+                #endif
 		if (SD.begin(4)) {
                         Cubicle_dir = SD.open("Cubicle");
                         if (Cubicle_dir) {
+                           #ifdef DEBUG
                            Serial.println("Init successfull");
+                           #endif
                            send4(RET_OK);
                         } else {
+                           #ifdef DEBUG
                            Serial.println("Init failure Cubicle dir not found");
+                           #endif
                            send4(RET_ERR);
                         }
 			
 		} else {
 			send4(RET_ERR);
+                        #ifdef DEBUG
                         Serial.println("Init failure initialising sd card");
+                        #endif
 		}
 
 	}
