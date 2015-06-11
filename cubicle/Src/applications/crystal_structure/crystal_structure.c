@@ -251,7 +251,6 @@ void CUB_ApplicationRun()
 	CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 
 	CUB_Event event;
-	uint32_t best_score = 0;
 	/* Infinite loop */
 	for(;;) {
 		while (CUB_PollEvent(&event)) {
@@ -259,7 +258,7 @@ void CUB_ApplicationRun()
 				if (status_update(event.button.id)) {
 					CUB_EnableButtonRepeat(0, 0); // disable btn repeat
 					consumesAllEvents();
-					best_score = CUB_ApplicationRun_snake(best_score);
+					CUB_ApplicationRun_snake();
 					consumesAllEvents();
 					CUB_EnableButtonRepeat(BTN_REPEAT_DELAY, BTN_REPEAT_INTERVAL);
 				}

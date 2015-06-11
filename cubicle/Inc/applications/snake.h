@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-uint32_t CUB_ApplicationRun_snake(uint32_t best_score);
+void CUB_ApplicationRun_snake();
 
 #endif
