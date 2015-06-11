@@ -138,10 +138,10 @@ void group_and_patter_free()
 
 #define NB_STATE 10
 int state_machine[NB_STATE] = {
-	CUB_BTN_UP,
-	CUB_BTN_UP,
-	CUB_BTN_DOWN,
-	CUB_BTN_DOWN,
+	CUB_BTN_TOP,
+	CUB_BTN_TOP,
+	CUB_BTN_BOTTOM,
+	CUB_BTN_BOTTOM,
 	CUB_BTN_LEFT,
 	CUB_BTN_RIGHT,
 	CUB_BTN_LEFT,
@@ -152,14 +152,7 @@ int state_machine[NB_STATE] = {
 
 bool status_update(CUB_Button b)
 {
-	//status = (state_machine[status] == b) ? status + 1 : 0;
-	if (state_machine[status] == b) {
-		status++;
-	} else if (status > 0
-			&& state_machine[status-1] == b) {
-	} else {
-		status = 0;
-	}
+	status = (state_machine[status] == b) ? status + 1 : 0;
 	if (status == NB_STATE) {
 		status = 0;
 		return true;
