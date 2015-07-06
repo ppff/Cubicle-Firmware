@@ -1,4 +1,4 @@
-#include "applications/crystal_structure/CUB_LED_list.h"
+#include "CUB_LED_list.h"
 #include <stddef.h>
 #include "constant.h"
 

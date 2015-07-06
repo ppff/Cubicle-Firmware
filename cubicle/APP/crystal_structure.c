@@ -2,12 +2,12 @@
 #include <stdio.h>
 
 #include "CUB.h"
-#include "LEDs/CUB_LEDs.h"
+#include "CUB_LEDs.h"
 #include "CUB_parser.h"
-#include "applications/crystal_structure/CUB_LED_list.h"
-#include "applications/snake.h"
+#include "CUB_LED_list.h"
+#include "snake.h"
 #include "constant.h"
-#include "fs/myspi.h"
+#include "myspi.h"
 
 #define SCREEN_WIDTH 32
 #define BTN_REPEAT_DELAY 700
@@ -206,11 +206,11 @@ void fill_list(pattern_t *p)
 #else
 	//CUB_parsed_file_t *pf = MALLOC(sizeof(CUB_parsed_file_t));
 	//CUB_LED_list_init((CUB_LED_list_t *)(&(pf->led_list)));
-	CUB_LED_list_init(&(p->data));
-	FIL *file = NULL;
-	f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
-	status = CUB_parser_parse_file(pf, file);
-	f_close(file);
+	//CUB_LED_list_init(&(p->data));
+	//FIL *file = NULL;
+	//f_open(file, groups[cur_group_id].patterns[cur_pattern_id].path, FA_READ);
+	//status = CUB_parser_parse_file(pf, file);
+	//f_close(file);
 #endif
 	if (status == 1) {
 		/* Do something */

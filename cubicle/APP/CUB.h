@@ -7,10 +7,10 @@
  */
 void CUB_ApplicationRun();
 
-#include "event/CUB_event.h"
-#include "text/CUB_text.h"
-#include "LEDs/CUB_LEDs.h"
-#include "fs/CUB_fs.h"
+#include "CUB_event.h"
+#include "CUB_text.h"
+#include "CUB_LEDs.h"
+#include "CUB_fs.h"
 
 /**
  * Initialize Cubicle

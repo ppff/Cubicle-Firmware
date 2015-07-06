@@ -1,4 +1,4 @@
-#include "applications/api_rt/api_rt.h"
+#include "api_rt.h"
 
 void apiRealTimeRun()
 {

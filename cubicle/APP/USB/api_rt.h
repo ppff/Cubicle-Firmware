@@ -5,8 +5,8 @@
 #include <stdio.h>
 
 #include "CUB.h"
-#include "api/CUB_api.h"
-#include "LEDs/CUB_LEDs.h"
+#include "CUB_api.h"
+#include "CUB_LEDs.h"
 #include "constant.h"
 
 #endif

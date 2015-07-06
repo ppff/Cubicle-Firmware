@@ -3,7 +3,7 @@
 
 #include "cmsis_os.h"
 #include "stm32f4xx_hal.h"
-#include "event/CUB_event.h"
+#include "CUB_event.h"
 #include "constant.h"
 #include "queue.h"
 

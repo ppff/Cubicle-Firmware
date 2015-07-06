@@ -3,7 +3,7 @@
 #include <cmsis_os.h>
 #include "stm32f4xx_hal.h"
 #include "constant.h"
-#include "fs/myspi.h"
+#include "myspi.h"
 
 const uint16_t pinClk = FS_GPIO_CLK_PIN;
 const uint16_t pinMosi = FS_GPIO_MOSI_PIN;

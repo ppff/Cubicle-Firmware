@@ -1,6 +1,6 @@
 #include "fatfs.h"
 #include "CUB_parser_def.h"
-#include "applications/crystal_structure/CUB_LED_list.h"
+#include "CUB_LED_list.h"
 
 bool CUB_parser_get_next_line(char buff[64], void *arg)
 {

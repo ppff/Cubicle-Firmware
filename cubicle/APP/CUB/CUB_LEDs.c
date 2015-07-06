@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "LEDs/CUB_LEDs.h"
+#include "CUB_LEDs.h"
 
 #ifndef STANDARD_COMPILATION
 #include "FreeRTOS.h"

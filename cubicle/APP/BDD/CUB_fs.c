@@ -4,7 +4,7 @@
  * @author Yassine El Khadiri 
  */
 
-#include "fs/CUB_fs.h"
+#include "CUB_fs.h"
 #include "fatfs.h"
 #include <stdint.h>
 

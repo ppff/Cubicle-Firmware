@@ -1,4 +1,4 @@
-#include "applications/snake.h"
+#include "snake.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -7,7 +7,7 @@
 
 #include "CUB.h"
 #include "stm32f4xx_hal_conf.h"
-#include "LEDs/CUB_LEDs.h"
+#include "CUB_LEDs.h"
 #include "constant.h"
 #include "CUB_point.h"
 #include "CUB_point_list.h"

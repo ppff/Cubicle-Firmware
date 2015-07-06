@@ -1,43 +1,24 @@
 # Binaries will be generated with this name (.elf, .bin, .hex, etc)
 PROJ_NAME=cubicle-stm32
 
-SRCS=Src/main.c
-SRCS+=Src/LEDs/CUB_LEDs.c
-SRCS+=Src/event/CUB_event.c
-SRCS+=Src/text/CUB_text.c
-SRCS+=Src/fs/CUB_fs.c
-SRCS+=Src/CUB.c
-SRCS+=Src/CUB_point.c
-SRCS+=Src/CUB_point_list.c
-SRCS+=Src/applications/snake.c
-SRCS+=Src/applications/crystal_structure/*.c
-SRCS+=Src/CUB_parser_def.c
-SRCS+=Parseur-BDD-Cubicle/CUB_parser.c
-SRCS+=Src/api/CUB_api.c
-SRCS+=Src/applications/api_rt/api_rt.c
-SRCS+=Src/fs/myspi.c
-
-DEFINES=-DARDUINODEMO
-
-# Normally you shouldn't need to change anything below this line!
-#######################################################################################
-
 ##########
 # STLINK
 ##########
 STLINK=/home/cubicle/stlink
+######## - STLINK
 
 #############
-#cross tools
+# cross tools
 #############
 CC=arm-none-eabi-gcc
 LD=arm-none-eabi-ld
 OBJCOPY=arm-none-eabi-objcopy
+######## - cross tools
 
-#########
-# CFLAGS
-#########
-#CFLAGS  = -g -O2 -Wall
+################
+# COMMON CFLAGS
+################
+
 CFLAGS  = -g -Wall -std=gnu99
 CFLAGS += -T$(LDSCRIPT)
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
@@ -48,10 +29,13 @@ CFLAGS += -I/usr/arm-none-eabi/lib
 CFLAGS += -lrdimon #--specs=rdimon.specs 
 CFLAGS += $(DEFINES)
 
+######## - COMMON CFLAGS
+
 #########
 # ARM DEF
 #########
 CFLAGS += -IDrivers/CMSIS/Include/
+######## - ARM DEF
 
 ##################
 # STM32F4xx Drivers
@@ -70,6 +54,8 @@ SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
 
+######## - STM32F4xx Drivers
+
 
 ########################
 # specific to STM32F429
@@ -81,44 +67,84 @@ SRCS += Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f429
 
 LDSCRIPT = SW4STM32/cubicle\ Configuration/STM32F429ZITx_FLASH.ld
 
-#########
-# BSP
-#########
+######## - specific to STM32F429
 
-CFLAGS += -IInc
-CFLAGS += -IParseur-BDD-Cubicle/
-SRCS += Src/main.c
-SRCS += Src/stm32f4xx_hal_msp.c
-SRCS += Src/stm32f4xx_it.c
-SRCS += Src/gpio.c
-SRCS += Src/spi.c
-SRCS += Src/freertos.c
-SRCS += Src/bsp_driver_sd.c
-SRCS += Src/fatfs.c
-SRCS += Src/sdio.c
-
-##########
+############
 # FreeRTOS
+############
+
+CFLAGS += -IFreeRTOS/Source/include
+CFLAGS += -IFreeRTOS/Source/portable
+CFLAGS += -IFreeRTOS/Source/CMSIS_RTOS
+CFLAGS += -IFreeRTOS/Source/portable/GCC/ARM_CM4F
+SRCS +=  $(wildcard FreeRTOS/Source/*.c)
+SRCS +=  $(wildcard FreeRTOS/Source/CMSIS_RTOS/*.c)
+SRCS +=  $(wildcard FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c)
+SRCS += FreeRTOS/Source/portable/MemMang/heap_4.c
+
+######## - FreeRTOS
+
+##########
+# COMMON
 ##########
 
-CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/include
-CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable
-CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
-CFLAGS += -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/*.c)
-SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/*.c)
-SRCS +=  $(wildcard Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c)
-SRCS += Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+CFLAGS += -ICOMMON
+SRCS += $(wildcard COMMON/*.c)
+
+######## - COMMON
 
 #########
-# FatFS
+## APP ##
 #########
-CFLAGS += -IMiddlewares/Third_Party/FatFs/src
-CFLAGS += -IMiddlewares/Third_Party/FatFs/src/drivers
-SRCS += Middlewares/Third_Party/FatFs/src/drivers/sd_diskio.c
-SRCS += $(wildcard Middlewares/Third_Party/FatFs/src/*.c)
-SRCS += Middlewares/Third_Party/FatFs/src/option/syscall.c
-SRCS += Middlewares/Third_Party/FatFs/src/option/unicode.c
+
+CFLAGS += -IAPP
+SRCS += $(wildcard APP/*.c)
+
+#########
+# BDD
+#########
+
+CFLAGS += -IAPP/BDD
+SRCS += $(wildcard APP/BDD/*.c)
+
+#### FatFs ####
+CFLAGS += -IAPP/BDD/FatFs/src
+CFLAGS += -IAPP/BDD/FatFs/src/drivers
+SRCS += APP/BDD/FatFs/src/drivers/sd_diskio.c
+SRCS += $(wildcard APP/BDD/FatFs/src/*.c)
+SRCS += APP/BDD/FatFs/src/option/syscall.c
+SRCS += APP/BDD/FatFs/src/option/unicode.c
+
+######## - BDD
+
+##########
+# CUB
+##########
+
+CFLAGS += -IAPP/CUB
+SRCS += $(wildcard APP/CUB/*.c)
+
+######## - CUB
+
+##########
+# TFT
+##########
+
+CFLAGS += -IAPP/TFT
+SRCS += $(wildcard APP/TFT/*.c)
+
+######## - TFT
+
+##########
+# USB
+##########
+
+CFLAGS += -IAPP/USB
+SRCS += $(wildcard APP/USB/*.c)
+
+######## - USB
+
+######## - APP
 
 ##########
 # Rules

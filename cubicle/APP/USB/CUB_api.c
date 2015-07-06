@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "api/CUB_api.h"
+#include "CUB_api.h"
 
 
 /**

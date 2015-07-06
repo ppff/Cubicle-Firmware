@@ -8,7 +8,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "stm32f4xx_hal.h"
-#include "text/CUB_text.h"
+#include "CUB_text.h"
 
 // When the display powers up, it is configured as follows:
 //
