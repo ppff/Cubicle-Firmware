@@ -2,6 +2,12 @@
 PROJ_NAME=cubicle-stm32
 
 ##########
+# DEFINES
+##########
+DEFINES = -DJSMN_PARENT_LINKS
+######## - DEFINES
+
+##########
 # STLINK
 ##########
 STLINK=/home/cubicle/stlink
