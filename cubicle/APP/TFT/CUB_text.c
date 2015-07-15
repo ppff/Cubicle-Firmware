@@ -399,6 +399,72 @@ void CUB_TextPrintf(char *str, ...)
     va_end(vl);
 }
 
+char* CUB_TextPrintf(char *str, ...)
+{
+	char* result = MALLOC(strlen(str));
+	uint32_t index = -1;
+    va_list vl;
+    va_start(vl, str);
+    while(*str)
+    {
+		index++;
+        switch(*str){
+        case '\n':
+			result[index] = '\n';
+            break;
+        case '%':
+            str++;
+            switch(*str){
+            case 'i':
+				{
+					int i = va_arg(vl, int);
+                    char c[2];
+                    my_itoa2(i,c);
+                    break;
+                }
+            case 's':
+			{
+				char *str = va_arg(vl, char*);
+                CUB_TextPrint(str);
+                break;
+            }
+			case '.':
+			{
+				str++;
+				switch(*str){
+					case '*':
+					{
+						str++;
+						switch(*str){
+							case 's':
+							{
+								int i = va_arg(vl, int);
+								char *str = va_arg(vl, char*);
+								for (int j=0; j<i; j++) 
+									_write(*(str+j));
+								break;
+							}
+							default:
+								CUB_TextPrint(".*");
+						}
+						break;
+					}
+					default:;
+				}
+				break;
+			}
+            default:
+				_write('%');
+            }
+            break;
+        default:
+            _write(*str);
+        }
+        str++;
+    }
+    va_end(vl);
+}
+
 /*********** mid level commands, for sending data/cmds */
 
 inline static void command(uint8_t value)
