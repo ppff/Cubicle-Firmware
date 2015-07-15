@@ -53,7 +53,38 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+typedef struct point {
+	uint8_t x, y, z;
+	struct point* next;
+} point_t;
 
+typedef struct option {
+	char* name;
+	int value;
+	struct option* next;
+} option_t;
+
+typedef struct motif {
+	char* name;
+	char* desc;
+	char* image;
+	point_t* points;
+	option_t* options;
+	struct motif* next;
+} motif_t;
+
+typedef struct group {
+	char* name;
+	uint32_t nb_motifs;
+	motif_t* motifs;
+	struct group* next;
+} group_t;
+
+typedef struct database {
+	char* name;
+	uint32_t nb_groups;
+	group_t* groups;
+} database_t;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +92,73 @@ void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 
 /* USER CODE BEGIN PFP */
+point_t* new_point_head(uint8_t x, uint8_t y, uint8_t z, point_t* old_head);
+point_t* free_point(point_t* point);
+option_t* new_option_head(char* name, int val, option_t* old_head);
+option_t* free_option(option_t* option);
+motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* old_head);
+motif_t* free_motif(motif_t* motif);
+group_t* new_group_head(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* old_head);
+group_t* free_group(group_t* group);
+database_t* new_database(char* name, uint32_t nb_groups, group_t* groups);
+void free_database(database_t* database);
+
+
+
+point_t* new_point_head(uint8_t x, uint8_t y, uint8_t z, point_t* old_head)
+{
+	point_t* p = MALLOC(sizeof(point_t));
+	p.x = x;
+	p.y = y;
+	p.z = z;
+	p.next = old_head;
+	return p;
+}
+
+point_t* free_point(point_t* point)
+{
+	point_t* next = point.next;
+	FREE(point);
+	return next;
+}
+
+option_t* new_option_head(char* name, int val, option_t* old_head)
+{
+	option_t o = MALLOC(sizeof(option_t));
+	o.name = MALLOC(strlen(name));
+	o.name = strcpy(o.name, name);
+	o.val = val;
+	o.next = old_head;
+	return o;
+}
+
+option_t* free_option(option_t* option)
+{
+	option_t* next = option.next;
+	FREE(option.name);
+	FREE(option);
+	return next;
+}
+
+motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* old_head)
+{
+	motif_t* m = MALLOC(sizeof(motif_t));
+	char* m.name = MALLOC(strlen(name));
+	m.name = strcpy(m.name, name);
+	char* m.desc = MALLOC(strlen(desc));
+	m.desc = strcpy(m.desc, desc);
+	char* m.image = MALLOC(strlen(image));
+	m.image = strcpy(m.image, image);
+	m.points = points;
+	m.options = options;
+	m.next = old_head;
+}
+
+motif_t* free_motif(motif_t* motif);
+group_t* new_group_head(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* old_head);
+group_t* free_group(group_t* group);
+database_t* new_database(char* name, uint32_t nb_groups, group_t* groups);
+void free_database(database_t* database);
 
 /* USER CODE END PFP */
 
@@ -101,7 +199,9 @@ int main(void)
 	static char lfn[_MAX_LFN+1];
 	fno.lfname = lfn;
 	fno.lfsize = sizeof lfn;
-	int dirnb = 0, filnb = 0;
+	char* dbname = "bd1.json";
+	bool db_found = false;
+
 	if (f_mount(&SDFatFs, (TCHAR const*)SD_Path, 0) != FR_OK )
 	{
 		CUB_TextPrint("Error f_mount");
@@ -117,33 +217,50 @@ int main(void)
 				if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
 				fn = *fno.lfname ? fno.lfname : fno.fname;
 				if (fno.fattrib & AM_DIR) {                    /* It is a directory */
-					CUB_TextPrintf("%s/\n", fn);
-					dirnb++;
+					// do nothing
 				} else {                                       /* It is a file. */
-					CUB_TextPrintf("%s\n", fn);
-					filnb++;
+					// check if database
+					db_found = !strcmp(fn, dbname);
+					if (db_found) break;
 				}
 			}
-			CUB_TextClear();
-			CUB_TextHome();
-			CUB_TextPrintf("Found %i directories\nand %i files", dirnb, filnb);
-			HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
 			f_closedir(&dir);
-			FIL json_file;
-			f_open(&json_file, "json.txt", FA_READ);
-			uint32_t json_size = f_size(&json_file);
-			char* json = MALLOC(json_size);
-			uint32_t bytesread;
-			f_read(&json_file, json, json_size, (UINT*)&bytesread);
-			f_close(&json_file);
-			jsmn_parser json_parser;
-			uint32_t read_tokens;
-			jsmntok_t t[128];
-			jsmn_init(&json_parser);
-			read_tokens = jsmn_parse(&json_parser, json, json_size, t, 128);
 			CUB_TextClear();
 			CUB_TextHome();
-			CUB_TextPrintf("nb of tokens : %i", read_tokens);
+			if (!db_found) {
+				CUB_TextPrintf("Data Base not found!");
+				HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+			} else {
+				// Loading database on the heap
+				FIL json_file;
+				if (f_open(&json_file, dbname, FA_READ) != FR_OK) {
+					CUB_TextPrintf("error opening file");
+				} else {
+					uint32_t json_size = f_size(&json_file);
+					char* json = MALLOC(json_size);
+					uint32_t bytesread;
+					f_read(&json_file, json, json_size, (UINT*)&bytesread);
+					f_close(&json_file);
+
+					// Parsing database
+					jsmn_parser json_parser;
+					int32_t read_tokens;
+					jsmntok_t t[512];
+					jsmn_init(&json_parser);
+					read_tokens = jsmn_parse(&json_parser, json, json_size, t, 512);
+					CUB_TextClear();
+					CUB_TextHome();
+					if (read_tokens < 0) {
+						CUB_TextPrintf("not tokens : -%i", -read_tokens);
+					} else {
+						CUB_TextPrintf("nb of tokens : %i", read_tokens);
+						CUB_TextClear();
+						CUB_TextHome();
+						int i = 9;
+						CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
+					}
+				}
+			}
 		}
 	}
 

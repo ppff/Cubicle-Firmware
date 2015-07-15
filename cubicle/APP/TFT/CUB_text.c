@@ -349,20 +349,46 @@ void CUB_TextPrintf(char *str, ...)
             str++;
             switch(*str){
             case 'i':
-                {
-                    int i = va_arg(vl, int);
+				{
+					int i = va_arg(vl, int);
                     char c[2];
                     my_itoa2(i,c);
                     CUB_TextPrint(c);
                     break;
                 }
             case 's':
-                {
-                    char *str = va_arg(vl, char*);
-                    CUB_TextPrint(str);
-                    break;
-                }
-            default:;
+			{
+				char *str = va_arg(vl, char*);
+                CUB_TextPrint(str);
+                break;
+            }
+			case '.':
+			{
+				str++;
+				switch(*str){
+					case '*':
+					{
+						str++;
+						switch(*str){
+							case 's':
+							{
+								int i = va_arg(vl, int);
+								char *str = va_arg(vl, char*);
+								for (int j=0; j<i; j++) 
+									_write(*(str+j));
+								break;
+							}
+							default:
+								CUB_TextPrint(".*");
+						}
+						break;
+					}
+					default:;
+				}
+				break;
+			}
+            default:
+				_write('%');
             }
             break;
         default:
