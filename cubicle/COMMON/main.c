@@ -124,10 +124,10 @@ point_t* free_point(point_t* point)
 
 option_t* new_option_head(char* name, int val, option_t* old_head)
 {
-	option_t o = MALLOC(sizeof(option_t));
+	option_t* o = MALLOC(sizeof(option_t));
 	o->name = MALLOC(strlen(name));
 	o->name = strcpy(o->name, name);
-	o->val = val;
+	o->value = val;
 	o->next = old_head;
 	return o;
 }
@@ -143,20 +143,21 @@ option_t* free_option(option_t* option)
 motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* old_head)
 {
 	motif_t* m = MALLOC(sizeof(motif_t));
-	char* m->name = MALLOC(strlen(name));
-	m.name = strcpy(m->name, name);
-	char* m->desc = MALLOC(strlen(desc));
+	m->name = MALLOC(strlen(name));
+	m->name = strcpy(m->name, name);
+	m->desc = MALLOC(strlen(desc));
 	m->desc = strcpy(m->desc, desc);
-	char* m->image = MALLOC(strlen(image));
+	m->image = MALLOC(strlen(image));
 	m->image = strcpy(m->image, image);
 	m->points = points;
 	m->options = options;
 	m->next = old_head;
+	return m;
 }
 
 motif_t* free_motif(motif_t* motif)
 {
-	motif_t* next = motif->next
+	motif_t* next = motif->next;
 	FREE(motif->name);
 	FREE(motif->desc);
 	FREE(motif->image);
@@ -196,15 +197,15 @@ database_t* new_database(char* name, uint32_t nb_groups, group_t* groups)
 	database_t* database = MALLOC(sizeof(database_t));
 	database->name = MALLOC(strlen(name));
 	database->name = strcpy(database->name, name);
-	database->nb_motifs = nb_motifs;
-	database->next = groups;
+	database->nb_groups = nb_groups;
+	database->groups = groups;
 	return database;
 }
 
 void free_database(database_t* database)
 {
 	FREE(database->name);
-	group_t g = database->groups;
+	group_t* g = database->groups;
 	while (g != NULL)
 		g = free_group(g);
 	FREE(database);
@@ -306,8 +307,13 @@ int main(void)
 						CUB_TextPrintf("nb of tokens : %i", read_tokens);
 						CUB_TextClear();
 						CUB_TextHome();
-						int i = 9;
-						CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
+						//int i = 9;
+						//CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
+						char db_name[t[1].end-t[1].start+1];
+						memcpy(db_name, json+t[1].start, t[1].end-t[1].start+1);
+						db_name[t[1].end-t[1].start] = '\0';
+						database_t* db = new_database(db_name, t[2].size, NULL);
+						CUB_TextPrintf("%s\n%i groups", db->name, db->nb_groups);
 					}
 				}
 			}
