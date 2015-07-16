@@ -57,10 +57,10 @@ SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
-SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sdram.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sdram.c
 
 ######## - STM32F4xx Drivers
 
@@ -166,12 +166,17 @@ all: proj
 proj: $(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(SRCS)
-	$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) $^ -o $@
-	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
-	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
+		@for i in $^; do \
+			echo "CC $$i"; \
+		done
+	@$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) $^ -o $@
+	@$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
+	@$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 
 clean:
-	rm -f *.o $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin
+	@echo "Cleaning object files and binaries....."
+	@rm -f *.o $(PROJ_NAME).elf $(PROJ_NAME).hex $(PROJ_NAME).bin
+	@echo "DONE"
 
 # Flash the STM32F4
 burn: proj

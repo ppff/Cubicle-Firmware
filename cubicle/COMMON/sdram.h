@@ -1,9 +1,6 @@
 #ifndef _SDRAM_H_
 #define _SDRAM_H_
 
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_ll_fmc.h"
-#include "stm32f4xx_hal_sdram.h"
 #include "stdbool.h"
 
 /* Exported constants --------------------------------------------------------*/
@@ -27,11 +24,6 @@
 
 /* SDRAM refresh counter (90MHz SD clock) */
 #define REFRESH_COUNT     ((uint32_t)0x0569)
-
-/* SDRAM handler declaration */
-SDRAM_HandleTypeDef hsdram;
-FMC_SDRAM_TimingTypeDef SDRAM_Timing;
-FMC_SDRAM_CommandTypeDef command;
 
 bool Init_SDRAM_Device();
 

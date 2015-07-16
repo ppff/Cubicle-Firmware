@@ -89,11 +89,9 @@ task.h is included from an application file. */
 /* Assumes 8bit bytes! */
 #define heapBITS_PER_BYTE		( ( size_t ) 8 )
 
-#include "sdram.h"
-
 /* Allocate the memory for the heap. */
 //static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
-static uint8_t* ucHeap = (uint8_t*)SDRAM_BANK_ADDR;
+static uint8_t* ucHeap = (uint8_t*) ((uint32_t)0xD0000000);
 
 /* Define the linked list structure.  This is used to link free blocks in order
 of their memory address. */
