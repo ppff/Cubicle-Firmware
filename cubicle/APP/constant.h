@@ -66,16 +66,10 @@
 #define CONFIG_BTN_SUB_MENU_LEFT_PORT GPIOE
 #define CONFIG_BTN_SUB_MENU_LEFT_PIN GPIO_PIN_13
 
-
-
-#ifdef STANDARD_COMPILATION
-#include <stdlib.h>
-#define MALLOC malloc
-#define FREE   free
-#else
 #include "FreeRTOS.h"
 #define MALLOC pvPortMalloc
 #define FREE   vPortFree
-#endif // STANDARD_COMPILATION
+#define malloc MALLOC
+#define free   FREE
 
 #endif // _CUBICLE_CONSTANTS_H_
