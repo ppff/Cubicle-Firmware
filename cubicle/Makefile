@@ -57,8 +57,10 @@ SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sdram.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sd.c
 SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_sdmmc.c
+SRCS += Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c
 
 ######## - STM32F4xx Drivers
 

@@ -50,6 +50,9 @@
 #include "jsmn.h"
 
 #include "database_structures.h"
+#include "database_utils.h"
+#include "mem_management.h"
+#include "sdram.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -91,99 +94,66 @@ int main(void)
 
 	/* USER CODE BEGIN 2 */
 	MX_FATFS_Init();
-	CUB_TextInit(2,20);
-	CUB_TextClear();
-	CUB_TextHome();
-	FATFS SDFatFs;
-	DIR dir;
-	FRESULT res;
-	FILINFO fno;
-	char* fn;
-	static char lfn[_MAX_LFN+1];
-	fno.lfname = lfn;
-	fno.lfsize = sizeof lfn;
-	char* dbname = "bd1.json";
-	bool db_found = false;
+	Init_SDRAM_Device();
 
-	if (f_mount(&SDFatFs, (TCHAR const*)SD_Path, 0) != FR_OK )
+	CUB_TextInit(2,20);
+	init_storage();
+	char* json = file2string("bd1.json");
+
+	// Parsing database
+	jsmn_parser json_parser;
+	int32_t read_tokens;
+	jsmntok_t* tok;
+	size_t tokcount = 512;
+	tok = malloc(sizeof(*tok)*tokcount);
+	jsmn_init(&json_parser);
+again:
+	read_tokens = jsmn_parse(&json_parser, json, strlen(json)+1, tok, tokcount);
+
+	if (read_tokens < 0)
 	{
-		CUB_TextPrint("Error f_mount");
-	} else {
-		if (f_opendir(&dir, "/") != FR_OK)
+		if (read_tokens == JSMN_ERROR_NOMEM)
 		{
-			CUB_TextPrint("Error opening / dir");
+			tokcount = tokcount*2;
+			tok = realloc(tok, sizeof(*tok)*tokcount);
+			goto again;
+		}
+	} else {
+		CUB_TextClear();
+		CUB_TextHome();
+		if (read_tokens < 0) {
+			CUB_TextPrintf("not tokens : -%i", -read_tokens);
 		} else {
-			for (;;)
-			{
-				res = f_readdir(&dir, &fno);
-				if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
-				if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
-				fn = *fno.lfname ? fno.lfname : fno.fname;
-				if (fno.fattrib & AM_DIR) {                    /* It is a directory */
-					// do nothing
-				} else {                                       /* It is a file. */
-					// check if database
-					db_found = !strcmp(fn, dbname);
-					if (db_found) break;
-				}
-			}
-			f_closedir(&dir);
+			CUB_TextPrintf("nb of tokens : %i", 0);
 			CUB_TextClear();
 			CUB_TextHome();
-			if (!db_found) {
-				CUB_TextPrintf("Data Base not found!");
-				HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+			//int i = 9;
+			//CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
+
+
+			// check file version number
+			char ver[tok[1].end-tok[1].start+1];
+			memcpy(ver, json+tok[1].start, tok[1].end-tok[1].start+1);
+			ver[tok[1].end-tok[1].start] = '\0';
+			bool ver_ok = !strcmp(ver, "1.00");
+			if (ver_ok) {
+				// get database name and number of groups
+				char db_name[tok[2].end-tok[2].start+1];
+				memcpy(db_name, json+tok[2].start, tok[2].end-tok[2].start+1);
+				db_name[tok[2].end-tok[2].start] = '\0';
+				database_t* db = new_database(db_name, tok[3].size, NULL);
+				CUB_TextPrintf("%s\n%i groups ver? %s", db->name, db->nb_groups, ver);
 			} else {
-				// Loading database on the heap
-				FIL json_file;
-				if (f_open(&json_file, dbname, FA_READ) != FR_OK) {
-					CUB_TextPrintf("error opening file");
-				} else {
-					uint32_t json_size = f_size(&json_file);
-					char* json = MALLOC(json_size);
-					uint32_t bytesread;
-					f_read(&json_file, json, json_size, (UINT*)&bytesread);
-					f_close(&json_file);
-
-					// Parsing database
-					jsmn_parser json_parser;
-					int32_t read_tokens;
-					jsmntok_t t[512];
-					jsmn_init(&json_parser);
-					read_tokens = jsmn_parse(&json_parser, json, json_size, t, 512);
-					CUB_TextClear();
-					CUB_TextHome();
-					if (read_tokens < 0) {
-						CUB_TextPrintf("not tokens : -%i", -read_tokens);
-					} else {
-						CUB_TextPrintf("nb of tokens : %i", read_tokens);
-						CUB_TextClear();
-						CUB_TextHome();
-						//int i = 9;
-						//CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
-
-						// check file version number
-						char ver[t[1].end-t[1].start+1];
-						memcpy(ver, json+t[1].start, t[1].end-t[1].start+1);
-						ver[t[1].end-t[1].start] = '\0';
-						bool ver_ok = !strcmp(ver, "1.00");
-
-						// get database name and number of groups
-						char db_name[t[2].end-t[2].start+1];
-						memcpy(db_name, json+t[2].start, t[2].end-t[2].start+1);
-						db_name[t[2].end-t[2].start] = '\0';
-						database_t* db = new_database(db_name, t[3].size, NULL);
-						CUB_TextPrintf("%s\n%i groups ver? %i", db->name, db->nb_groups, ver_ok);
-					}
-				}
+				CUB_TextPrintf("Unsupported data\nbase version %s", ver);
 			}
 		}
 	}
 
+
 	/* USER CODE END 2 */
 
 	/* Call init function for freertos objects (in freertos.c) */
-	//MX_FREERTOS_Init();
+	MX_FREERTOS_Init();
 
 	/* Start scheduler */
 	//osKernelStart();
