@@ -19,10 +19,15 @@ char* file2string(char* filename)
 	{
 		return NULL;
 	} else {
+		// kwerky way to get clean file size
 		uint32_t file_size = f_size(&my_file);
 		char* str = malloc(file_size);
-		uint32_t bytesread;
+		
+		// read the file in a buffer
+		f_lseek(&my_file, 0);
+		uint32_t bytesread; // TODO check bytesead agains lenght
 		FRESULT res = f_read(&my_file, str, file_size, (UINT*)&bytesread);
+		str[file_size-1] = '\0';
 		f_close(&my_file);
 		if (res != FR_OK)
 		{

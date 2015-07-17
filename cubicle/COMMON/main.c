@@ -53,11 +53,13 @@
 #include "database_utils.h"
 #include "mem_management.h"
 #include "sdram.h"
+#include "stm32f4xx_hal_sdram.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern SDRAM_HandleTypeDef hsdram;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,7 +67,7 @@ void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 
 /* USER CODE BEGIN PFP */
-
+void Error_Handler();
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -96,15 +98,14 @@ int main(void)
 	MX_FATFS_Init();
 	Init_SDRAM_Device();
 
-	CUB_TextInit(2,20);
 	init_storage();
 	char* json = file2string("bd1.json");
 
 	// Parsing database
 	jsmn_parser json_parser;
 	int32_t read_tokens;
-	jsmntok_t* tok;
 	size_t tokcount = 512;
+	jsmntok_t *tok;
 	tok = malloc(sizeof(*tok)*tokcount);
 	jsmn_init(&json_parser);
 again:
@@ -112,48 +113,45 @@ again:
 
 	if (read_tokens < 0)
 	{
-		if (read_tokens == JSMN_ERROR_NOMEM)
-		{
-			tokcount = tokcount*2;
+		switch(read_tokens){
+		case JSMN_ERROR_NOMEM:
+			tokcount *= 2;
 			tok = realloc(tok, sizeof(*tok)*tokcount);
 			goto again;
+			break;
+		case JSMN_ERROR_INVAL:
+			Error_Handler();
+			break;
+		case JSMN_ERROR_PART:
+			Error_Handler();
+			break;
 		}
 	} else {
-		CUB_TextClear();
-		CUB_TextHome();
-		if (read_tokens < 0) {
-			CUB_TextPrintf("not tokens : -%i", -read_tokens);
+
+		// check file version number
+		char ver[tok[1].end-tok[1].start+1];
+		memcpy(ver, json+tok[1].start, tok[1].end-tok[1].start+1);
+		ver[tok[1].end-tok[1].start] = '\0';
+		bool ver_ok = !strcmp(ver, "1.00");
+
+		if (!ver_ok) {
+			Error_Handler();
 		} else {
-			CUB_TextPrintf("nb of tokens : %i", 0);
-			CUB_TextClear();
-			CUB_TextHome();
-			//int i = 9;
-			//CUB_TextPrintf("%.*s\nsize = %i", t[i].end - t[i].start, json+t[i].start, t[i].size);
+			// get database name and number of groups
+			char db_name[tok[2].end-tok[2].start+1];
+			memcpy(db_name, json+tok[2].start, tok[2].end-tok[2].start+1);
+			db_name[tok[2].end-tok[2].start] = '\0';
+			database_t* db = new_database(db_name, tok[3].size, NULL);
 
-
-			// check file version number
-			char ver[tok[1].end-tok[1].start+1];
-			memcpy(ver, json+tok[1].start, tok[1].end-tok[1].start+1);
-			ver[tok[1].end-tok[1].start] = '\0';
-			bool ver_ok = !strcmp(ver, "1.00");
-			if (ver_ok) {
-				// get database name and number of groups
-				char db_name[tok[2].end-tok[2].start+1];
-				memcpy(db_name, json+tok[2].start, tok[2].end-tok[2].start+1);
-				db_name[tok[2].end-tok[2].start] = '\0';
-				database_t* db = new_database(db_name, tok[3].size, NULL);
-				CUB_TextPrintf("%s\n%i groups ver? %s", db->name, db->nb_groups, ver);
-			} else {
-				CUB_TextPrintf("Unsupported data\nbase version %s", ver);
-			}
+			// YAY
+			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
 		}
 	}
-
 
 	/* USER CODE END 2 */
 
 	/* Call init function for freertos objects (in freertos.c) */
-	MX_FREERTOS_Init();
+	//MX_FREERTOS_Init();
 
 	/* Start scheduler */
 	//osKernelStart();
@@ -209,7 +207,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void Error_Handler()
+{
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
+}
 /* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT
