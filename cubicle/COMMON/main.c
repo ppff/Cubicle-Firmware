@@ -99,54 +99,15 @@ int main(void)
 	Init_SDRAM_Device();
 
 	init_storage();
+
 	char* json = file2string("bd1.json");
+	if (json == NULL)
+		Error_Handler();
+	database_t* db = string2database(json);
+	if (db == NULL)
+		Error_Handler();
 
-	// Parsing database
-	jsmn_parser json_parser;
-	int32_t read_tokens;
-	size_t tokcount = 512;
-	jsmntok_t *tok;
-	tok = malloc(sizeof(*tok)*tokcount);
-	jsmn_init(&json_parser);
-again:
-	read_tokens = jsmn_parse(&json_parser, json, strlen(json)+1, tok, tokcount);
-
-	if (read_tokens < 0)
-	{
-		switch(read_tokens){
-		case JSMN_ERROR_NOMEM:
-			tokcount *= 2;
-			tok = realloc(tok, sizeof(*tok)*tokcount);
-			goto again;
-			break;
-		case JSMN_ERROR_INVAL:
-			Error_Handler();
-			break;
-		case JSMN_ERROR_PART:
-			Error_Handler();
-			break;
-		}
-	} else {
-
-		// check file version number
-		char ver[tok[1].end-tok[1].start+1];
-		memcpy(ver, json+tok[1].start, tok[1].end-tok[1].start+1);
-		ver[tok[1].end-tok[1].start] = '\0';
-		bool ver_ok = !strcmp(ver, "1.00");
-
-		if (!ver_ok) {
-			Error_Handler();
-		} else {
-			// get database name and number of groups
-			char db_name[tok[2].end-tok[2].start+1];
-			memcpy(db_name, json+tok[2].start, tok[2].end-tok[2].start+1);
-			db_name[tok[2].end-tok[2].start] = '\0';
-			database_t* db = new_database(db_name, tok[3].size, NULL);
-
-			// YAY
-			HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
-		}
-	}
+	free(db);
 
 	/* USER CODE END 2 */
 
@@ -210,6 +171,7 @@ void SystemClock_Config(void)
 void Error_Handler()
 {
 	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
+	while(1);
 }
 /* USER CODE END 4 */
 

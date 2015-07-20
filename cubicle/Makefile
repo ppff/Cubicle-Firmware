@@ -166,12 +166,11 @@ all: proj
 proj: $(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(SRCS)
-		@for i in $^; do \
-			echo "CC $$i"; \
-		done
+	@echo "Compiling project...."
 	@$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) $^ -o $@
 	@$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	@$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
+	@echo "DONE"
 
 clean:
 	@echo "Cleaning object files and binaries....."

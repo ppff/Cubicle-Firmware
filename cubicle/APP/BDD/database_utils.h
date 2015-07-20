@@ -2,6 +2,7 @@
 #define _DATABASE_UTILS_H_
 
 #include "stdbool.h"
+#include "database_structures.h"
 
 /**
  * Mounting stuff'n shit
@@ -15,5 +16,11 @@ bool init_storage();
  * returns NULL if shit got real
  */
 char* file2string(char* filename);
+
+/**
+ * parse string return database. simple.
+ * oh and don't forget to free ;p
+ */
+database_t* string2database(char* string);
 
 #endif
