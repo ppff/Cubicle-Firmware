@@ -3,13 +3,26 @@
 #include "constant.h"
 #include "inttypes.h"
 
-point_t* new_point_head(uint8_t x, uint8_t y, uint8_t z, point_t* old_head)
+point_t* new_point_queue(uint8_t x, uint8_t y, uint8_t z, point_t** head)
 {
 	point_t* p = malloc(sizeof(point_t));
 	p->x = x;
 	p->y = y;
 	p->z = z;
-	p->next = old_head;
+	p->next = NULL;
+
+	if (*head == NULL)
+	{
+		*head = p;
+		return p;
+	}
+	
+	point_t* current = *head;
+	// look for the last element of the list
+	while(current->next != NULL)
+		current = current->next;
+
+	current->next = p;
 	return p;
 }
 
@@ -20,13 +33,13 @@ point_t* free_point(point_t* point)
 	return next;
 }
 
-option_t* new_option_head(char* name, int val, option_t* old_head)
+option_t* new_option_queue(char* name, int val, option_t* head)
 {
 	option_t* o = malloc(sizeof(option_t));
 	o->name = malloc(strlen(name));
 	o->name = strcpy(o->name, name);
 	o->value = val;
-	o->next = old_head;
+	o->next = head;
 	return o;
 }
 
@@ -38,7 +51,7 @@ option_t* free_option(option_t* option)
 	return next;
 }
 
-motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* old_head)
+motif_t* new_motif_queue(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* head)
 {
 	motif_t* m = malloc(sizeof(motif_t));
 	m->name = malloc(strlen(name));
@@ -49,7 +62,7 @@ motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, op
 	m->image = strcpy(m->image, image);
 	m->points = points;
 	m->options = options;
-	m->next = old_head;
+	m->next = head;
 	return m;
 }
 
@@ -69,14 +82,14 @@ motif_t* free_motif(motif_t* motif)
 	return next;
 }
 
-group_t* new_group_head(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* old_head)
+group_t* new_group_queue(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* head)
 {
 	group_t* g = malloc(sizeof(group_t));
 	g->name = malloc(strlen(name));
 	g->name = strcpy(g->name, name);
 	g->nb_motifs = nb_motifs;
 	g->motifs = motifs;
-	g->next = old_head;
+	g->next = head;
 	return g;
 }
 

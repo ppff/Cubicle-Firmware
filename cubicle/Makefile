@@ -166,7 +166,7 @@ all: proj
 proj: $(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(SRCS)
-	@echo "Compiling project...."
+	@echo "Compiling project....."
 	@$(CC) $(CFLAGS) $(DEFS) $(LDFLAGS) $^ -o $@
 	@$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	@$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin

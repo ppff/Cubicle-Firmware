@@ -7,6 +7,7 @@
 #include "mem_management.h"
 #include "string.h"
 #include "stdbool.h"
+#include "simple_utils.h"
 
 FATFS SDFatFs;
 
@@ -90,9 +91,70 @@ again:
 			char db_name[tok[2].end-tok[2].start+1];
 			memcpy(db_name, json+tok[2].start, tok[2].end-tok[2].start+1);
 			db_name[tok[2].end-tok[2].start] = '\0';
-			db = new_database(db_name, tok[3].size, NULL);
+			group_t *groups = NULL;
+			uint32_t err = parse_groups(json, tok, 3, &groups);
+			if (err < 0)
+				return NULL;
+			db = new_database(db_name, tok[3].size, groups);
+			point_t* points = NULL;
+			uint32_t options_index = parse_points(json,tok,15,&points);
+			if (options_index != 48)
+				return NULL;
 		}
 	}
 
 	return db;
+}
+
+
+uint32_t parse_points(char* json, jsmntok_t* tok, uint32_t index, point_t** points)
+{
+	uint32_t nb_points = tok[index].size;
+	*points = NULL;
+
+	for (int i=0; i<nb_points; i++)
+	{
+		index += 2; // selecting the next x point
+
+		char x_c[tok[index].end-tok[index].start+1];
+		memcpy(x_c, json+tok[index].start,tok[index].end-tok[index].start+1);
+		x_c[tok[index].end-tok[index].start] = '\0';
+		uint8_t x = atoi(x_c);
+		
+		index++;
+
+		char y_c[tok[index].end-tok[index].start+1];
+		memcpy(y_c, json+tok[index].start,tok[index].end-tok[index].start+1);
+		y_c[tok[index].end-tok[index].start] = '\0';
+		uint8_t y = atoi(y_c);
+
+		index++;
+
+		char z_c[tok[index].end-tok[index].start+1];
+		memcpy(z_c, json+tok[index].start,tok[index].end-tok[index].start+1);
+		z_c[tok[index].end-tok[index].start] = '\0';
+		uint8_t z = atoi(z_c);		
+		
+		new_point_queue(x,y,z,points);	
+	}
+
+	index++;
+
+	return index;
+}
+
+uint32_t parse_options(char* json, jsmntok_t* tok, uint32_t index, option_t** options)
+{
+	
+	return 0;
+}
+
+uint32_t parse_motifs(char* json, jsmntok_t* tok, uint32_t index, motif_t** motifs)
+{
+	return 0;
+}
+
+uint32_t parse_groups(char* json, jsmntok_t* tok, uint32_t index, group_t** groups)
+{
+	return 0;
 }

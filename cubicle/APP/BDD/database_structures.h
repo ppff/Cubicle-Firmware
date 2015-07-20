@@ -38,19 +38,19 @@ typedef struct database {
 } database_t;
 
 
-point_t* new_point_head(uint8_t x, uint8_t y, uint8_t z, point_t* old_head);
+point_t* new_point_queue(uint8_t x, uint8_t y, uint8_t z, point_t** head);
 
 point_t* free_point(point_t* point);
 
-option_t* new_option_head(char* name, int val, option_t* old_head);
+option_t* new_option_queue(char* name, int val, option_t* head);
 
 option_t* free_option(option_t* option);
 
-motif_t* new_motif_head(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* old_head);
+motif_t* new_motif_queue(char* name, char* desc, char* image, point_t* points, option_t* options, motif_t* head);
 
 motif_t* free_motif(motif_t* motif);
 
-group_t* new_group_head(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* old_head);
+group_t* new_group_queue(char* name, uint32_t nb_motifs, motif_t* motifs, group_t* head);
 
 group_t* free_group(group_t* group);
 
