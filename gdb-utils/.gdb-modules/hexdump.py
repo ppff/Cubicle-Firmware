@@ -10,7 +10,7 @@ def groups_of(iterable, size, first=0):
 
 class HexDump(gdb.Command):
     def __init__(self):
-        super(HexDump, self).__init__('hex-dump', gdb.COMMAND_DATA)
+        super (HexDump, self).__init__ ('hex-dump', gdb.COMMAND_DATA)
 
     def invoke(self, arg, from_tty):
         argv = gdb.string_to_argv(arg)
@@ -39,11 +39,11 @@ class HexDump(gdb.Command):
             pr_addr -= pr_addr % width
 
         for group in groups_of(mem, width, pr_offset):
-            print '0x%x: ' % (pr_addr,) + '    '*(width - pr_offset),
+            print '0x%x: ' % (pr_addr,) + '   '*(width - pr_offset),
             print ' '.join(['%02X' % (ord(g),) for g in group]) + \
                 '   ' * (width - len(group) if pr_offset == width else 0) + ' ',
-            print ' '*(width - pr_offset) + ''.join(
-                [g if is graph(g) or g == ' ' else '.' for g in group])
+            print ' '*(width - pr_offset) +  ''.join(
+                [g if isgraph(g) or g == ' ' else '.' for g in group])
             pr_addr += width
             pr_offset = width
 
@@ -52,7 +52,8 @@ class HexDumpAlign(gdb.Parameter):
         super (HexDumpAlign, self).__init__('hex-dump-align',
                                             gdb.COMMAND_DATA,
                                             gdb.PARAM_BOOLEAN)
-    set_doc = 'Determines if hex-dump always starts at an "aligned address (see hex-dump-width)'
+
+    set_doc = 'Determines if hex-dump always starts at an "aligned" address (see hex-dump-width'
     show_doc = 'Hex dump alignment is currently'
 
 class HexDumpWidth(gdb.Parameter):
