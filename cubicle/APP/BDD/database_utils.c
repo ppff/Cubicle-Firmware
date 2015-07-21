@@ -96,10 +96,6 @@ again:
 			if (err < 0)
 				return NULL;
 			db = new_database(db_name, tok[3].size, groups);
-			point_t* points = NULL;
-			uint32_t options_index = parse_points(json,tok,15,&points);
-			if (options_index != 48)
-				return NULL;
 		}
 	}
 
@@ -116,24 +112,27 @@ uint32_t parse_points(char* json, jsmntok_t* tok, uint32_t index, point_t** poin
 	{
 		index += 2; // selecting the next x point
 
-		char x_c[tok[index].end-tok[index].start+1];
+		char* x_c = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
 		memcpy(x_c, json+tok[index].start,tok[index].end-tok[index].start+1);
 		x_c[tok[index].end-tok[index].start] = '\0';
 		uint8_t x = atoi(x_c);
+		free(x_c);
 		
 		index++;
 
-		char y_c[tok[index].end-tok[index].start+1];
+		char* y_c = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
 		memcpy(y_c, json+tok[index].start,tok[index].end-tok[index].start+1);
 		y_c[tok[index].end-tok[index].start] = '\0';
 		uint8_t y = atoi(y_c);
+		free(y_c);
 
 		index++;
 
-		char z_c[tok[index].end-tok[index].start+1];
+		char* z_c = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
 		memcpy(z_c, json+tok[index].start,tok[index].end-tok[index].start+1);
 		z_c[tok[index].end-tok[index].start] = '\0';
 		uint8_t z = atoi(z_c);		
+		free(z_c);
 		
 		new_point_queue(x,y,z,points);	
 	}
@@ -145,16 +144,93 @@ uint32_t parse_points(char* json, jsmntok_t* tok, uint32_t index, point_t** poin
 
 uint32_t parse_options(char* json, jsmntok_t* tok, uint32_t index, option_t** options)
 {
+	uint32_t nb_options = tok[index].size;
+	*options = NULL;
+
+	for (int i=0; i<nb_options; i++)
+	{
+		index++;
+		char* option_name = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(option_name,json+tok[index].start,tok[index].end-tok[index].start+1);
+		option_name[tok[index].end-tok[index].start] = '\0';
+		
+		index++;
+		char* option_value = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(option_value,json+tok[index].start,tok[index].end-tok[index].start+1);
+		option_value[tok[index].end-tok[index].start] = '\0';
+		uint32_t value = atoi(option_value);
+
+		new_option_queue(option_name,value,options);
+		
+		free(option_value);
+	}
 	
-	return 0;
+	index++;
+	return index;
 }
 
 uint32_t parse_motifs(char* json, jsmntok_t* tok, uint32_t index, motif_t** motifs)
 {
-	return 0;
+	uint32_t nb_motifs = tok[index].size;
+	*motifs = NULL;
+	index++;
+
+	for (int i=0; i<nb_motifs; i++)
+	{
+		index += 2;
+		char* motif_name = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(motif_name, json+tok[index].start,tok[index].end-tok[index].start+1);
+		motif_name[tok[index].end-tok[index].start] = '\0';
+
+		index++;
+		char* motif_desc = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(motif_desc, json+tok[index].start,tok[index].end-tok[index].start+1);
+		motif_desc[tok[index].end-tok[index].start] = '\0';
+
+		index++;
+		char* motif_image = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(motif_image, json+tok[index].start,tok[index].end-tok[index].start+1);
+		motif_image[tok[index].end-tok[index].start] = '\0';
+
+		index++;
+
+		point_t* points = NULL;
+		index = parse_points(json, tok, index, &points);
+
+		option_t* options = NULL;
+		index = parse_options(json, tok, index, &options);
+
+		new_motif_queue(motif_name, motif_desc, motif_image, points, options, motifs);
+	}
+
+	return index;
 }
 
 uint32_t parse_groups(char* json, jsmntok_t* tok, uint32_t index, group_t** groups)
 {
-	return 0;
+	*groups = NULL;
+
+	uint32_t nb_groups = tok[index].size;
+
+	index++;
+	
+	for (int i=0; i<nb_groups; i++)
+	{
+		index++;
+		
+		char* group_name = malloc(sizeof(char)*(tok[index].end-tok[index].start+1));
+		memcpy(group_name, json+tok[index].start,tok[index].end-tok[index].start+1);
+		group_name[tok[index].end-tok[index].start] = '\0';
+
+		index++;
+
+		uint32_t nb_motifs = tok[index].size;
+
+		motif_t* motifs = NULL;
+		index = parse_motifs(json, tok, index, &motifs);
+
+		new_group_queue(group_name, nb_motifs, motifs, groups);
+	}
+
+	return index;
 }

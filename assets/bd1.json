@@ -79,17 +79,28 @@
 			[
 				{
 					{
-						"Tétragonale",
-						"Réseau Primitif",
+						"Tétragonal",
+						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
 				},
 				{
 					{
-						"Tétragonale Centré",
-						"Réseau Centré",
+						"Tétragonal Centré",
+						"Réseau centré",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				}
 			]
 		},
@@ -99,8 +110,24 @@
 				{
 					{
 						"Rhomboédrique",
-						"Réseau Primitif",
+						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0],
+						[2, 0, 0],
+						[2, 0, 2],
+						[4, 0, 2],
+						[0, 2, 0],
+						[2, 2, 0],
+						[2, 2, 2],
+						[4, 2, 2]
+					],
+					{
+						"a"     : "2",
+						"alpha" : "45",
+						"beta"  : "45",
+						"gamma" : "45"
 					}
 				}
 			]
@@ -111,9 +138,15 @@
 				{
 					{
 						"Hexagonal",
-						"Réseau Primitif",
+						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				}
 			]
 		},
@@ -125,28 +158,52 @@
 						"Orthohombrique",
 						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				},
 				{
 					{
 						"Orthohombrique Centré",
 						"Réseau centré",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				},
 				{
 					{
 						"Orthohombrique Base Centrée",
 						"Réseau à base centrée",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				},
 				{
 					{
-						"Orthohombrique faces centrées",
+						"Orthohombrique Faces Centrées",
 						"Réseau à faces centrées",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				}
 			]
 		},
@@ -158,14 +215,26 @@
 						"Monoclinique",
 						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				},
 				{
 					{
-						"Monoclinique Base Centrée",
-						"Réseau à base centrée",
+						"Monoclinique Centré",
+						"Réseau centré",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				}
 			]
 		},
@@ -177,7 +246,13 @@
 						"Triclinique",
 						"Réseau primitif",
 						""
+					},
+					[
+						[0, 0, 0]
+					],
+					{
 					}
+
 				}
 			]
 		}
