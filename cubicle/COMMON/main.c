@@ -42,8 +42,6 @@
 
 /* USER CODE BEGIN Includes */
 #include "stm32f4xx_hal_conf.h"
-#include "CUB.h"
-#include "CUB_text.h"
 #include "fatfs.h"
 #include "constant.h"
 #include "string.h"

@@ -41,7 +41,6 @@
 #include "spi.h"
 #include <stdint.h>
 #include "stm32f4xx_hal_conf.h"
-#include "CUB.h"
 #include "fatfs.h"
 /* USER CODE END Includes */
 
@@ -68,7 +67,6 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-	CUB_Init();
        
   /* USER CODE END Init */
 
@@ -109,7 +107,7 @@ void StartDefaultTask(void const * argument)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN StartDefaultTask */
-    CUB_ApplicationRun();
+
     /* Infinite loop */
     for(;;)
     {
