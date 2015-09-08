@@ -1,6 +1,8 @@
 Cubicle-Firmware
 ================
 
+Project Migrated to CCube_Firmware after custom pcb integration
+
 Requirements
 ------------
 
